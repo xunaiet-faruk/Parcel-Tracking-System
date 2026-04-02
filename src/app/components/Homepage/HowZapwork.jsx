@@ -35,7 +35,7 @@ const HowZapwork = () => {
         <section className="py-16 my-20 px-6 ">
             {/* Heading */}
             <div className="text-start mb-12 mx-7">
-                <h2 className="text-4xl font-bold">How It Works</h2>
+                <h2 className="text-4xl text-[#03373d]  font-bold">How It Works</h2>
                 
             </div>
 
@@ -44,7 +44,7 @@ const HowZapwork = () => {
                 {items.map((item, index) => (
                     <div
                         key={index}
-                        className="bg-[#171717] hover:bg-[#caeb66] cursor-pointer text-white p-6 rounded-xl shadow hover:shadow-lg transition text-center"
+                        className="bg-white border border-gray-200 shadow-2xl hover:bg-[#caeb66] cursor-pointer  p-6 rounded-xl shadow hover:shadow-lg transition text-center"
                     >
                         {/* Icon (Emoji style) */}
                         <div className="flex justify-center text-white mb-3">
@@ -57,7 +57,7 @@ const HowZapwork = () => {
                         </h3>
 
                         {/* Text */}
-                        <p className="text-gray-300 text-sm">
+                        <p className="text-sm">
                             {item.text}
                         </p>
                     </div>

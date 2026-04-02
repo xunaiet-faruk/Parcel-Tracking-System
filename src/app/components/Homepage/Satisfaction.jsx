@@ -152,7 +152,7 @@ const Satisfaction = () => {
                 }}
             />
 
-            <div className="absolute inset-0 bg-gradient-to-t from-[#03373d] via-[#03373d]/140 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t  from-[#03373d] via-[#03373d]/140 to-transparent" />
 
             <motion.div
                 ref={sectionRef}

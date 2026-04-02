@@ -47,18 +47,18 @@ const Ourservices = () => {
                 {services.map((item, index) => (
                     <div
                         key={index}
-                        className="bg-[#171717] hover:bg-[#caeb66] text-white   transition duration-300 rounded-xl p-6 flex flex-col items-center text-center shadow-lg"
+                        className="bg-white hover:bg-[#caeb66] hover:text-white   transition duration-300 rounded-xl p-6 flex flex-col items-center text-center shadow-lg"
                     >
                         {/* Emoji center */}
                         <div className="text-5xl mb-6">{item.icon}</div>
 
                         {/* Title bottom */}
-                        <h3 className="text-lg font-semibold mt-auto">
+                        <h3 className="text-lg text-[#03373d]  font-semibold mt-auto">
                             {item.title}
                         </h3>
 
                         {/* Text */}
-                        <p className="text-sm mt-2 opacity-80 text-gray-300 hover:text-white">
+                        <p className="text-sm mt-2 opacity-80  ">
                             {item.text}
                         </p>
                     </div>
