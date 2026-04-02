@@ -2,26 +2,76 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import useAuth from "@/app/hooks/useAuth";
+import Swal from "sweetalert2";
 
 const RegisterPage = () => {
-    const [formData, setFormData] = useState({
-        fullName: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-        phone: ""
-    });
+    const { register, googleLogin } = useAuth();
+    const router = useRouter();
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        });
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError("");
+        setLoading(true);
+
+        const form = e.target;
+        const email = form.email.value;
+        const password = form.password.value;
+
+        // Validate password length
+        if (password.length < 6) {
+            setError("Password should be at least 6 characters");
+            setLoading(false);
+            return;
+        }
+
+        try {
+            await register(email, password);
+            form.reset(); 
+            Swal.fire({
+                title: "Registration Successful",
+                icon: "success",
+                draggable: true
+            });
+            router.push("/"); 
+        } catch (error) {
+            console.error("Registration failed:", error);
+            Swal.fire({
+                title: "Registration Failed",
+                icon: "error",
+                draggable: true
+            });
+            setError("Registration failed. Please try again.");
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log("Form submitted:", formData);
+    const handleGoogleRegister = async () => {
+        setError("");
+        setLoading(true);
+        try {
+            await googleLogin();
+            Swal.fire({
+                title: "Google Registration Successful",
+                icon: "success",
+                draggable: true
+            });
+            router.push("/"); 
+        } catch (error) {
+            console.error("Google registration failed:", error);
+            Swal.fire({
+                title: "Google Registration Failed",
+                icon: "error",
+                draggable: true
+            });
+            setError("Google registration failed. Please try again.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     const containerVariants = {
@@ -30,9 +80,9 @@ const RegisterPage = () => {
             opacity: 1,
             transition: {
                 staggerChildren: 0.1,
-                delayChildren: 0.2
-            }
-        }
+                delayChildren: 0.2,
+            },
+        },
     };
 
     const itemVariants = {
@@ -43,13 +93,13 @@ const RegisterPage = () => {
             transition: {
                 type: "spring",
                 stiffness: 100,
-                damping: 12
-            }
-        }
+                damping: 12,
+            },
+        },
     };
 
     return (
-        <div className="min-h-screen  py-12 px-4">
+        <div className="py-12 px-4">
             <div className="max-w-6xl mx-auto">
                 <motion.div
                     initial="hidden"
@@ -92,7 +142,8 @@ const RegisterPage = () => {
                                 transition={{ delay: 0.5 }}
                                 className="text-white/80 mb-8"
                             >
-                                Create your account and start shipping with Bangladesh's most trusted courier service
+                                Create your account and start shipping with Bangladesh's most
+                                trusted courier service
                             </motion.p>
                             <motion.div
                                 initial={{ opacity: 0, scale: 0 }}
@@ -129,15 +180,31 @@ const RegisterPage = () => {
                             transition={{ delay: 0.2 }}
                             className="text-center mb-8"
                         >
-                            <h1 className="text-3xl font-bold text-[#03373d] mb-2">Create Account</h1>
-                            <p className="text-gray-500">Get started with your free account</p>
+                            <h1 className="text-3xl font-bold text-[#03373d] mb-2">
+                                Create Account
+                            </h1>
+                            <p className="text-gray-500">
+                                Get started with your free account
+                            </p>
                         </motion.div>
+
+                        {error && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm"
+                            >
+                                {error}
+                            </motion.div>
+                        )}
 
                         {/* Google Sign Up Button */}
                         <motion.button
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
-                            className="w-full mb-6 py-3 px-4 border border-gray-300 rounded-lg flex items-center justify-center gap-3 hover:bg-gray-50 transition-all duration-300"
+                            onClick={handleGoogleRegister}
+                            disabled={loading}
+                            className="w-full mb-6 py-3 px-4 border border-gray-300 rounded-lg flex items-center justify-center gap-3 hover:bg-gray-50 transition-all duration-300 disabled:opacity-50"
                         >
                             <svg className="w-5 h-5" viewBox="0 0 24 24">
                                 <path
@@ -157,7 +224,9 @@ const RegisterPage = () => {
                                     d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                                 />
                             </svg>
-                            <span className="text-gray-700 font-medium">Continue with Google</span>
+                            <span className="text-gray-700 font-medium">
+                                Continue with Google
+                            </span>
                         </motion.button>
 
                         <div className="relative my-6">
@@ -165,32 +234,33 @@ const RegisterPage = () => {
                                 <div className="w-full border-t border-gray-300"></div>
                             </div>
                             <div className="relative flex justify-center text-sm">
-                                <span className="px-2 bg-white text-gray-500">Or register with email</span>
+                                <span className="px-2 bg-white text-gray-500">
+                                    Or register with email
+                                </span>
                             </div>
                         </div>
 
                         {/* Registration Form */}
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <motion.div variants={itemVariants}>
-                                <label className="block text-gray-700 font-semibold mb-2">Full Name</label>
+                                <label className="block text-gray-700 font-semibold mb-2">
+                                    Name
+                                </label>
                                 <input
                                     type="text"
-                                    name="fullName"
-                                    value={formData.fullName}
-                                    onChange={handleChange}
+                                    name="name"
                                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#caeb66] focus:ring-2 focus:ring-[#caeb66]/20 transition-all"
-                                    placeholder="Enter your full name"
+                                    placeholder="Enter your name"
                                     required
                                 />
                             </motion.div>
-
                             <motion.div variants={itemVariants}>
-                                <label className="block text-gray-700 font-semibold mb-2">Email Address</label>
+                                <label className="block text-gray-700 font-semibold mb-2">
+                                    Email Address
+                                </label>
                                 <input
                                     type="email"
                                     name="email"
-                                    value={formData.email}
-                                    onChange={handleChange}
                                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#caeb66] focus:ring-2 focus:ring-[#caeb66]/20 transition-all"
                                     placeholder="Enter your email"
                                     required
@@ -198,60 +268,29 @@ const RegisterPage = () => {
                             </motion.div>
 
                             <motion.div variants={itemVariants}>
-                                <label className="block text-gray-700 font-semibold mb-2">Phone Number</label>
+                                <label className="block text-gray-700 font-semibold mb-2">
+                                    Phone
+                                </label>
                                 <input
                                     type="tel"
                                     name="phone"
-                                    value={formData.phone}
-                                    onChange={handleChange}
                                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#caeb66] focus:ring-2 focus:ring-[#caeb66]/20 transition-all"
                                     placeholder="Enter your phone number"
+                                    required
                                 />
                             </motion.div>
 
                             <motion.div variants={itemVariants}>
-                                <label className="block text-gray-700 font-semibold mb-2">Password</label>
+                                <label className="block text-gray-700 font-semibold mb-2">
+                                    Password
+                                </label>
                                 <input
                                     type="password"
                                     name="password"
-                                    value={formData.password}
-                                    onChange={handleChange}
                                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#caeb66] focus:ring-2 focus:ring-[#caeb66]/20 transition-all"
-                                    placeholder="Create a password"
+                                    placeholder="Create a password (min. 6 characters)"
                                     required
                                 />
-                            </motion.div>
-
-                            <motion.div variants={itemVariants}>
-                                <label className="block text-gray-700 font-semibold mb-2">Confirm Password</label>
-                                <input
-                                    type="password"
-                                    name="confirmPassword"
-                                    value={formData.confirmPassword}
-                                    onChange={handleChange}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#caeb66] focus:ring-2 focus:ring-[#caeb66]/20 transition-all"
-                                    placeholder="Confirm your password"
-                                    required
-                                />
-                            </motion.div>
-
-                            <motion.div variants={itemVariants} className="flex items-center gap-2">
-                                <input
-                                    type="checkbox"
-                                    id="terms"
-                                    className="w-4 h-4 text-[#caeb66] rounded focus:ring-[#caeb66]"
-                                    required
-                                />
-                                <label htmlFor="terms" className="text-gray-600 text-sm">
-                                    I agree to the{" "}
-                                    <Link href="/terms" className="text-[#03373d] font-semibold hover:underline">
-                                        Terms of Service
-                                    </Link>
-                                    {" "}and{" "}
-                                    <Link href="/privacy" className="text-[#03373d] font-semibold hover:underline">
-                                        Privacy Policy
-                                    </Link>
-                                </label>
                             </motion.div>
 
                             <motion.button
@@ -259,9 +298,10 @@ const RegisterPage = () => {
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                                 type="submit"
-                                className="w-full py-3 bg-gradient-to-r from-[#03373d] to-[#044e57] text-white rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+                                disabled={loading}
+                                className="w-full py-3 bg-gradient-to-r from-[#03373d] to-[#044e57] text-white rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50"
                             >
-                                Create Account
+                                {loading ? "Creating Account..." : "Create Account"}
                             </motion.button>
                         </form>
 
@@ -273,7 +313,10 @@ const RegisterPage = () => {
                         >
                             <p className="text-gray-600">
                                 Already have an account?{" "}
-                                <Link href="/login" className="text-[#caeb66] font-semibold hover:underline">
+                                <Link
+                                    href="/login"
+                                    className="text-[#caeb66] font-semibold hover:underline"
+                                >
                                     Sign In
                                 </Link>
                             </p>

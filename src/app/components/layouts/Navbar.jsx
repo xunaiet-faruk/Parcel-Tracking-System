@@ -1,10 +1,13 @@
 "use client";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import useAuth from "@/app/hooks/useAuth";
 
 const Navbar = () => {
     const pathname = usePathname();
+    const router = useRouter();
+    const { user, logout, loading } = useAuth();
 
     const links = [
         { name: 'Home', href: '/' },
@@ -21,6 +24,33 @@ const Navbar = () => {
         }
         return pathname === href || pathname.startsWith(href + '/');
     };
+
+    const handleLogout = async () => {
+        try {
+            await logout();
+            router.push('/');
+        } catch (error) {
+            console.error("Logout failed:", error);
+        }
+    };
+
+    // Show loading state while checking authentication
+    if (loading) {
+        return (
+            <div className="navbar bg-white shadow-md">
+                <div className="navbar-start">
+                    <div className="flex items-end">
+                        <img className="mb-2 w-7" src="/assets/logo.png" alt="Logo" />
+                        <h1 className="text-2xl font-semibold text-[#03373d]">Profast</h1>
+                    </div>
+                </div>
+                <div className="navbar-end gap-4">
+                    <div className="w-20 h-10 bg-gray-200 animate-pulse rounded-lg"></div>
+                    <div className="w-24 h-10 bg-gray-200 animate-pulse rounded-lg"></div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div>
@@ -48,10 +78,10 @@ const Navbar = () => {
                             ))}
                         </ul>
                     </div>
-                    <div className="flex items-end">
+                    <Link href="/" className="flex items-end">
                         <img className="mb-2 w-7" src="/assets/logo.png" alt="Logo" />
                         <h1 className="text-2xl font-semibold text-[#03373d]">Profast</h1>
-                    </div>
+                    </Link>
                 </div>
 
                 <div className="navbar-center hidden lg:flex">
@@ -61,8 +91,8 @@ const Navbar = () => {
                                 <Link
                                     href={link.href}
                                     className={`relative px-3 py-2 transition-all duration-300 ${isActive(link.href)
-                                            ? "text-[#caeb66] font-semibold"
-                                            : "text-[#03373d] hover:text-[#caeb66]"
+                                        ? "text-[#caeb66] font-semibold"
+                                        : "text-[#03373d] hover:text-[#caeb66]"
                                         }`}
                                 >
                                     {link.name}
@@ -86,14 +116,29 @@ const Navbar = () => {
                 </div>
 
                 <div className="navbar-end gap-4">
-                    <motion.a
-                        href="/register"
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="btn border-2 border-[#caeb66] bg-transparent text-[#03373d] hover:bg-[#caeb66] hover:text-[#03373d] transition-all duration-300 rounded-lg px-6 font-semibold"
-                    >
-                        Sign Up
-                    </motion.a>
+                    {user ? (
+                        <>
+                            
+                            <motion.button
+                                onClick={handleLogout}
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                className="btn border-2 border-red-500 bg-transparent text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300 rounded-lg px-6 font-semibold"
+                            >
+                                Logout
+                            </motion.button>
+                        </>
+                    ) : (
+                        <motion.a
+                            href="/login"
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="btn border-2 border-[#caeb66] bg-transparent text-[#03373d] hover:bg-[#caeb66] hover:text-[#03373d] transition-all duration-300 rounded-lg px-6 font-semibold"
+                        >
+                            Sign In
+                        </motion.a>
+                    )}
+
                     <motion.a
                         href="/rider"
                         whileHover={{ scale: 1.05 }}
