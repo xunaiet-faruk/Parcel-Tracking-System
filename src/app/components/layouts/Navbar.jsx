@@ -2,14 +2,15 @@
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import useAuth from "@/app/hooks/useAuth";
+import useAuth from "@/app/(site)/hooks/useAuth";
+
 
 const Navbar = () => {
     const pathname = usePathname();
     const router = useRouter();
     const { user, logout, loading } = useAuth();
 
-    const links = [
+    const publicLinks = [
         { name: 'Home', href: '/' },
         { name: 'Services', href: '/services' },
         { name: 'Coverage', href: '/coverage' },
@@ -17,6 +18,10 @@ const Navbar = () => {
         { name: 'Send Parcel', href: '/parcel' },
         { name: 'Be a Rider', href: '/rider' },
     ];
+
+
+
+    const links = [...publicLinks];
 
     const isActive = (href) => {
         if (href === '/') {
@@ -34,7 +39,7 @@ const Navbar = () => {
         }
     };
 
-    // Show loading state while checking authentication
+  
     if (loading) {
         return (
             <div className="navbar bg-white shadow-md">
@@ -118,7 +123,6 @@ const Navbar = () => {
                 <div className="navbar-end gap-4">
                     {user ? (
                         <>
-                            
                             <motion.button
                                 onClick={handleLogout}
                                 whileHover={{ scale: 1.05 }}
@@ -139,14 +143,26 @@ const Navbar = () => {
                         </motion.a>
                     )}
 
-                    <motion.a
-                        href="/rider"
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="btn bg-[#caeb66] text-[#03373d] hover:bg-[#d4ff6e] transition-all duration-300 rounded-lg px-6 font-semibold shadow-md"
-                    >
-                        Be a Rider
-                    </motion.a>
+                    {
+                        user ? (
+                            <motion.a
+                                href="/dashboard/overview"
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                className="btn bg-[#caeb66] text-[#03373d] cursor-pointer hover:bg-[#d4ff6e] transition-all duration-300 rounded-lg px-6 font-semibold shadow-md"
+                            >
+                                Dashboard
+                            </motion.a>
+                        ) : <motion.a
+                            href="/rider"
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="btn bg-[#caeb66] text-[#03373d] hover:bg-[#d4ff6e] transition-all duration-300 rounded-lg px-6 font-semibold shadow-md"
+                        >
+                            Be a Rider
+                        </motion.a>
+
+                    }
                 </div>
             </div>
         </div>
