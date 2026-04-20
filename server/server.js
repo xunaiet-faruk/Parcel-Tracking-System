@@ -7,6 +7,15 @@ const dns =require('dns');
 const port = process.env.PORT || 5000;
 const crypto = require('crypto');
 
+const admin = require("firebase-admin");
+
+const serviceAccount = require("./zap-shift-firebase-adminsdk.json");
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
+});
+
+
 function generateTrackingId() {
     const prefix = 'PRCL';
     const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
@@ -23,6 +32,23 @@ dns.setServers(['1.1.1.1', '8.8.8.8']);
 app.use(cors());
 app.use(express.json());
 
+
+const veryFytoken =async(req,res,next) =>{
+    const token = req.headers.authorization;
+    if(!token){
+        return res.status(401).send({meassge : "unauthorized access"})
+    }
+    try {
+        const idToken =token.split(' ')[1];
+        const decoded =await admin.auth().verifyIdToken(idToken)
+        req.decoded_email =decoded.email
+        next()
+        console.log("hello junaiet",decoded);
+    } catch (error) {
+        return res.status(401).send({ meassge: "unauthorized access" })
+    }
+  
+}
 
 
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
@@ -215,11 +241,15 @@ async function run() {
             }
         });
 
-        app.get('/payment',async(req,res)=>{
+        app.get('/payment',veryFytoken,async(req,res)=>{
             const email =req.query.email;
+            console.log("token is here",req.headers);
             const query ={}
             if(email){
                 query.customer_email =email
+            }
+            if(email !== req.decoded_email){
+                return res.status(403).send({message : 'forbiden access'})
             }
 
             const result =await PaymentCollection.find(query).toArray();

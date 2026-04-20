@@ -1,16 +1,18 @@
 "use client";
+import useAuth from "@/app/(site)/hooks/useAuth";
 import useAxios from "@/app/(site)/hooks/useAxios";
 import React, { useEffect, useState } from "react";
 
 const PaymentHistory = () => {
     const axios = useAxios();
+    const {user} =useAuth()
     const [payments, setPayments] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchPayments = async () => {
             try {
-                const res = await axios.get("/payment");
+                const res = await axios.get(`/payment?email=${user?.email}`);
                 setPayments(res.data);
                 console.log(res.data);
             } catch (error) {
@@ -22,7 +24,6 @@ const PaymentHistory = () => {
         fetchPayments();
     }, [axios]);
 
-    // Format date to readable string
     const formatDate = (dateString) => {
         return new Date(dateString).toLocaleDateString("en-US", {
             year: "numeric",
@@ -33,7 +34,7 @@ const PaymentHistory = () => {
         });
     };
 
-    // Get status badge with brand colors
+    
     const getStatusBadge = (status) => {
         if (status === "paid") {
             return (
@@ -80,10 +81,10 @@ const PaymentHistory = () => {
 
             {/* Stats Cards with Brand Colors */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-4 hover:shadow-xl transition-shadow">
+                <div className="bg-green-50 rounded-xl shadow-lg  p-4 hover:shadow-xl transition-shadow">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm text-gray-500">Total Payments</p>
+                            <p className="text-sm  text-[#03373d]">Total Payments</p>
                             <p className="text-2xl font-bold text-gray-900">{payments.length}</p>
                         </div>
                         <div className="w-10 h-10 bg-[#caeb66]/20 rounded-lg flex items-center justify-center">
@@ -93,7 +94,7 @@ const PaymentHistory = () => {
                         </div>
                     </div>
                 </div>
-                <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-4 hover:shadow-xl transition-shadow">
+                <div className="bg-blue-50 rounded-xl shadow-lg border border-gray-100 p-4 hover:shadow-xl transition-shadow">
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm text-gray-500">Total Amount</p>
@@ -108,7 +109,7 @@ const PaymentHistory = () => {
                         </div>
                     </div>
                 </div>
-                <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-4 hover:shadow-xl transition-shadow">
+                <div className="bg-purple-50 rounded-xl shadow-lg border border-gray-100 p-4 hover:shadow-xl transition-shadow">
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm text-gray-500">Successful Payments</p>
@@ -123,7 +124,7 @@ const PaymentHistory = () => {
                         </div>
                     </div>
                 </div>
-                <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-4 hover:shadow-xl transition-shadow">
+                <div className="bg-orange-50 rounded-xl shadow-lg border border-gray-100 p-4 hover:shadow-xl transition-shadow">
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-sm text-gray-500">Payment Methods</p>
