@@ -3,6 +3,7 @@
 # dependencies
 /node_modules
 server/node_modules/
+server/zap-shift-firebase-adminsdk.json
 /.pnp
 .pnp.*
 .yarn/*
