@@ -6,12 +6,14 @@ import { useRouter } from "next/navigation";
 
 import Swal from "sweetalert2";
 import useAuth from "../../hooks/useAuth";
+import useAxios from "../../hooks/useAxios";
 
 const RegisterPage = () => {
     const { register, googleLogin } = useAuth();
     const router = useRouter();
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+    const axios =useAxios()
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -21,8 +23,9 @@ const RegisterPage = () => {
         const form = e.target;
         const email = form.email.value;
         const password = form.password.value;
+        const phone = form.phone.value;
 
-        // Validate password length
+   
         if (password.length < 6) {
             setError("Password should be at least 6 characters");
             setLoading(false);
@@ -31,6 +34,17 @@ const RegisterPage = () => {
 
         try {
             await register(email, password);
+            const userInfo ={
+                name,
+                email,
+                phone
+            }
+
+            const res = await axios.post("/users", userInfo);
+            console.log("User saved:", res.data);
+            
+
+            
             form.reset();
             Swal.fire({
                 title: "Registration Successful",

@@ -72,6 +72,7 @@ async function run() {
 
         const ParcelCollection = client.db("ZapshiptDB").collection("parcels");
         const PaymentCollection = client.db("ZapshiptDB").collection("payment");
+        const UsersCollection = client.db("ZapshiptDB").collection("Users");
 
         app.post('/parcels', async (req, res) => {
             const parcel = req.body;
@@ -253,6 +254,16 @@ async function run() {
             }
 
             const result =await PaymentCollection.find(query).toArray();
+            res.send(result)
+        })
+
+        // user details
+
+        app.post('/users',async(req,res)=>{
+            const user =req.body;
+            user.role ="user";
+            user.createAt =new Date();
+            const result =await UsersCollection.insertOne(user)
             res.send(result)
         })
 
