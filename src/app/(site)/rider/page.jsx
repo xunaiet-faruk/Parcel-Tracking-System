@@ -1,8 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
+import useAxios from "../hooks/useAxios";
+import Swal from "sweetalert2";
 
-const Page = () => {
+const RiderPage = () => {
     const [formData, setFormData] = useState({
         fullName: "",
         email: "",
@@ -19,6 +21,7 @@ const Page = () => {
     });
 
     const [errors, setErrors] = useState({});
+    const axios =useAxios()
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -51,15 +54,54 @@ const Page = () => {
         return newErrors;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         const newErrors = validateForm();
+
         if (Object.keys(newErrors).length === 0) {
-            console.log("Form submitted:", formData);
-            alert("Application submitted successfully! We'll contact you soon.");
-            // Reset form or handle submission
+            try {
+                const result = await axios.post('/Rider', formData);
+                console.log(result.data);
+                Swal.fire({
+                    title: "Application Submitted 🎉",
+                    text: "Your rider application has been received successfully!",
+                    icon: "success",
+                    confirmButtonText: "OK"
+                });
+
+                // ✅ optional: form reset
+                setFormData({
+                    fullName: "",
+                    email: "",
+                    phone: "",
+                    address: "",
+                    district: "",
+                    vehicleType: "",
+                    licenseNumber: "",
+                    experience: "",
+                    availableHours: "",
+                    emergencyContact: "",
+                    emergencyPhone: "",
+                    termsAccepted: false,
+                });
+
+            } catch (error) {
+        
+                Swal.fire({
+                    title: "Submission Failed ❌",
+                    text: error?.response?.data?.message || "Something went wrong. Please try again.",
+                    icon: "error",
+                    confirmButtonText: "Try Again"
+                });
+            }
         } else {
             setErrors(newErrors);
+
+            Swal.fire({
+                title: "Form Error ⚠️",
+                text: "Please fill all required fields correctly.",
+                icon: "warning",
+            });
         }
     };
 
@@ -411,4 +453,4 @@ const Page = () => {
     );
 };
 
-export default Page;
+export default RiderPage;

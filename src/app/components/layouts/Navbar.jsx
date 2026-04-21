@@ -154,7 +154,7 @@ const Navbar = () => {
                                 Dashboard
                             </motion.a>
                         ) : <motion.a
-                            href="/rider"
+                            href="/login"
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             className="btn bg-[#caeb66] text-[#03373d] hover:bg-[#d4ff6e] transition-all duration-300 rounded-lg px-6 font-semibold shadow-md"

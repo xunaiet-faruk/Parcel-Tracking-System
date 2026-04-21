@@ -22,6 +22,7 @@ const RegisterPage = () => {
 
         const form = e.target;
         const email = form.email.value;
+        const name = form.name.value;
         const password = form.password.value;
         const phone = form.phone.value;
 
@@ -41,7 +42,7 @@ const RegisterPage = () => {
             }
 
             const res = await axios.post("/users", userInfo);
-            console.log("User saved:", res.data);
+            
             
 
             
@@ -68,22 +69,28 @@ const RegisterPage = () => {
     const handleGoogleRegister = async () => {
         setError("");
         setLoading(true);
+
         try {
-            await googleLogin();
+            const result = await googleLogin();
+
+            const userInfo = {
+                name: result.user.displayName,
+                email: result.user.email,
+                photo: result.user.photoURL,
+            };
+
+            const res = await axios.post("/users", userInfo);
+
+            console.log("Google user saved:", res.data);
+
             Swal.fire({
                 title: "Google Registration Successful",
                 icon: "success",
-                draggable: true
             });
+
             router.push("/");
         } catch (error) {
             console.error("Google registration failed:", error);
-            Swal.fire({
-                title: "Google Registration Failed",
-                icon: "error",
-                draggable: true
-            });
-            setError("Google registration failed. Please try again.");
         } finally {
             setLoading(false);
         }

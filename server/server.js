@@ -73,6 +73,7 @@ async function run() {
         const ParcelCollection = client.db("ZapshiptDB").collection("parcels");
         const PaymentCollection = client.db("ZapshiptDB").collection("payment");
         const UsersCollection = client.db("ZapshiptDB").collection("Users");
+        const RiderCollection = client.db("ZapshiptDB").collection("Rider");
 
         app.post('/parcels', async (req, res) => {
             const parcel = req.body;
@@ -257,13 +258,34 @@ async function run() {
             res.send(result)
         })
 
+
+
         // user details
 
-        app.post('/users',async(req,res)=>{
-            const user =req.body;
-            user.role ="user";
-            user.createAt =new Date();
-            const result =await UsersCollection.insertOne(user)
+        app.post('/users', async (req, res) => {
+            const user = req.body;
+
+            const existingUser = await UsersCollection.findOne({ email: user.email });
+
+            if (existingUser) {
+                return res.send({ message: "User already exists" });
+            }
+
+            user.role = "user";
+            user.createAt = new Date();
+
+            const result = await UsersCollection.insertOne(user);
+            res.send(result);
+        });
+
+
+        // rider data 
+
+        app.post('/rider',async(req,res)=>{
+            const rider =req.body;
+            rider.status ="pending";
+            rider.createAt =new Date();
+            const result =await PaymentCollection.insertOne(rider);
             res.send(result)
         })
 
