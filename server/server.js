@@ -285,7 +285,29 @@ async function run() {
             const rider =req.body;
             rider.status ="pending";
             rider.createAt =new Date();
-            const result =await PaymentCollection.insertOne(rider);
+            const result =await RiderCollection.insertOne(rider);
+            res.send(result)
+        })
+
+        app.get('/rider',async(req,res)=>{
+            const query ={}
+            if(req.query.status){
+                query.status =req.query.status
+            }
+            const result =await RiderCollection.find(query).toArray();
+            res.send(result)
+        })
+
+        app.patch('/rider/:id',async(req,res)=>{
+            const status =req.body.status;
+            const id =req.params.id;
+            const query ={_id : new ObjectId(id)}
+            const updateStatus ={
+                $set :{
+                    status : status
+                }
+            }
+            const result =await RiderCollection.updateOne(query,updateStatus)
             res.send(result)
         })
 

@@ -23,6 +23,7 @@ import {
     FaBell,
     FaUserCircle,
     FaHistory,
+    FaUserCheck,
 } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import useAuth from "../(site)/hooks/useAuth";
@@ -74,9 +75,9 @@ const Sidebar = ({ children }) => {
             roles: ["user", "admin"],
         },
         {
-            name: "Delivery Pricing",
-            href: "/dashboard/pricing",  
-            icon: <FaMoneyBillWave />,
+            name: "Approve Rider",
+            href: "/dashboard/approverider",  
+            icon: <FaUserCheck />,
             roles: ["user", "admin"],
         },
         {
