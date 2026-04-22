@@ -68,7 +68,9 @@ const AppoveRider = () => {
 
         if (result.isConfirmed) {
             try {
-                await axios.patch(`/rider/${riderId}/reject`, { status: 'rejected' });
+                const updateStatus = { status: 'rejected' };
+                const res = await axios.patch(`/rider/${riderId}`, updateStatus);
+                console.log(res.data);
                 await refetch();
                 setShowModal(false);
 
@@ -90,7 +92,7 @@ const AppoveRider = () => {
         }
     };
 
-    // Get card styling based on status
+
     const getCardStyle = (status) => {
         switch (status) {
             case 'approved':
@@ -157,7 +159,7 @@ const AppoveRider = () => {
 
          
 
-            {/* Horizontal Cards - Each rider in a single row */}
+           
             <div className="space-y-4">
                 {allRiders.map((rider) => {
                     const style = getCardStyle(rider.status);
