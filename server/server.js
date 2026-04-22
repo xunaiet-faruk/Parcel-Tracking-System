@@ -281,13 +281,52 @@ async function run() {
 
         // rider data 
 
-        app.post('/rider',async(req,res)=>{
-            const rider =req.body;
-            rider.status ="pending";
-            rider.createAt =new Date();
-            const result =await RiderCollection.insertOne(rider);
-            res.send(result)
-        })
+        app.post('/rider', async (req, res) => {
+            try {
+                const rider = req.body;
+                const email = rider.email;
+
+                // চেক করুন ইউজার ইতিমধ্যে approved বা pending আছে কিনা
+                const existingApplication = await RiderCollection.findOne({
+                    email: email,
+                    status: { $in: ['approved', 'pending'] }
+                });
+
+                if (existingApplication) {
+                    return res.status(400).json({
+                        message: `You already have a ${existingApplication.status} application. ${existingApplication.status === 'approved'
+                                ? 'You are already a rider.'
+                                : 'Please wait for review.'
+                            }`
+                    });
+                }
+
+                // যদি rejected থাকে, তাহলে পুরাতন ডাটা আপডেট করুন
+                const rejectedApplication = await RiderCollection.findOne({
+                    email: email,
+                    status: 'rejected'
+                });
+
+                if (rejectedApplication) {
+                    rider.status = "pending";
+                    rider.createAt = new Date();
+                    const result = await RiderCollection.updateOne(
+                        { _id: rejectedApplication._id },
+                        { $set: rider }
+                    );
+                    return res.send(result);
+                }
+
+                // নতুন এপ্লিকেশন তৈরি করুন
+                rider.status = "pending";
+                rider.createAt = new Date();
+                const result = await RiderCollection.insertOne(rider);
+                res.send(result);
+
+            } catch (error) {
+                res.status(500).send({ error: error.message });
+            }
+        });
 
         app.get('/rider',async(req,res)=>{
             const query ={}
@@ -298,18 +337,81 @@ async function run() {
             res.send(result)
         })
 
-        app.patch('/rider/:id',async(req,res)=>{
-            const status =req.body.status;
-            const id =req.params.id;
-            const query ={_id : new ObjectId(id)}
-            const updateStatus ={
-                $set :{
-                    status : status
+        app.get('/rider/check-application/:email', async (req, res) => {
+            try {
+                const email = req.params.email;
+                const existingApplication = await RiderCollection.findOne({ email: email });
+
+                if (existingApplication) {
+                    res.send({
+                        hasApplied: true,
+                        status: existingApplication.status,
+                        application: existingApplication
+                    });
+                } else {
+                    res.send({
+                        hasApplied: false,
+                        status: null
+                    });
                 }
+            } catch (error) {
+                res.status(500).send({ error: error.message });
             }
-            const result =await RiderCollection.updateOne(query,updateStatus)
-            res.send(result)
-        })
+        });
+
+        app.patch('/rider/:id', veryFytoken, async (req, res) => {
+            try {
+                const status = req.body.status;
+                const id = req.params.id;
+                const query = { _id: new ObjectId(id) };
+                const rider = await RiderCollection.findOne(query);
+
+                if (!rider) {
+                    return res.status(404).send({ message: "Rider not found" });
+                }
+
+                const updateStatus = {
+                    $set: {
+                        status: status
+                    }
+                };
+
+       
+                if (status === "approved") {
+                    const userEmail = rider.email;
+                    const userQuery = { email: userEmail };
+                    const updateUser = {
+                        $set: {
+                            role: "rider"
+                        }
+                    };
+
+                    const userResult = await UsersCollection.updateOne(userQuery, updateUser);
+                    console.log("User role updated:", userResult);
+
+                    if (userResult.matchedCount === 0) {
+                        console.log("User not found in UsersCollection with email:", userEmail);
+                     
+                    }
+                }
+
+                const result = await RiderCollection.updateOne(query, updateStatus);
+
+                res.send({
+                    success: true,
+                    riderUpdate: result,
+                    message: status === "approved" ? "Rider approved and role updated" : "Rider rejected"
+                });
+
+            } catch (error) {
+                console.error("Error updating rider:", error);
+                res.status(500).send({
+                    success: false,
+                    message: "Failed to update rider status",
+                    error: error.message
+                });
+            }
+        });
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });

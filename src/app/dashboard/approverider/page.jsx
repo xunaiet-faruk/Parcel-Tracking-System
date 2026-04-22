@@ -8,17 +8,17 @@ const AppoveRider = () => {
     const axios = useAxios();
     const [selectedRider, setSelectedRider] = useState(null);
     const [showModal, setShowModal] = useState(false);
+    const [actionLoading, setActionLoading] = useState(false);
 
-    const { data: riders, refetch } = useQuery({
-        queryKey: ['rider', 'pending'],
+    const { data: riders, refetch, isLoading } = useQuery({
+        queryKey: ['rider'],
         queryFn: async () => {
             const res = await axios.get('/rider');
-            console.log(res.data);
             return res.data;
         }
     });
 
-    const handleApprove = async (riderId) => {
+    const handleApprove = async (riderId, riderEmail) => {
         const result = await Swal.fire({
             title: "Are you sure?",
             text: "You won't be able to revert this!",
@@ -30,27 +30,31 @@ const AppoveRider = () => {
         });
 
         if (result.isConfirmed) {
+            setActionLoading(true);
             try {
-                const updateStatus = { status: 'approved' };
-                const res = await axios.patch(`/rider/${riderId}`, updateStatus);
-                console.log(res.data);
-                await refetch();
-                setShowModal(false);
+                const updateData = { status: 'approved', email: riderEmail };
+                const res = await axios.patch(`/rider/${riderId}`, updateData);
 
-                Swal.fire({
-                    title: "Approved!",
-                    text: "Rider has been approved successfully.",
-                    icon: "success",
-                    confirmButtonColor: "#caeb66"
-                });
+                if (res.data.success || res.data.modifiedCount > 0) {
+                    await refetch();
+                    setShowModal(false);
+                    Swal.fire({
+                        title: "Approved!",
+                        text: "Rider has been approved successfully.",
+                        icon: "success",
+                        confirmButtonColor: "#caeb66",
+                        timer: 2000
+                    });
+                }
             } catch (error) {
-                console.error("Failed to approve rider", error);
                 Swal.fire({
                     title: "Error!",
-                    text: "Failed to approve rider. Please try again.",
+                    text: "Failed to approve rider.",
                     icon: "error",
                     confirmButtonColor: "#caeb66"
                 });
+            } finally {
+                setActionLoading(false);
             }
         }
     };
@@ -67,31 +71,31 @@ const AppoveRider = () => {
         });
 
         if (result.isConfirmed) {
+            setActionLoading(true);
             try {
                 const updateStatus = { status: 'rejected' };
-                const res = await axios.patch(`/rider/${riderId}`, updateStatus);
-                console.log(res.data);
+                await axios.patch(`/rider/${riderId}`, updateStatus);
                 await refetch();
                 setShowModal(false);
-
                 Swal.fire({
                     title: "Rejected!",
                     text: "Rider has been rejected.",
                     icon: "success",
-                    confirmButtonColor: "#caeb66"
+                    confirmButtonColor: "#caeb66",
+                    timer: 2000
                 });
             } catch (error) {
-                console.error("Failed to reject rider", error);
                 Swal.fire({
                     title: "Error!",
-                    text: "Failed to reject rider. Please try again.",
+                    text: "Failed to reject rider.",
                     icon: "error",
                     confirmButtonColor: "#caeb66"
                 });
+            } finally {
+                setActionLoading(false);
             }
         }
     };
-
 
     const getCardStyle = (status) => {
         switch (status) {
@@ -102,10 +106,8 @@ const AppoveRider = () => {
                     leftBg: 'bg-gradient-to-br from-emerald-700 to-emerald-900',
                     statusBg: 'bg-emerald-500/20',
                     statusText: 'text-emerald-300',
-                    tickIcon: true,
                     badgeIcon: '✅',
                     badgeText: 'Approved',
-                    badgeColor: 'text-emerald-600 bg-emerald-50',
                     showActions: false
                 };
             case 'rejected':
@@ -115,10 +117,8 @@ const AppoveRider = () => {
                     leftBg: 'bg-gradient-to-br from-red-700 to-red-900',
                     statusBg: 'bg-red-500/20',
                     statusText: 'text-red-300',
-                    tickIcon: false,
                     badgeIcon: '❌',
                     badgeText: 'Rejected',
-                    badgeColor: 'text-red-600 bg-red-50',
                     showActions: false
                 };
             default:
@@ -128,22 +128,26 @@ const AppoveRider = () => {
                     leftBg: 'bg-gradient-to-br from-[#03373d] to-[#1a5c64]',
                     statusBg: 'bg-amber-500/20',
                     statusText: 'text-amber-300',
-                    tickIcon: false,
                     badgeIcon: '⏳',
                     badgeText: 'Pending',
-                    badgeColor: 'text-amber-600 bg-amber-50',
                     showActions: true
                 };
         }
     };
 
-    const pendingRiders = riders?.filter(rider => rider.status === 'pending') || [];
-    const approvedRiders = riders?.filter(rider => rider.status === 'approved') || [];
-    const rejectedRiders = riders?.filter(rider => rider.status === 'rejected') || [];
-    const allRiders = [...pendingRiders, ...approvedRiders, ...rejectedRiders];
+    if (isLoading) {
+        return (
+            <div className="w-full max-w-7xl mx-auto px-4 py-8 flex justify-center items-center min-h-[400px]">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#03373d] mx-auto mb-4"></div>
+                    <p className="text-gray-600">Loading riders...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 ">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {/* Header Section */}
             <div className="mb-8">
                 <div className="flex items-center gap-3 mb-2">
@@ -157,51 +161,42 @@ const AppoveRider = () => {
                 </p>
             </div>
 
-         
-
-           
             <div className="space-y-4">
-                {allRiders.map((rider) => {
+                {riders?.map((rider) => {
                     const style = getCardStyle(rider.status);
                     return (
                         <div
                             key={rider._id}
                             className={`bg-white rounded-2xl shadow-${style.shadow} border ${style.border} hover:shadow-2xl transition-all duration-300 overflow-hidden relative`}
                         >
-                            {/* Approved Badge Overlay */}
-                            {rider.status === 'approved' && (
-                                <div className="absolute top-4 right-4 z-10">
+                            {/* Status Badge Overlay */}
+                            <div className="absolute top-4 right-4 z-10">
+                                {rider.status === 'approved' && (
                                     <div className="bg-emerald-500 rounded-full p-2 shadow-lg animate-bounce">
                                         <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                                         </svg>
                                     </div>
-                                </div>
-                            )}
-
-                            {/* Rejected Badge Overlay */}
-                            {rider.status === 'rejected' && (
-                                <div className="absolute top-4 right-4 z-10">
+                                )}
+                                {rider.status === 'rejected' && (
                                     <div className="bg-red-500 rounded-full p-2 shadow-lg">
                                         <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
                                         </svg>
                                     </div>
-                                </div>
-                            )}
+                                )}
+                                {rider.status === 'pending' && (
+                                    <div className="bg-amber-500 rounded-full p-2 shadow-lg animate-pulse">
+                                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                )}
+                            </div>
 
                             <div className="flex flex-col lg:flex-row">
                                 {/* Left Section - Profile & Basic Info */}
                                 <div className={`lg:w-1/4 ${style.leftBg} p-6 flex flex-col items-center text-center relative`}>
-                                    {/* Animated tick for approved */}
-                                    {rider.status === 'approved' && (
-                                        <div className="absolute -top-2 -left-2 w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center shadow-lg animate-pulse">
-                                            <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                                            </svg>
-                                        </div>
-                                    )}
-
                                     <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mb-3">
                                         <span className="text-4xl">🏍️</span>
                                     </div>
@@ -290,7 +285,8 @@ const AppoveRider = () => {
                                                     setSelectedRider(rider);
                                                     setShowModal(true);
                                                 }}
-                                                className="w-full cursor-pointer px-4 py-2.5 bg-gradient-to-r from-[#03373d] to-[#1a5c64] text-white rounded-lg hover:opacity-90 transition-all hover:shadow-md font-medium text-sm flex items-center justify-center gap-2"
+                                                disabled={actionLoading}
+                                                className="w-full cursor-pointer px-4 py-2.5 bg-gradient-to-r from-[#03373d] to-[#1a5c64] text-white rounded-lg hover:opacity-90 transition-all hover:shadow-md font-medium text-sm flex items-center justify-center gap-2 disabled:opacity-50"
                                             >
                                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -301,15 +297,17 @@ const AppoveRider = () => {
                                             <div className="flex gap-2 w-full">
                                                 <button
                                                     onClick={() => handleReject(rider._id)}
-                                                    className="flex-1 px-3 py-2 bg-red-600 text-white cursor-pointer rounded-lg hover:bg-red-700 transition-all text-sm font-medium"
+                                                    disabled={actionLoading}
+                                                    className="flex-1 px-3 py-2 bg-red-600 text-white cursor-pointer rounded-lg hover:bg-red-700 transition-all text-sm font-medium disabled:opacity-50"
                                                 >
-                                                    Reject
+                                                    {actionLoading ? '...' : 'Reject'}
                                                 </button>
                                                 <button
-                                                    onClick={() => handleApprove(rider._id)}
-                                                    className="flex-1 px-3 py-2 bg-[#caeb66] cursor-pointer rounded-lg hover:bg-[#dcf497] transition-all text-sm font-medium text-[#03373d]"
+                                                    onClick={() => handleApprove(rider._id, rider.email)}
+                                                    disabled={actionLoading}
+                                                    className="flex-1 px-3 py-2 bg-[#caeb66] cursor-pointer rounded-lg hover:bg-[#dcf497] transition-all text-sm font-medium text-[#03373d] disabled:opacity-50"
                                                 >
-                                                    Approve
+                                                    {actionLoading ? '...' : 'Approve'}
                                                 </button>
                                             </div>
                                         </>
@@ -326,6 +324,15 @@ const AppoveRider = () => {
                                                     </div>
                                                     <p className="text-emerald-600 font-semibold">Application Approved</p>
                                                     <p className="text-xs text-gray-500">This rider has been verified and approved</p>
+                                                    <button
+                                                        onClick={() => {
+                                                            setSelectedRider(rider);
+                                                            setShowModal(true);
+                                                        }}
+                                                        className="w-full mt-2 px-3 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-all text-sm font-medium"
+                                                    >
+                                                        View Details
+                                                    </button>
                                                 </>
                                             )}
                                             {rider.status === 'rejected' && (
@@ -339,6 +346,15 @@ const AppoveRider = () => {
                                                     </div>
                                                     <p className="text-red-600 font-semibold">Application Rejected</p>
                                                     <p className="text-xs text-gray-500">This application has been declined</p>
+                                                    <button
+                                                        onClick={() => {
+                                                            setSelectedRider(rider);
+                                                            setShowModal(true);
+                                                        }}
+                                                        className="w-full mt-2 px-3 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-all text-sm font-medium"
+                                                    >
+                                                        View Details
+                                                    </button>
                                                 </>
                                             )}
                                         </div>
@@ -351,15 +367,11 @@ const AppoveRider = () => {
             </div>
 
             {/* Empty State */}
-            {allRiders.length === 0 && (
+            {(!riders || riders.length === 0) && (
                 <div className="flex flex-col items-center justify-center py-16 px-4 bg-white rounded-2xl shadow-lg border border-gray-100">
                     <div className="text-6xl mb-4 opacity-50">🏍️</div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-1">
-                        No riders found
-                    </h3>
-                    <p className="text-gray-500 text-sm text-center">
-                        No rider applications available at the moment
-                    </p>
+                    <h3 className="text-lg font-medium text-gray-900 mb-1">No riders found</h3>
+                    <p className="text-gray-500 text-sm text-center">No rider applications available at the moment</p>
                 </div>
             )}
 
@@ -369,10 +381,7 @@ const AppoveRider = () => {
                     <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                         <div className="sticky top-0 bg-gradient-to-r from-[#03373d] to-[#1a5c64] px-6 py-4 flex items-center justify-between">
                             <h2 className="text-xl font-semibold text-white">Complete Application Review</h2>
-                            <button
-                                onClick={() => setShowModal(false)}
-                                className="text-white hover:text-[#caeb66] transition-colors"
-                            >
+                            <button onClick={() => setShowModal(false)} className="text-white hover:text-[#caeb66] transition-colors">
                                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                 </svg>
@@ -389,26 +398,11 @@ const AppoveRider = () => {
                                     Personal Information
                                 </h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 rounded-lg p-4">
-                                    <div>
-                                        <p className="text-xs text-gray-500">Full Name</p>
-                                        <p className="font-medium text-gray-900">{selectedRider.fullName}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-500">Email</p>
-                                        <p className="font-medium text-gray-900">{selectedRider.email}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-500">Phone</p>
-                                        <p className="font-medium text-gray-900">{selectedRider.phone}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-500">Address</p>
-                                        <p className="font-medium text-gray-900">{selectedRider.address}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-500">District</p>
-                                        <p className="font-medium text-gray-900">{selectedRider.district}</p>
-                                    </div>
+                                    <div><p className="text-xs text-gray-500">Full Name</p><p className="font-medium text-gray-900">{selectedRider.fullName}</p></div>
+                                    <div><p className="text-xs text-gray-500">Email</p><p className="font-medium text-gray-900">{selectedRider.email}</p></div>
+                                    <div><p className="text-xs text-gray-500">Phone</p><p className="font-medium text-gray-900">{selectedRider.phone}</p></div>
+                                    <div><p className="text-xs text-gray-500">Address</p><p className="font-medium text-gray-900">{selectedRider.address}</p></div>
+                                    <div><p className="text-xs text-gray-500">District</p><p className="font-medium text-gray-900">{selectedRider.district}</p></div>
                                 </div>
                             </div>
 
@@ -421,22 +415,10 @@ const AppoveRider = () => {
                                     Vehicle Information
                                 </h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 rounded-lg p-4">
-                                    <div>
-                                        <p className="text-xs text-gray-500">Vehicle Type</p>
-                                        <p className="font-medium text-gray-900">{selectedRider.vehicleType}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-500">License Number</p>
-                                        <p className="font-medium text-gray-900">{selectedRider.licenseNumber}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-500">Experience</p>
-                                        <p className="font-medium text-gray-900">{selectedRider.experience}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-500">Available Hours</p>
-                                        <p className="font-medium text-gray-900">{selectedRider.availableHours} hours/day</p>
-                                    </div>
+                                    <div><p className="text-xs text-gray-500">Vehicle Type</p><p className="font-medium text-gray-900">{selectedRider.vehicleType}</p></div>
+                                    <div><p className="text-xs text-gray-500">License Number</p><p className="font-medium text-gray-900">{selectedRider.licenseNumber}</p></div>
+                                    <div><p className="text-xs text-gray-500">Experience</p><p className="font-medium text-gray-900">{selectedRider.experience}</p></div>
+                                    <div><p className="text-xs text-gray-500">Available Hours</p><p className="font-medium text-gray-900">{selectedRider.availableHours} hours/day</p></div>
                                 </div>
                             </div>
 
@@ -449,32 +431,22 @@ const AppoveRider = () => {
                                     Emergency Contact
                                 </h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-red-50 rounded-lg p-4">
-                                    <div>
-                                        <p className="text-xs text-red-600">Contact Name</p>
-                                        <p className="font-medium text-gray-900">{selectedRider.emergencyContact}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-red-600">Emergency Phone</p>
-                                        <p className="font-medium text-gray-900">{selectedRider.emergencyPhone}</p>
-                                    </div>
+                                    <div><p className="text-xs text-red-600">Contact Name</p><p className="font-medium text-gray-900">{selectedRider.emergencyContact}</p></div>
+                                    <div><p className="text-xs text-red-600">Emergency Phone</p><p className="font-medium text-gray-900">{selectedRider.emergencyPhone}</p></div>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-6 py-4 flex gap-3">
-                            <button
-                                onClick={() => handleReject(selectedRider._id)}
-                                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all font-medium"
-                            >
-                                Reject Application
-                            </button>
-                            <button
-                                onClick={() => handleApprove(selectedRider._id)}
-                                className="flex-1 px-4 py-2 bg-gradient-to-r from-[#03373d] to-[#1a5c64] text-white rounded-lg hover:opacity-90 transition-all font-medium"
-                            >
-                                Approve Application
-                            </button>
-                        </div>
+                        {selectedRider.status === 'pending' && (
+                            <div className="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-6 py-4 flex gap-3">
+                                <button onClick={() => handleReject(selectedRider._id)} disabled={actionLoading} className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all font-medium disabled:opacity-50">
+                                    {actionLoading ? 'Processing...' : 'Reject Application'}
+                                </button>
+                                <button onClick={() => handleApprove(selectedRider._id, selectedRider.email)} disabled={actionLoading} className="flex-1 px-4 py-2 bg-gradient-to-r from-[#03373d] to-[#1a5c64] text-white rounded-lg hover:opacity-90 transition-all font-medium disabled:opacity-50">
+                                    {actionLoading ? 'Processing...' : 'Approve Application'}
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
