@@ -87,9 +87,9 @@ const Sidebar = ({ children }) => {
             roles: ["user"],
         },
         {
-            name: "Service Centers",
-            href: "/dashboard/coverage",  
-            icon: <FaStore />,
+            name: "User-Management",
+            href: "/dashboard/usermanagment",  
+            icon: <FaUserFriends />,
             roles: ["user", "admin"],
         },
         {

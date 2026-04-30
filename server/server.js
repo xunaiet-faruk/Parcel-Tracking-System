@@ -285,8 +285,6 @@ async function run() {
             try {
                 const rider = req.body;
                 const email = rider.email;
-
-                // চেক করুন ইউজার ইতিমধ্যে approved বা pending আছে কিনা
                 const existingApplication = await RiderCollection.findOne({
                     email: email,
                     status: { $in: ['approved', 'pending'] }
@@ -301,7 +299,6 @@ async function run() {
                     });
                 }
 
-                // যদি rejected থাকে, তাহলে পুরাতন ডাটা আপডেট করুন
                 const rejectedApplication = await RiderCollection.findOne({
                     email: email,
                     status: 'rejected'
@@ -317,7 +314,6 @@ async function run() {
                     return res.send(result);
                 }
 
-                // নতুন এপ্লিকেশন তৈরি করুন
                 rider.status = "pending";
                 rider.createAt = new Date();
                 const result = await RiderCollection.insertOne(rider);

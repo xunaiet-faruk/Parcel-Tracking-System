@@ -1,4 +1,3 @@
-// hooks/useRiderApplication.js
 import { useState, useEffect, useCallback } from 'react';
 import useAxios from './useAxios';
 import useAuth from './useAuth';
