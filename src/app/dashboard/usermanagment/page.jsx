@@ -1,43 +1,53 @@
 "use client";
-import { div } from "framer-motion/client";
-import React, { useState } from "react";
+import useAuth from "@/app/(site)/hooks/useAuth";
+import useAxios from "@/app/(site)/hooks/useAxios";
+import { useQuery } from "@tanstack/react-query";
+import React, { useState, useEffect } from "react";
+import Swal from 'sweetalert2';
 import {
     HiOutlineEye,
     HiOutlinePencilAlt,
     HiOutlineTrash,
-    HiOutlineSearch,
     HiOutlineUserAdd,
     HiOutlineChevronLeft,
     HiOutlineChevronRight,
     HiOutlineShieldCheck,
     HiOutlineUser,
-    HiOutlineStar,
-    HiOutlineChevronDown
+    HiOutlineChevronDown,
+    HiOutlineX
 } from "react-icons/hi";
-
-const users = [
-    { id: 1, name: "John Doe", email: "john.doe@example.com", role: "Admin", joinDate: "2024-01-15", status: "Active", permissions: "Full Access" },
-    { id: 2, name: "Jane Smith", email: "jane.smith@example.com", role: "User", joinDate: "2024-02-20", status: "Active", permissions: "Limited" },
-    { id: 3, name: "Mike Johnson", email: "mike.j@example.com", role: "Moderator", joinDate: "2024-03-10", status: "Active", permissions: "Medium" },
-    { id: 4, name: "Sarah Williams", email: "sarah.w@example.com", role: "User", joinDate: "2024-01-05", status: "Inactive", permissions: "Limited" },
-    { id: 5, name: "David Brown", email: "david.b@example.com", role: "Admin", joinDate: "2024-02-28", status: "Active", permissions: "Full Access" },
-    { id: 6, name: "Emma Wilson", email: "emma.w@example.com", role: "User", joinDate: "2024-03-15", status: "Active", permissions: "Limited" },
-];
 
 const UsermanagMent = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [roleFilter, setRoleFilter] = useState("All");
-    const [usersList, setUsersList] = useState(users);
-    const [openDropdownId, setOpenDropdownId] = useState(null);
+    const [usersList, setUsersList] = useState([]);
+    const [showRoleModal, setShowRoleModal] = useState(false);
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [selectedRole, setSelectedRole] = useState("");
+    const { user } = useAuth();
+    const axios = useAxios();
     const itemsPerPage = 4;
 
-    // Filter by search and role
+    const { data: Allusers = [], refetch, isLoading } = useQuery({
+        queryKey: ['Allusers', user?.email],
+        queryFn: async () => {
+            const res = await axios.get('/users');
+            return res.data;
+        }
+    });
+
+    // Update usersList when API data loads
+    useEffect(() => {
+        if (Allusers && Allusers.length > 0) {
+            setUsersList(Allusers);
+        }
+    }, [Allusers]);
+
+    // Filter by role only (search is skipped)
     const filteredUsers = usersList.filter(user => {
-        const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            user.email.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesRole = roleFilter === "All" || user.role === roleFilter;
-        return matchesSearch && matchesRole;
+        return matchesRole;
     });
 
     const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
@@ -50,8 +60,6 @@ const UsermanagMent = () => {
         switch (role) {
             case "Admin":
                 return <HiOutlineShieldCheck className="w-4 h-4" />;
-            case "Moderator":
-                return <HiOutlineStar className="w-4 h-4" />;
             default:
                 return <HiOutlineUser className="w-4 h-4" />;
         }
@@ -61,51 +69,147 @@ const UsermanagMent = () => {
         switch (role) {
             case "Admin":
                 return { background: "#03373d", color: "white" };
-            case "Moderator":
-                return { background: "#e6f3f4", color: "#03373d" };
             default:
                 return { background: "#f0f3f4", color: "#03373d" };
         }
     };
 
-    const handleRoleChange = (userId, newRole) => {
-        setUsersList(prevUsers =>
-            prevUsers.map(user =>
-                user.id === userId ? { ...user, role: newRole } : user
-            )
-        );
-        setOpenDropdownId(null);
-        // Optional: Show a success message
-        alert(`User role updated to ${newRole}`);
+    const openRoleChangeModal = (user) => {
+        setSelectedUser(user);
+        setSelectedRole(user.role);
+        setShowRoleModal(true);
     };
 
-    const handleDeleteUser = (userId) => {
-        if (window.confirm("Are you sure you want to delete this user?")) {
-            setUsersList(prevUsers => prevUsers.filter(user => user.id !== userId));
+    const handleRoleChange = async () => {
+        if (!selectedUser || !selectedRole) return;
+
+        Swal.fire({
+            title: 'Updating Role...',
+            text: 'Please wait',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        try {
+            const response = await axios.patch(`/users/${selectedUser._id}`, {
+                role: selectedRole.toLowerCase()
+            });
+
+            if (response.data.modifiedCount > 0 || response.data.matchedCount > 0) {
+                setUsersList(prevUsers =>
+                    prevUsers.map(user =>
+                        user._id === selectedUser._id ? { ...user, role: selectedRole } : user
+                    )
+                );
+
+                setShowRoleModal(false);
+                setSelectedUser(null);
+                setSelectedRole("");
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Role Updated!',
+                    text: `${selectedUser.name || selectedUser.email}'s role has been changed to ${selectedRole}`,
+                    confirmButtonColor: '#03373d',
+                    timer: 2000,
+                    showConfirmButton: true
+                });
+
+                refetch();
+            } else {
+                throw new Error('No changes were made');
+            }
+        } catch (error) {
+            console.error("Error updating role:", error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Update Failed',
+                text: error.response?.data?.message || 'Failed to update user role. Please try again.',
+                confirmButtonColor: '#03373d'
+            });
         }
     };
 
+    const handleDeleteUser = async (userId) => {
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#03373d',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'Cancel'
+        });
+
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Deleting...',
+                text: 'Please wait',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            try {
+                await axios.delete(`/users/${userId}`);
+
+                setUsersList(prevUsers => prevUsers.filter(user => user._id !== userId));
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Deleted!',
+                    text: 'User has been deleted successfully.',
+                    confirmButtonColor: '#03373d',
+                    timer: 2000,
+                    showConfirmButton: true
+                });
+
+                refetch();
+            } catch (error) {
+                console.error("Error deleting user:", error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Delete Failed',
+                    text: error.response?.data?.message || 'Failed to delete user. Please try again.',
+                    confirmButtonColor: '#03373d'
+                });
+            }
+        }
+    };
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#03373d] mx-auto"></div>
+                    <p className="mt-4 text-[#03373d]">Loading users...</p>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div>
-
-            <div className="mb-6 p-6 rounded-2xl  text-[#03373d]">
+            <div className="mb-6 p-6 rounded-2xl text-[#03373d]">
                 <div className="flex flex-col items-center justify-center text-center gap-4">
-
                     <div>
-                        <h1 className="text-3xl md:text-4xl font-bold  flex items-center justify-center gap-2">
-                            👥 User Management Dashboard
+                        <h1 className="text-3xl md:text-4xl font-bold flex items-center justify-center gap-2">
+                            👥 User Management Dashboard {Allusers?.length}
                         </h1>
                         <p className="text-sm mt-2 opacity-90 text-center text-gray-400">
                             Manage users, roles, and access in one place. 🔐
                         </p>
                     </div>
-
                 </div>
-            </div> <div className="px-6 py-4 border-b flex justify-end  gap-4 flex-wrap" style={{ borderColor: "#e0e7e9" }}>
+            </div>
 
-
+            <div className="px-6 py-4 border-b flex justify-end gap-4 flex-wrap" style={{ borderColor: "#e0e7e9" }}>
                 <div className="flex gap-2 flex-wrap">
-                    {["All", "Admin", "Moderator", "User"].map(role => (
+                    {["All", "Admin", "User"].map(role => (
                         <button
                             key={role}
                             onClick={() => {
@@ -123,18 +227,13 @@ const UsermanagMent = () => {
                     ))}
                 </div>
             </div>
-            
-            <div className=" bg-gray-50 flex items-center justify-center">
-                <div className="w-full container mx-auto bg-white rounded-2xl shadow-xl overflow-hidden" style={{ color: "#03373d" }}>   
 
-                    {/* Filters */}
-                   
-
-                    {/* Table */}
+            <div className="bg-gray-50 flex items-center justify-center">
+                <div className="w-full container mx-auto bg-white rounded-2xl shadow-xl overflow-hidden" style={{ color: "#03373d" }}>
                     <div className="overflow-x-auto">
                         <table className="w-full">
                             <thead>
-                                <tr className="border-b bg-gradient-to-r from-[#03373d] to-[#1a5c64] text-white " >
+                                <tr className="border-b bg-gradient-to-r from-[#03373d] to-[#1a5c64] text-white">
                                     <th className="text-left py-3 px-6 font-semibold text-sm">USER</th>
                                     <th className="text-left py-3 px-6 font-semibold text-sm">EMAIL</th>
                                     <th className="text-left py-3 px-6 font-semibold text-sm">ROLE</th>
@@ -145,7 +244,7 @@ const UsermanagMent = () => {
                             <tbody>
                                 {paginatedUsers.map((user, index) => (
                                     <tr
-                                        key={user.id}
+                                        key={user._id}
                                         className="border-b transition-all hover:bg-gray-50"
                                         style={{ borderColor: "#f0f3f4" }}
                                     >
@@ -155,10 +254,10 @@ const UsermanagMent = () => {
                                                     className="w-9 h-9 rounded-full flex items-center justify-center text-white font-semibold text-sm"
                                                     style={{ background: "#03373d" }}
                                                 >
-                                                    {user.name.charAt(0)}
+                                                    {user.name?.charAt(0) || user.email?.charAt(0) || "U"}
                                                 </div>
                                                 <div>
-                                                    <span className="font-medium">{user.name}</span>
+                                                    <span className="font-medium">{user.name || user.email}</span>
                                                     {user.role === "Admin" && (
                                                         <span className="ml-2 text-xs px-1.5 py-0.5 rounded" style={{ background: "#03373d", color: "white" }}>
                                                             Admin
@@ -169,41 +268,19 @@ const UsermanagMent = () => {
                                         </td>
                                         <td className="py-3 px-6 text-sm opacity-80">{user.email}</td>
                                         <td className="py-3 px-6">
-                                            <div className="relative">
-                                                <button
-                                                    onClick={() => setOpenDropdownId(openDropdownId === user.id ? null : user.id)}
-                                                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all hover:opacity-80"
-                                                    style={getRoleStyle(user.role)}
-                                                >
-                                                    {getRoleIcon(user.role)}
-                                                    <span>{user.role}</span>
-                                                    <HiOutlineChevronDown className="w-3 h-3" />
-                                                </button>
-
-                                                {/* Dropdown Menu */}
-                                                {openDropdownId === user.id && (
-                                                    <div className="absolute top-full left-0 mt-1 w-32 bg-white rounded-lg shadow-lg border z-10 overflow-hidden" style={{ borderColor: "#e0e7e9" }}>
-                                                        {["Admin", "Moderator", "User"].map(roleOption => (
-                                                            <button
-                                                                key={roleOption}
-                                                                onClick={() => handleRoleChange(user.id, roleOption)}
-                                                                className={`w-full text-left px-3 py-2 text-xs transition-all hover:bg-gray-50 flex items-center gap-2 ${user.role === roleOption ? "opacity-50 cursor-not-allowed" : ""
-                                                                    }`}
-                                                                style={{ color: "#03373d" }}
-                                                                disabled={user.role === roleOption}
-                                                            >
-                                                                {getRoleIcon(roleOption)}
-                                                                <span>{roleOption}</span>
-                                                                {user.role === roleOption && (
-                                                                    <span className="ml-auto text-xs">✓</span>
-                                                                )}
-                                                            </button>
-                                                        ))}
-                                                    </div>
-                                                )}
-                                            </div>
+                                            <button
+                                                onClick={() => openRoleChangeModal(user)}
+                                                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all hover:opacity-80 cursor-pointer"
+                                                style={getRoleStyle(user.role)}
+                                            >
+                                                {getRoleIcon(user.role)}
+                                                <span>{user.role}</span>
+                                                <HiOutlineChevronDown className="w-3 h-3" />
+                                            </button>
                                         </td>
-                                        <td className="py-3 px-6 text-sm opacity-80">{user.joinDate}</td>
+                                        <td className="py-3 px-6 text-sm opacity-80">
+                                            {user.joinDate || user.createdAt?.split('T')[0] || "N/A"}
+                                        </td>
                                         <td className="py-3 px-6">
                                             <div className="flex gap-2">
                                                 <button
@@ -221,7 +298,7 @@ const UsermanagMent = () => {
                                                     <HiOutlinePencilAlt className="w-4 h-4" />
                                                 </button>
                                                 <button
-                                                    onClick={() => handleDeleteUser(user.id)}
+                                                    onClick={() => handleDeleteUser(user._id)}
                                                     className="p-2 rounded-lg transition-all hover:bg-red-50"
                                                     style={{ color: "#dc2626" }}
                                                     title="Delete"
@@ -236,14 +313,12 @@ const UsermanagMent = () => {
                         </table>
                     </div>
 
-                    {/* Empty State */}
                     {paginatedUsers.length === 0 && (
                         <div className="text-center py-12">
                             <p className="opacity-60">No users found matching your criteria</p>
                         </div>
                     )}
 
-                    {/* Pagination */}
                     {totalPages > 1 && (
                         <div className="px-6 py-4 border-t flex justify-between items-center flex-wrap gap-4" style={{ borderColor: "#e0e7e9", background: "#f8fafb" }}>
                             <p className="text-sm opacity-60">
@@ -286,6 +361,76 @@ const UsermanagMent = () => {
                     )}
                 </div>
             </div>
+
+            {showRoleModal && selectedUser && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-2xl shadow-xl max-w-md w-full mx-auto overflow-hidden" style={{ color: "#03373d" }}>
+                        <div className="flex justify-between items-center p-6 border-b" style={{ borderColor: "#e0e7e9" }}>
+                            <h2 className="text-xl font-bold">Change User Role</h2>
+                            <button
+                                onClick={() => setShowRoleModal(false)}
+                                className="p-1 rounded-lg hover:bg-gray-100 transition-all"
+                            >
+                                <HiOutlineX className="w-6 h-6" />
+                            </button>
+                        </div>
+
+                        <div className="p-6">
+                            <div className="mb-6">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div
+                                        className="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold text-lg"
+                                        style={{ background: "#03373d" }}
+                                    >
+                                        {selectedUser.name?.charAt(0) || selectedUser.email?.charAt(0) || "U"}
+                                    </div>
+                                    <div>
+                                        <p className="font-semibold text-lg">{selectedUser.name || selectedUser.email}</p>
+                                        <p className="text-sm opacity-70">{selectedUser.email}</p>
+                                    </div>
+                                </div>
+                                <p className="text-sm mb-4">Current Role:
+                                    <span className="ml-2 font-semibold">{selectedUser.role}</span>
+                                </p>
+                                <label className="block text-sm font-medium mb-2">Select New Role</label>
+                                <div className="flex gap-3">
+                                    {["Admin", "User"].map(role => (
+                                        <button
+                                            key={role}
+                                            onClick={() => setSelectedRole(role)}
+                                            className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all ${selectedRole === role
+                                                ? "bg-[#03373d] text-white"
+                                                : "bg-gray-100 text-[#03373d] hover:bg-gray-200"
+                                                }`}
+                                        >
+                                            {getRoleIcon(role)}
+                                            <span className="ml-2">{role}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end gap-3 p-6 border-t" style={{ borderColor: "#e0e7e9", background: "#f8fafb" }}>
+                            <button
+                                onClick={() => setShowRoleModal(false)}
+                                className="px-4 py-2 rounded-lg font-medium transition-all hover:bg-gray-200"
+                                style={{ color: "#03373d" }}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleRoleChange}
+                                disabled={selectedRole === selectedUser.role}
+                                className="px-4 py-2 rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                style={{ background: "#03373d", color: "white" }}
+                            >
+                                Update Role
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

@@ -278,6 +278,24 @@ async function run() {
             res.send(result);
         });
 
+        app.get('/users',veryFytoken, async (req, res) => {
+           const result =await UsersCollection.find().toArray();
+           res.send(result)
+        });
+
+        app.patch('/users/:id',async(req,res)=>{
+            const {id} =req.params;
+            const role = req.body.role;
+            const filter ={_id :new ObjectId(id)};
+            const updatedDoc ={
+                $set :{
+                    role : role
+                }
+
+            }
+            const result = await UsersCollection.updateOne(filter, updatedDoc);
+            res.send(result);
+        })
 
         // rider data 
 
