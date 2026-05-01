@@ -8,18 +8,14 @@ import {
     FaBox,
     FaTruck,
     FaUsers,
-    FaMoneyBillWave,
     FaChartBar,
     FaCog,
     FaSignOutAlt,
     FaBars,
     FaTimes,
-    FaHome,
     FaUserFriends,
     FaClipboardList,
     FaHeadset,
-    FaStore,
-    FaStar,
     FaBell,
     FaUserCircle,
     FaHistory,
@@ -27,13 +23,14 @@ import {
 } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import useAuth from "../(site)/hooks/useAuth";
-
+import useRole from "../(site)/hooks/useRole";
 
 const Sidebar = ({ children }) => {
     const [isOpen, setIsOpen] = useState(true);
     const [isMobile, setIsMobile] = useState(false);
     const pathname = usePathname();
     const { user, logout } = useAuth();
+    const { role, isLoading } = useRole(); // role can be 'user', 'rider', or 'admin'
 
     useEffect(() => {
         const handleResize = () => {
@@ -49,82 +46,118 @@ const Sidebar = ({ children }) => {
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
-    const navLinks = [
+    // Define all navigation links with role-based access
+    const allNavLinks = [
+        // Admin only links
         {
             name: "Dashboard",
-            href: "/dashboard/overview",  
+            href: "/dashboard/overview",
             icon: <FaTachometerAlt />,
-            roles: ["user", "admin"],
-        },
-        {
-            name: "Send Parcel",
-            href: "/dashboard/send-parcel", 
-            icon: <FaBox />,
-            roles: ["user", "admin"],
-        },
-        {
-            name: "My Parcels",
-            href: "/dashboard/myparcels",  
-            icon: <FaClipboardList />,
-            roles: ["user", "admin"],
-        },
-        {
-            name: "Payment History",
-            href: "/dashboard/paymentHistroy",  
-            icon: <FaHistory />,
-            roles: ["user", "admin"],
+            roles: ["admin", "rider", "user"] // All roles can see dashboard
         },
         {
             name: "Approve Rider",
-            href: "/dashboard/approverider",  
+            href: "/dashboard/approverider",
             icon: <FaUserCheck />,
-            roles: ["user", "admin"],
+            roles: ["admin"] // Only admin
         },
         {
-            name: "Become a Rider",
-            href: "/dashboard/become-rider",  
-            icon: <FaUsers />,
-            roles: ["user"],
-        },
-        {
-            name: "User-Management",
-            href: "/dashboard/usermanagment",  
+            name: "User Management",
+            href: "/dashboard/usermanagment",
             icon: <FaUserFriends />,
-            roles: ["user", "admin"],
-        },
-        {
-            name: "Riders",
-            href: "/dashboard/riders",  
-            icon: <FaTruck />,
-            roles: ["admin"],
+            roles: ["admin"] // Only admin
         },
         {
             name: "Analytics",
-            href: "/dashboard/analytics",  
+            href: "/dashboard/analytics",
             icon: <FaChartBar />,
-            roles: ["admin"],
+            roles: ["admin"] // Only admin
+        },
+
+        // Rider specific links
+        {
+            name: "My Deliveries",
+            href: "/dashboard/my-deliveries",
+            icon: <FaTruck />,
+            roles: ["rider"] // Only riders
+        },
+        {
+            name: "Delivery History",
+            href: "/dashboard/delivery-history",
+            icon: <FaHistory />,
+            roles: ["rider"] // Only riders
+        },
+
+        // User (customer) specific links
+        {
+            name: "Send Parcel",
+            href: "/dashboard/send-parcel",
+            icon: <FaBox />,
+            roles: ["user"] // Only customers
+        },
+        {
+            name: "My Parcels",
+            href: "/dashboard/myparcels",
+            icon: <FaClipboardList />,
+            roles: ["user"] // Only customers
+        },
+        {
+            name: "Become a Rider",
+            href: "/dashboard/become-rider",
+            icon: <FaUsers />,
+            roles: ["user"] // Only customers
+        },
+
+        // Common links for all authenticated users
+        {
+            name: "Payment History",
+            href: "/dashboard/paymentHistroy",
+            icon: <FaHistory />,
+            roles: ["admin", "rider", "user"]
         },
         {
             name: "Support",
-            href: "/dashboard/support", 
+            href: "/dashboard/support",
             icon: <FaHeadset />,
-            roles: ["user", "admin"],
+            roles: ["admin", "rider", "user"]
         },
         {
             name: "Settings",
-            href: "/dashboard/settings",  
+            href: "/dashboard/settings",
             icon: <FaCog />,
-            roles: ["user", "admin"],
+            roles: ["admin", "rider", "user"]
         },
     ];
 
-    const filteredLinks = navLinks.filter(link =>
-        link.roles.includes(user?.role || "user")
+    // Filter links based on user role
+    const navLinks = allNavLinks.filter(link =>
+        !isLoading && link.roles.includes(role)
     );
+
+    // Get role display name
+    const getRoleDisplayName = () => {
+        if (role === "admin") return "Admin";
+        if (role === "rider") return "Rider";
+        return "Customer";
+    };
 
     const toggleSidebar = () => {
         setIsOpen(!isOpen);
     };
+
+    // Show loading state while fetching role
+    if (isLoading) {
+        return (
+            <div className="flex h-screen bg-gray-50">
+                <div className="flex-1 flex items-center justify-center">
+                    <div className="text-center">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#03373d] mx-auto"></div>
+                        <p className="mt-4 text-gray-600">Loading...</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex h-screen bg-gray-50">
@@ -153,7 +186,8 @@ const Sidebar = ({ children }) => {
                 style={{ width: isOpen ? (isMobile ? "280px" : "280px") : "80px" }}
             >
                 {/* Logo Section */}
-                <div className={`p-6 border-b border-white/10 flex items-center ${isOpen ? "justify-between" : "justify-center"}`}>
+                <div className={`p-6 border-b border-white/10 flex items-center ${isOpen ? "justify-between" : "justify-center"
+                    }`}>
                     {isOpen ? (
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 bg-[#caeb66] rounded-xl flex items-center justify-center">
@@ -190,18 +224,29 @@ const Sidebar = ({ children }) => {
                 )}
 
                 {/* User Profile Section */}
-                <div className={`p-4 border-b border-white/10 ${isOpen ? "flex" : "flex-col"} items-center gap-3`}>
+                <div className={`p-4 border-b border-white/10 ${isOpen ? "flex" : "flex-col"
+                    } items-center gap-3`}>
                     <div className="w-12 h-12 bg-[#caeb66]/20 rounded-full flex items-center justify-center border-2 border-[#caeb66]">
-                        <FaUserCircle className="text-[#caeb66] text-2xl" />
+                        {user?.photoURL ? (
+                            <img
+                                src={user.photoURL}
+                                alt="Profile"
+                                className="w-full h-full rounded-full object-cover"
+                            />
+                        ) : (
+                            <FaUserCircle className="text-[#caeb66] text-2xl" />
+                        )}
                     </div>
                     {isOpen && (
                         <div className="flex-1">
                             <p className="text-white font-semibold text-sm">
-                                {user?.displayName || "Guest User"}
+                                {user?.displayName || user?.email?.split('@')[0] || "Guest User"}
                             </p>
-                            <p className="text-[#caeb66] text-xs">{user?.email || "Not logged in"}</p>
+                            <p className="text-[#caeb66] text-xs truncate max-w-[180px]">
+                                {user?.email || "Not logged in"}
+                            </p>
                             <span className="inline-block mt-1 px-2 py-0.5 bg-white/10 rounded-full text-white text-xs">
-                                {user?.role === "admin" ? "Admin" : "Customer"}
+                                {getRoleDisplayName()}
                             </span>
                         </div>
                     )}
@@ -216,7 +261,7 @@ const Sidebar = ({ children }) => {
                             </p>
                         )}
                         <ul className="space-y-2">
-                            {filteredLinks.map((link) => {
+                            {navLinks.map((link) => {
                                 const isActive = pathname === link.href;
                                 return (
                                     <li key={link.name}>
@@ -225,8 +270,8 @@ const Sidebar = ({ children }) => {
                                                 whileHover={{ x: 5 }}
                                                 transition={{ type: "spring", stiffness: 300 }}
                                                 className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 cursor-pointer ${isActive
-                                                    ? "bg-[#caeb66] text-[#03373d] shadow-lg"
-                                                    : "text-white/80 hover:bg-white/10 hover:text-white"
+                                                        ? "bg-[#caeb66] text-[#03373d] shadow-lg"
+                                                        : "text-white/80 hover:bg-white/10 hover:text-white"
                                                     }`}
                                             >
                                                 <span className="text-xl">{link.icon}</span>
@@ -247,7 +292,7 @@ const Sidebar = ({ children }) => {
                         </ul>
                     </div>
 
-                    {/* Extra Section */}
+                    {/* Notifications Section */}
                     <div className="mt-6 px-4">
                         {isOpen && (
                             <p className="text-white/50 text-xs uppercase tracking-wider mb-3 px-3">

@@ -6,12 +6,14 @@ import { useRouter } from "next/navigation";
 
 import Swal from "sweetalert2";
 import useAuth from "../../hooks/useAuth";
+import useAxios from "../../hooks/useAxios";
 
 const LoginPage = () => {
     const { login, googleLogin } = useAuth();
     const router = useRouter();
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+    const axios =useAxios()
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -49,6 +51,13 @@ const LoginPage = () => {
         setLoading(true);
         try {
             await googleLogin();
+            const userInfo = {
+                name: result.user.displayName,
+                email: result.user.email,
+                photo: result.user.photoURL,
+            };
+
+            const res = await axios.post("/users", userInfo);
             Swal.fire({
                 title: "Google Login Successful",
                 icon: "success",

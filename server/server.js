@@ -297,6 +297,20 @@ async function run() {
             res.send(result);
         })
 
+        app.delete('/users/:id',async(req,res)=>{
+            const {id} =req.params;
+            const query ={_id : new ObjectId(id)};
+            const result = await UsersCollection.deleteOne(query);
+            res.send(result);
+        })
+
+        app.get('/users/:email/role', async (req, res) => {
+            const email = req.params.email;
+            const query = { email: email };
+            const user = await UsersCollection.findOne(query);
+            res.send({role : user?.role || 'user'});
+        });
+
         // rider data 
 
         app.post('/rider', async (req, res) => {
