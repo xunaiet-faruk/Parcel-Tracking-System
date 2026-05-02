@@ -13,6 +13,7 @@ import {
 import { motion } from "framer-motion";
 import useAuth from "../../(site)/hooks/useAuth";
 import useAxios from "../../(site)/hooks/useAxios";
+import Loading from "@/app/components/Loading";
 
 export default function OverviewPage() {
     const { user } = useAuth();
@@ -103,14 +104,7 @@ export default function OverviewPage() {
     };
 
     if (loading) {
-        return (
-            <div className="flex items-center justify-center h-96">
-                <div className="text-center">
-                    <div className="w-16 h-16 border-4 border-[#03373d] border-t-[#caeb66] rounded-full animate-spin mx-auto mb-4"></div>
-                    <p className="text-gray-600">Loading dashboard...</p>
-                </div>
-            </div>
-        );
+        return <Loading/>
     }
 
     return (

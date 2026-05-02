@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import useAxios from '@/app/(site)/hooks/useAxios';
+import Loading from '@/app/components/Loading';
 
 // Animation variants for better organization
 const fadeInUp = {
@@ -44,6 +45,7 @@ const PaymentSuccess = () => {
                     transactionId: response.data.transactionId || '',
                     trackingId: response.data.trackingId || ''
                 });
+              
             } catch (err) {
                 console.error('Payment verification failed:', err);
                 setError('Failed to verify payment. Please contact support.');
@@ -66,23 +68,9 @@ const PaymentSuccess = () => {
 
     // Loading state
     if (isLoading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
-                <motion.div
-                    variants={scaleIn}
-                    initial="initial"
-                    animate="animate"
-                    exit="exit"
-                    className="bg-white p-8 rounded-2xl shadow-xl text-center"
-                >
-                    <div className="w-16 h-16 border-4 border-[#03373d] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                    <p className="text-gray-600">Verifying your payment...</p>
-                </motion.div>
-            </div>
-        );
+        return <Loading/>
     }
 
-    // Error state
     if (error) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">

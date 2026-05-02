@@ -5,6 +5,7 @@ import useAxios from "../hooks/useAxios";
 import Swal from "sweetalert2";
 import useAuth from "../hooks/useAuth";
 import useRiderApplication from "../hooks/useRiderApplication";
+import Loading from "@/app/components/Loading";
 
 const RiderPage = () => {
     const { user } = useAuth();
@@ -182,14 +183,7 @@ const RiderPage = () => {
     ];
 
     if (isLoading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#03373d] mx-auto mb-4"></div>
-                    <p className="text-gray-600">Loading application status...</p>
-                </div>
-            </div>
-        );
+        return <Loading/>
     }
 
   

@@ -3,6 +3,7 @@ import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import useAuth from "@/app/(site)/hooks/useAuth";
+import Loading from "../Loading";
 
 
 const Navbar = () => {
@@ -41,20 +42,7 @@ const Navbar = () => {
 
   
     if (loading) {
-        return (
-            <div className="navbar bg-white shadow-md">
-                <div className="navbar-start">
-                    <div className="flex items-end">
-                        <img className="mb-2 w-7" src="/assets/logo.png" alt="Logo" />
-                        <h1 className="text-2xl font-semibold text-[#03373d]">Profast</h1>
-                    </div>
-                </div>
-                <div className="navbar-end gap-4">
-                    <div className="w-20 h-10 bg-gray-200 animate-pulse rounded-lg"></div>
-                    <div className="w-24 h-10 bg-gray-200 animate-pulse rounded-lg"></div>
-                </div>
-            </div>
-        );
+        return <Loading/>
     }
 
     return (

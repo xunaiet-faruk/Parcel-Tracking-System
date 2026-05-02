@@ -3,7 +3,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 dotenv.config();
 const app = express();
-const dns =require('dns');
+const dns = require('dns');
 const port = process.env.PORT || 5000;
 const crypto = require('crypto');
 
@@ -33,27 +33,28 @@ app.use(cors());
 app.use(express.json());
 
 
-const veryFytoken =async(req,res,next) =>{
+const veryFytoken = async (req, res, next) => {
     const token = req.headers.authorization;
-    if(!token){
-        return res.status(401).send({meassge : "unauthorized access"})
+    if (!token) {
+        return res.status(401).send({ meassge: "unauthorized access" })
     }
     try {
-        const idToken =token.split(' ')[1];
-        const decoded =await admin.auth().verifyIdToken(idToken)
-        req.decoded_email =decoded.email
+        const idToken = token.split(' ')[1];
+        const decoded = await admin.auth().verifyIdToken(idToken)
+        req.decoded_email = decoded.email
         next()
-        console.log("hello junaiet",decoded);
+        console.log("hello junaiet", decoded);
     } catch (error) {
         return res.status(401).send({ meassge: "unauthorized access" })
     }
-  
+
 }
 
 
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const { url } = require('inspector');
 const { trace } = require('console');
+const { del } = require('framer-motion/client');
 const uri = `mongodb+srv://${process.env.USER_NAME}:${process.env.PASSWORD}@cluster0.kwkb8qp.mongodb.net/?appName=Cluster0`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -75,6 +76,16 @@ async function run() {
         const UsersCollection = client.db("ZapshiptDB").collection("Users");
         const RiderCollection = client.db("ZapshiptDB").collection("Rider");
 
+        // const veryFyadmin =async(req,res,next) =>{
+        //     const email = req.decoded_email;
+        //     const query = {email : email};
+        //     const user = await UsersCollection.findOne(query);
+        //     if(user?.role !== 'admin'){
+        //         return res.status(403).send({message : 'forbiden access'})
+        //     }
+        //     next();
+        // }
+
         app.post('/parcels', async (req, res) => {
             const parcel = req.body;
             const result = await ParcelCollection.insertOne(parcel);
@@ -83,9 +94,12 @@ async function run() {
 
         app.get('/parcels', async (req, res) => {
             const query = {};
-            const {email} =req.query;
-            if(email){
-                query.senderEmail=email
+            const { email, deliverystatus } = req.query;
+            if (email) {
+                query.senderEmail = email
+            }
+            if (deliverystatus) {
+                query.deliverystatus = deliverystatus
             }
             const parcels = await ParcelCollection.find(query).toArray();
             res.send(parcels);
@@ -98,17 +112,17 @@ async function run() {
             res.send(parcel);
         });
 
-        app.delete('/parcels/:id',async(req,res)=>{
-            const {id} =req.params;
-            const query={_id : new ObjectId(id)};
+        app.delete('/parcels/:id', async (req, res) => {
+            const { id } = req.params;
+            const query = { _id: new ObjectId(id) };
             const result = await ParcelCollection.deleteOne(query);
             res.send(result);
         })
 
-        app.put('/parcels/:id',async(req,res)=>{
-            const {id} =req.params;
+        app.put('/parcels/:id', async (req, res) => {
+            const { id } = req.params;
             const updatedData = req.body;
-            const filter ={_id :new ObjectId(id)};
+            const filter = { _id: new ObjectId(id) };
             delete updatedData.senderName;
             delete updatedData.senderEmail;
             delete updatedData.status;
@@ -121,38 +135,63 @@ async function run() {
             res.send(result);
         });
 
+        app.patch('/parcels/:id', async (req, res) => {
+            const { riderId, riderName, riderEmail, riderPhone, parentId } = req.body;
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) };
+            const updateDoc = {
+                $set: {
+                    deliverystatus: 'assigned-assigned',
+                    riderId,
+                    riderName,
+                    riderEmail,
+                    riderPhone,
+                    parentId
+                }
+            };
+            const result = await ParcelCollection.updateOne(filter, updateDoc);
+            const riderFilter = { _id: new ObjectId(riderId) };
+            const updateRiderDoc = {
+                $set: {
+                    workstatus: 'in-delivery'
+                }
+            };
+            await RiderCollection.updateOne(riderFilter, updateRiderDoc);
+            res.send(result);
+        });
+
         // PAYMENT 
-       app.post('/create-payment-intent', async (req, res) => {
-             const payInfo = req.body;
-           const session = await stripe.checkout.sessions.create({
-               line_items: [
-                   {
-                       // Provide the exact Price ID (for example, price_1234) of the product you want to sell
-                       price_data:{
-                            currency:'USD',
-                            unit_amount: parseInt(payInfo.totalPrice )* 100, 
-                            product_data:{
+        app.post('/create-payment-intent', async (req, res) => {
+            const payInfo = req.body;
+            const session = await stripe.checkout.sessions.create({
+                line_items: [
+                    {
+                        // Provide the exact Price ID (for example, price_1234) of the product you want to sell
+                        price_data: {
+                            currency: 'USD',
+                            unit_amount: parseInt(payInfo.totalPrice) * 100,
+                            product_data: {
                                 name: payInfo.
                                     parcelName,
                             }
-                       } ,
-                   
-                       quantity: 1,
-                   },
-               ],
-               customer_email: payInfo.email,
-               mode: 'payment',
-               metadata:{
-                parcelId: payInfo.parcelId,
-                parcelName: payInfo.parcelName,
-               },
-               success_url: `${process.env.STRIPE_DOMAIN}/dashboard/paymentSuccess?session_id={CHECKOUT_SESSION_ID}`,
-               cancel_url: `${process.env.STRIPE_DOMAIN}/dashboard/paymentCancel`,
-           });
-        
-           res.send({url : session.url});
+                        },
 
-       })
+                        quantity: 1,
+                    },
+                ],
+                customer_email: payInfo.email,
+                mode: 'payment',
+                metadata: {
+                    parcelId: payInfo.parcelId,
+                    parcelName: payInfo.parcelName,
+                },
+                success_url: `${process.env.STRIPE_DOMAIN}/dashboard/paymentSuccess?session_id={CHECKOUT_SESSION_ID}`,
+                cancel_url: `${process.env.STRIPE_DOMAIN}/dashboard/paymentCancel`,
+            });
+
+            res.send({ url: session.url });
+
+        })
 
         app.patch('/paymentSuccess', async (req, res) => {
             try {
@@ -173,9 +212,7 @@ async function run() {
                     return res.status(400).send({ error: 'Payment not completed' });
                 }
 
-                const transactionId = session.payment_intent; // Now session is defined
-
-                // Check if payment already exists
+                const transactionId = session.payment_intent;
                 const query = { transactionId: transactionId };
                 const paymentExist = await PaymentCollection.findOne(query);
 
@@ -202,7 +239,8 @@ async function run() {
                         paymentStatus: 'completed',
                         paidAt: new Date(),
                         trackingId: trackingId,
-                        transactionId: transactionId
+                        transactionId: transactionId,
+                        deliverystatus: 'pending-pickup'
                     }
                 };
 
@@ -243,18 +281,18 @@ async function run() {
             }
         });
 
-        app.get('/payment',veryFytoken,async(req,res)=>{
-            const email =req.query.email;
-            console.log("token is here",req.headers);
-            const query ={}
-            if(email){
-                query.customer_email =email
+        app.get('/payment', veryFytoken, async (req, res) => {
+            const email = req.query.email;
+            console.log("token is here", req.headers);
+            const query = {}
+            if (email) {
+                query.customer_email = email
             }
-            if(email !== req.decoded_email){
-                return res.status(403).send({message : 'forbiden access'})
+            if (email !== req.decoded_email) {
+                return res.status(403).send({ message: 'forbiden access' })
             }
 
-            const result =await PaymentCollection.find(query).toArray();
+            const result = await PaymentCollection.find(query).toArray();
             res.send(result)
         })
 
@@ -278,18 +316,18 @@ async function run() {
             res.send(result);
         });
 
-        app.get('/users',veryFytoken, async (req, res) => {
-           const result =await UsersCollection.find().toArray();
-           res.send(result)
+        app.get('/users', veryFytoken, async (req, res) => {
+            const result = await UsersCollection.find().toArray();
+            res.send(result)
         });
 
-        app.patch('/users/:id',async(req,res)=>{
-            const {id} =req.params;
+        app.patch('/users/:id', veryFytoken, async (req, res) => {
+            const { id } = req.params;
             const role = req.body.role;
-            const filter ={_id :new ObjectId(id)};
-            const updatedDoc ={
-                $set :{
-                    role : role
+            const filter = { _id: new ObjectId(id) };
+            const updatedDoc = {
+                $set: {
+                    role: role
                 }
 
             }
@@ -297,9 +335,9 @@ async function run() {
             res.send(result);
         })
 
-        app.delete('/users/:id',async(req,res)=>{
-            const {id} =req.params;
-            const query ={_id : new ObjectId(id)};
+        app.delete('/users/:id', async (req, res) => {
+            const { id } = req.params;
+            const query = { _id: new ObjectId(id) };
             const result = await UsersCollection.deleteOne(query);
             res.send(result);
         })
@@ -308,7 +346,7 @@ async function run() {
             const email = req.params.email;
             const query = { email: email };
             const user = await UsersCollection.findOne(query);
-            res.send({role : user?.role || 'user'});
+            res.send({ role: user?.role || 'user' });
         });
 
         // rider data 
@@ -325,8 +363,8 @@ async function run() {
                 if (existingApplication) {
                     return res.status(400).json({
                         message: `You already have a ${existingApplication.status} application. ${existingApplication.status === 'approved'
-                                ? 'You are already a rider.'
-                                : 'Please wait for review.'
+                            ? 'You are already a rider.'
+                            : 'Please wait for review.'
                             }`
                     });
                 }
@@ -356,12 +394,20 @@ async function run() {
             }
         });
 
-        app.get('/rider',async(req,res)=>{
-            const query ={}
-            if(req.query.status){
-                query.status =req.query.status
+        app.get('/rider', async (req, res) => {
+            const query = {}
+            if (req.query.status) {
+                query.status = req.query.status
             }
-            const result =await RiderCollection.find(query).toArray();
+            if (req.query.district) {
+                query.district = req.query.district
+            }
+            if (req.query.workstatus) {
+                query.workstatus = req.query.workstatus
+            }
+            console.log('Rider query:', query);
+            const result = await RiderCollection.find(query).toArray();
+            console.log('Rider results:', result.length);
             res.send(result)
         })
 
@@ -400,11 +446,12 @@ async function run() {
 
                 const updateStatus = {
                     $set: {
-                        status: status
+                        status: status,
+                        workstatus: 'available'
                     }
                 };
 
-       
+
                 if (status === "approved") {
                     const userEmail = rider.email;
                     const userQuery = { email: userEmail };
@@ -419,7 +466,7 @@ async function run() {
 
                     if (userResult.matchedCount === 0) {
                         console.log("User not found in UsersCollection with email:", userEmail);
-                     
+
                     }
                 }
 

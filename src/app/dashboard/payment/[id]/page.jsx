@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import React from 'react';
 import Swal from 'sweetalert2';
 import { FiUser, FiMail, FiDollarSign, FiCreditCard, FiCheckCircle, FiArrowLeft } from 'react-icons/fi';
+import Loading from '@/app/components/Loading';
 
 const Payment = () => {
     const { id } = useParams();
@@ -32,14 +33,7 @@ const Payment = () => {
     }
 
     if (isLoading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="text-center">
-                    <div className="w-16 h-16 border-4 border-white border-t-[#caeb66] rounded-full animate-spin mx-auto mb-4"></div>
-                    <p className="text-white text-lg">Loading Payment Details...</p>
-                </div>
-            </div>
-        );
+        return <Loading/>
     }
 
     if (!parcel) {

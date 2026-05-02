@@ -19,7 +19,9 @@ const MyParcels = () => {
         queryFn: async () => {
             const res = await axios.get(`/parcels?email=${user?.email}`)
             return res.data;
+           
         }
+         
     });
 
     const filteredParcels = myParcels.filter(parcel =>

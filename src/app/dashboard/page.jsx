@@ -20,10 +20,13 @@ import {
     FaUserCircle,
     FaHistory,
     FaUserCheck,
+    FaTasks,
+    FaUserPlus,
 } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import useAuth from "../(site)/hooks/useAuth";
 import useRole from "../(site)/hooks/useRole";
+import Loading from "../components/Loading";
 
 const Sidebar = ({ children }) => {
     const [isOpen, setIsOpen] = useState(true);
@@ -68,10 +71,10 @@ const Sidebar = ({ children }) => {
             roles: ["admin"] // Only admin
         },
         {
-            name: "Analytics",
-            href: "/dashboard/analytics",
-            icon: <FaChartBar />,
-            roles: ["admin"] // Only admin
+            name: "Assign Rider",
+            href: "/dashboard/assignrider",
+            icon: <FaUserCheck />,
+            roles: ["admin","user"] // Only admin
         },
 
         // Rider specific links
@@ -145,18 +148,8 @@ const Sidebar = ({ children }) => {
         setIsOpen(!isOpen);
     };
 
-    // Show loading state while fetching role
     if (isLoading) {
-        return (
-            <div className="flex h-screen bg-gray-50">
-                <div className="flex-1 flex items-center justify-center">
-                    <div className="text-center">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#03373d] mx-auto"></div>
-                        <p className="mt-4 text-gray-600">Loading...</p>
-                    </div>
-                </div>
-            </div>
-        );
+        return <Loading/>
     }
 
     return (

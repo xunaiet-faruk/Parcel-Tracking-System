@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import React, { useState } from 'react';
 import Swal from 'sweetalert2';
 import AdminRouters from '../AdminRoutes/AdminRouters';
+import Loading from '@/app/components/Loading';
 
 const AppoveRider = () => {
     const axios = useAxios();
@@ -137,14 +138,7 @@ const AppoveRider = () => {
     };
 
     if (isLoading) {
-        return (
-            <div className="w-full max-w-7xl mx-auto px-4 py-8 flex justify-center items-center min-h-[400px]">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#03373d] mx-auto mb-4"></div>
-                    <p className="text-gray-600">Loading riders...</p>
-                </div>
-            </div>
-        );
+        return <Loading/>
     }
 
     return (

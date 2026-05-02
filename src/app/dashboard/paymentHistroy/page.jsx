@@ -1,6 +1,7 @@
 "use client";
 import useAuth from "@/app/(site)/hooks/useAuth";
 import useAxios from "@/app/(site)/hooks/useAxios";
+import Loading from "@/app/components/Loading";
 import React, { useEffect, useState } from "react";
 
 const PaymentHistory = () => {
@@ -54,14 +55,7 @@ const PaymentHistory = () => {
     };
 
     if (loading) {
-        return (
-            <div className="flex items-center justify-center min-h-[400px] bg-white">
-                <div className="animate-pulse flex flex-col items-center gap-3">
-                    <div className="w-12 h-12 border-4 border-[#caeb66] border-t-[#03373d] rounded-full animate-spin"></div>
-                    <p className="text-gray-500">Loading payment history...</p>
-                </div>
-            </div>
-        );
+        return <Loading/>
     }
 
     return (
