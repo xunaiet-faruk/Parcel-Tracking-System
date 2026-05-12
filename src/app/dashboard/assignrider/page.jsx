@@ -1,4 +1,3 @@
-"use client";
 import useAuth from '@/app/(site)/hooks/useAuth';
 import useAxios from '@/app/(site)/hooks/useAxios';
 import { useQuery } from '@tanstack/react-query';

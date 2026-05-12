@@ -75,6 +75,7 @@ const Sidebar = ({ children }) => {
             href: "/dashboard/assignrider",
             icon: <FaUserCheck />,
             roles: ["admin", "user"] // Only admin
+           
         },
 
         // Rider specific links
@@ -83,12 +84,34 @@ const Sidebar = ({ children }) => {
             href: "/dashboard/assigned-deliveries",
             icon: <FaTruck />,
             roles: ["rider", "user"] // Only riders
+           
+        },
+        {
+            name: "Delivery History",
+            href: "/dashboard/delivery-history",
+            icon: <FaHistory />,
+            roles: ["rider"] // Only riders
+        },
+
+        // User (customer) specific links
+        {
+            name: "Send Parcel",
+            href: "/dashboard/send-parcel",
+            icon: <FaBox />,
+            roles: ["user"] // Only customers
         },
         {
             name: "My Parcels",
             href: "/dashboard/myparcels",
             icon: <FaClipboardList />,
             roles: ["user", "admin"] // Only customers
+        
+        },
+        {
+            name: "Become a Rider",
+            href: "/dashboard/become-rider",
+            icon: <FaUsers />,
+            roles: ["user"] // Only customers
         },
 
         // Common links for all authenticated users
@@ -96,6 +119,18 @@ const Sidebar = ({ children }) => {
             name: "Payment History",
             href: "/dashboard/paymentHistroy",
             icon: <FaHistory />,
+            roles: ["admin", "rider", "user"]
+        },
+        {
+            name: "Support",
+            href: "/dashboard/support",
+            icon: <FaHeadset />,
+            roles: ["admin", "rider", "user"]
+        },
+        {
+            name: "Settings",
+            href: "/dashboard/settings",
+            icon: <FaCog />,
             roles: ["admin", "rider", "user"]
         },
     ];
@@ -118,6 +153,7 @@ const Sidebar = ({ children }) => {
 
     if (isLoading) {
         return <Loading />
+    
     }
 
     return (
@@ -233,6 +269,7 @@ const Sidebar = ({ children }) => {
                                                 className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 cursor-pointer ${isActive
                                                     ? "bg-[#caeb66] text-[#03373d] shadow-lg"
                                                     : "text-white/80 hover:bg-white/10 hover:text-white"
+                                                       
                                                     }`}
                                             >
                                                 <span className="text-xl">{link.icon}</span>
