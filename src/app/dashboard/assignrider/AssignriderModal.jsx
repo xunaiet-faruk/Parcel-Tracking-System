@@ -1,543 +1,231 @@
-rider jkn data accept korbea akn takeadata ta solea jabea "use client";
+"use client";
+import React, { useState } from 'react';
+import { FaMotorcycle, FaTimes, FaUser, FaEnvelope, FaMapMarkerAlt, FaCheckCircle, FaSpinner } from 'react-icons/fa';
 
-import useAuth from '@/app/(site)/hooks/useAuth';
+const AssignRiderModal = ({
+    isOpen,
+    onClose,
+    selectedParcel,
+    riders,
+    selectedRider,
+    setSelectedRider,
+    onConfirm,
+    ridersLoading,
+    showFallbackRiders
+}) => {
+    const [isLoading, setIsLoading] = useState(false);
+    const [selectedRow, setSelectedRow] = useState(null);
 
-import useAxios from '@/app/(site)/hooks/useAxios';
+    if (!isOpen) return null;
 
-import { useQuery } from '@tanstack/react-query';
-
-import React, { useState, useEffect } from 'react';
-
-import Swal from 'sweetalert2';
-
-import {
-
-    FaMotorcycle, FaUser, FaMapMarkerAlt, FaBox, FaSearch,
-
-    FaHashtag, FaPhone, FaEnvelope, FaWeightHanging,
-
-    FaTag, FaCalendarAlt, FaCreditCard, FaTruck
-
-} from 'react-icons/fa';
-
-import AssignRiderModal from './AssignriderModal';
-
-
-
-const AssignRider = () => {
-
-    const { user } = useAuth();
-
-    const axios = useAxios();
-
-    const [searchTerm, setSearchTerm] = useState('');
-
-    const [isModalOpen, setIsModalOpen] = useState(false);
-
-    const [selectedParcel, setSelectedParcel] = useState(null);
-
-    const [selectedRider, setSelectedRider] = useState('');
-
-
-
-    const { data: assignRider = [], refetch } = useQuery({
-
-        queryKey: ['assignRider', user?.email],
-
-        queryFn: async () => {
-
-            const res = await axios.get('/parcels?deliverystatus=pending-pickup');
-
-            return res.data;
-
-        }
-
-    });
-
-
-
-    // ... অন্যান্য ইমপোর্ট
-
-
-
-    const { data: allRiders = [], isLoading: ridersLoading } = useQuery({
-
-        queryKey: ['riders', selectedParcel?._id],
-
-        queryFn: async () => {
-
-            if (!selectedParcel) return [];
-
-
-
-            const res = await axios.get(`/rider?status=approved&workstatus=available`);
-
-            return res.data;
-
-        },
-
-        enabled: !!selectedParcel && isModalOpen,
-
-        staleTime: 10 * 60 * 1000, // ১০ মিনিট পর্যন্ত ডাটা ক্যাশ থাকবে
-
-    });
-
-
-
-    const districtRiders = selectedParcel ? allRiders.filter(rider => rider.district === selectedParcel.senderDistrict) : [];
-
-    const riders = districtRiders.length > 0 ? districtRiders : allRiders;
-
-    const showFallbackRiders = selectedParcel && districtRiders.length === 0 && allRiders.length > 0;
-
-
-
-    // মডাল ক্লোজ করার ফাংশনটি একটু গুছিয়ে লিখুন
-
-    const closeModal = () => {
-
-        setIsModalOpen(false);
-
-        setSelectedParcel(null);
-
-        setSelectedRider('');
-
+    const handleSelectRider = (riderId) => {
+        setSelectedRow(riderId);
+        setSelectedRider(riderId);
     };
 
-    console.log('Riders loading:', ridersLoading);
+    const handleConfirmClick = async () => {
+        const selectedRiderObject = riders.find(rider => rider._id === selectedRider);
 
-    console.log('Riders data:', riders);
-
-    useEffect(() => {
-
-        if (!isModalOpen) {
-
-            setSelectedRider('');
-
-        }
-
-    }, [isModalOpen]);
-
-
-
-    const handleAssignRiderClick = (parcel) => {
-
-        console.log('Selected parcel district:', parcel.senderDistrict);
-
-        setSelectedParcel(parcel);
-
-        setIsModalOpen(true);
-
-    };
-
-
-
-    const handleConfirmAssignment = async (riderInfo) => {
-
-        if (!riderInfo) {
-
-            return Swal.fire({
-
-                icon: 'warning',
-
-                title: 'Rider select korun!',
-
-                text: 'Assignment confirm korar age ekjon rider select kora dorkar.',
-
-                confirmButtonColor: '#2563eb'
-
-            });
-
-        }
-
-
-
-        try {
-
-            const updateData = {
-
-                riderId: riderInfo.riderId,
-
-                riderName: riderInfo.riderName,
-
-                riderEmail: riderInfo.riderEmail,
-
-                riderPhone: riderInfo.riderPhone,
-
-                parentId: riderInfo.parentId,
-
-                deliverystatus: 'assigned',
-
-                assignedAt: new Date()
-
+        if (selectedRiderObject) {
+            const riderInfo = {
+                riderId: selectedRiderObject._id,
+                riderName: selectedRiderObject.fullName || selectedRiderObject.name,
+                riderEmail: selectedRiderObject.email,
+                riderPhone: selectedRiderObject.phone,
+                parentId: selectedParcel?._id,
             };
 
-
-
-            const res = await axios.patch(`/parcels/${riderInfo.parentId}`, updateData);
-
-
-
-            if (res.data.modifiedCount > 0) {
-
-                Swal.fire({
-
-                    icon: 'success',
-
-                    title: 'Assigned!',
-
-                    text: `Rider ${riderInfo.riderName} assigned successfully.`,
-
-                    timer: 1500,
-
-                    showConfirmButton: false
-
-                });
-
-
-
-                refetch();
-
-                setIsModalOpen(false);
-
-                setSelectedParcel(null);
-
-                setSelectedRider('');
-
-
-
-                return res.data;
-
+            setIsLoading(true);
+            try {
+                await onConfirm(riderInfo);
+                onClose();
+            } catch (error) {
+                console.error('Assignment error:', error);
+            } finally {
+                setIsLoading(false);
             }
-
-        } catch (error) {
-
-            console.error('Assignment error:', error);
-
-            Swal.fire({
-
-                icon: 'error',
-
-                title: 'Oops...',
-
-                text: error.response?.data?.message || 'Something went wrong!',
-
-            });
-
-            throw error;
-
+        } else {
+            console.error('No rider selected');
         }
-
     };
 
-
-
-    const filteredParcels = assignRider.filter(parcel =>
-
-        parcel.trackingId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-
-        parcel.receiverName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-
-        parcel.senderName?.toLowerCase().includes(searchTerm.toLowerCase())
-
-    );
-
-
-
-    const formatDate = (dateString) => new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-
-    const formatTime = (dateString) => new Date(dateString).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-
-
-
     return (
-
-        <div className="min-h-screen bg-gray-50 p-6">
-
-            <div className="container mx-auto">
-
-                {/* Header Section */}
-
-                <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-
-                    <div className="flex justify-between items-center flex-wrap gap-4">
-
-                        <div>
-
-                            <h1 className="text-2xl font-bold text-gray-800">Assign Riders</h1>
-
-                            <p className="text-gray-600 mt-1">Manage and assign delivery riders to pending parcels</p>
-
-                        </div>
-
-                        <div className="bg-blue-50 rounded-lg px-4 py-2">
-
-                            <span className="text-blue-600 font-semibold">Pending Pickup: {filteredParcels.length}</span>
-
-                        </div>
-
-                    </div>
-
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm p-4">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden transform transition-all flex flex-col">
+                {/* Modal Header */}
+                <div className="bg-gradient-to-r from-[#03373d] to-[#1a5c64] p-4 flex justify-between items-center text-white sticky top-0 z-10">
+                    <h3 className="text-lg font-bold flex items-center gap-2">
+                        <FaMotorcycle /> Assign Rider to Parcel
+                    </h3>
+                    <button onClick={onClose} className="hover:rotate-90 transition-transform">
+                        <FaTimes size={20} />
+                    </button>
                 </div>
 
-
-
-                {/* Search Section */}
-
-                <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
-
-                    <div className="relative">
-
-                        <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-
-                        <input
-
-                            type="text"
-
-                            value={searchTerm}
-
-                            onChange={(e) => setSearchTerm(e.target.value)}
-
-                            placeholder="Search by Tracking ID, Receiver, or Sender..."
-
-                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-
-                        />
-
-                    </div>
-
-                </div>
-
-
-
-                {/* Parcels Grid */}
-
-                {filteredParcels.length === 0 ? (
-
-                    <div className="bg-white rounded-xl shadow-sm p-12 text-center">
-
-                        <FaBox className="text-6xl text-gray-300 mx-auto mb-4" />
-
-                        <h3 className="text-lg font-semibold text-gray-600">No pending parcels</h3>
-
-                        <p className="text-gray-400 mt-1">
-
-                            {searchTerm ? 'No parcels match your search criteria' : 'All parcels have been assigned to riders'}
-
-                        </p>
-
-                    </div>
-
-                ) : (
-
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-                        {filteredParcels.map((parcel) => (
-
-                            <div key={parcel._id} className="bg-white rounded-xl shadow-xl border border-gray-100 hover:shadow-md transition-shadow duration-300">
-
-                                {/* Parcel Header */}
-
-                                <div className="p-5 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-white rounded-t-xl">
-
-                                    <div className="flex justify-between items-start flex-wrap gap-2">
-
-                                        <div>
-
-                                            <div className="flex items-center gap-2 mb-2">
-
-                                                <FaHashtag className="text-blue-500 text-sm" />
-
-                                                <span className="text-xs font-mono text-gray-600 bg-gray-100 px-2 py-1 rounded">{parcel.trackingId}</span>
-
-                                            </div>
-
-                                            <div className="flex items-center gap-4 mt-2 flex-wrap">
-
-                                                <div className="flex items-center gap-2 text-sm text-gray-500">
-
-                                                    <FaCalendarAlt className="text-green-500" />
-
-                                                    <span>{formatDate(parcel.bookingDate)} at {formatTime(parcel.bookingDate)}</span>
-
-                                                </div>
-
-                                                <div className="flex items-center gap-2 text-sm font-semibold text-green-600">
-
-                                                    <FaCreditCard />
-
-                                                    <span>${parcel.totalPrice}</span>
-
-                                                </div>
-
-                                            </div>
-
-                                        </div>
-
-                                        {/* স্ট্যাটাস ব্যাজ - পেন্ডিং এবং রিজেক্টেড উভয় দেখাবে */}
-
-                                        <div className="flex gap-2">
-
-                                            {parcel.deliverystatus === 'rejected' ? (
-
-                                                <span className="px-3 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full uppercase">
-
-                                                    REJECTED
-
-                                                </span>
-
-                                            ) : (
-
-                                                <span className="px-3 py-1 bg-yellow-100 text-yellow-700 text-xs font-medium rounded-full uppercase">
-
-                                                    {parcel.deliverystatus?.replace('-', ' ')}
-
-                                                </span>
-
-                                            )}
-
-                                            <span className="px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full uppercase">
-
-                                                {parcel.paymentStatus}
-
-                                            </span>
-
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
-
-
-                                {/* Parcel Info Body */}
-
-                                <div className="p-5 space-y-4">
-
-                                    <div className="bg-gray-50 rounded-lg p-3 flex justify-between items-center">
-
-                                        <div className="flex items-center gap-2">
-
-                                            <FaBox className="text-purple-500" />
-
-                                            <span className="font-medium text-gray-700">{parcel.parcelName}</span>
-
-                                        </div>
-
-                                        <span className="text-sm text-gray-600"><FaWeightHanging className="inline mr-1 text-orange-500" />{parcel.parcelWeight} kg</span>
-
-                                    </div>
-
-
-
-                                    {/* Sender Info */}
-
-                                    <div className="border-l-4 border-blue-400 pl-3">
-
-                                        <h4 className="text-sm font-semibold text-gray-700 flex items-center gap-2 mb-2"><FaTruck className="text-blue-500 text-xs" /> Sender Information</h4>
-
-                                        <div className="ml-2 text-sm text-gray-600 space-y-1">
-
-                                            <p className="font-medium text-gray-800">{parcel.senderName}</p>
-
-                                            <p><FaMapMarkerAlt className="inline mr-1 text-red-400" /> {parcel.senderAddress} ({parcel.senderDistrict})</p>
-
-                                            <p><FaPhone className="inline mr-1 text-blue-400" /> {parcel.senderPhone}</p>
-
-                                        </div>
-
-                                    </div>
-
-
-
-                                    {/* Receiver Info */}
-
-                                    <div className="border-l-4 border-green-400 pl-3">
-
-                                        <h4 className="text-sm font-semibold text-gray-700 flex items-center gap-2 mb-2"><FaUser className="text-green-500 text-xs" /> Receiver Information</h4>
-
-                                        <div className="ml-2 text-sm text-gray-600 space-y-1">
-
-                                            <p className="font-medium text-gray-800">{parcel.receiverName}</p>
-
-                                            <p><FaMapMarkerAlt className="inline mr-1 text-green-400" /> {parcel.receiverAddress} ({parcel.receiverDistrict})</p>
-
-                                            <p><FaPhone className="inline mr-1 text-blue-400" /> {parcel.receiverPhone}</p>
-
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
-
-
-                                {/* Action Button */}
-
-                                <div className="p-5 bg-gray-50 rounded-b-xl flex gap-3">
-
-                                    <button
-
-                                        onClick={() => handleAssignRiderClick(parcel)}
-
-                                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium shadow-sm"
-
-                                    >
-
-                                        <FaMotorcycle /> Assign Rider
-
-                                    </button>
-
-                                </div>
-
+                {/* Modal Body */}
+                <div className="p-6 overflow-y-auto flex-1">
+                    {/* Parcel Information */}
+                    <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
+                        <h4 className="font-semibold text-blue-800 mb-2">Parcel Information</h4>
+                        <div className="grid grid-cols-2 gap-3 text-sm">
+                            <div>
+                                <p className="text-gray-600">Tracking ID:</p>
+                                <p className="font-mono font-bold text-blue-700">{selectedParcel?.trackingId}</p>
                             </div>
-
-                        ))}
-
+                            <div>
+                                <p className="text-gray-600">Parcel Name:</p>
+                                <p className="font-medium text-gray-800">{selectedParcel?.parcelName}</p>
+                            </div>
+                            <div>
+                                <p className="text-gray-600">Sender District:</p>
+                                <p className="font-medium text-gray-800">{selectedParcel?.senderDistrict}</p>
+                            </div>
+                            <div>
+                                <p className="text-gray-600">Delivery Fee:</p>
+                                <p className="font-semibold text-green-600">${selectedParcel?.totalPrice}</p>
+                            </div>
+                        </div>
                     </div>
 
-                )}
+                    {/* Riders Table */}
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-3">
+                            Select Available Rider ({riders?.length} available)
+                        </label>
 
+                        {ridersLoading ? (
+                            <div className="flex flex-col items-center py-10">
+                                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
+                                <p className="mt-2 text-gray-500">Loading riders...</p>
+                            </div>
+                        ) : riders?.length === 0 ? (
+                            <div className="text-center py-8 bg-gray-50 rounded-lg">
+                                <FaMotorcycle className="text-5xl text-gray-300 mx-auto mb-3" />
+                                <p className="text-gray-500">No available riders found in {selectedParcel?.senderDistrict} district</p>
+                            </div>
+                        ) : (
+                            <div className="overflow-x-auto border border-gray-200 rounded-xl">
+                                <table className="w-full">
+                                    <thead className="bg-gray-50 border-b border-gray-200">
+                                        <tr>
+                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                                Select
+                                            </th>
+                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                                Rider Name
+                                            </th>
+                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                                District
+                                            </th>
+                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                                Email
+                                            </th>
+                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                                Phone
+                                            </th>
+                                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                                Vehicle
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="bg-white divide-y divide-gray-200">
+                                        {riders?.map((rider) => (
+                                            <tr
+                                                key={rider._id}
+                                                className={`cursor-pointer transition-colors ${selectedRow === rider._id
+                                                    ? 'bg-blue-50 border-l-4 border-l-blue-500'
+                                                    : 'hover:bg-gray-50'
+                                                    }`}
+                                                onClick={() => handleSelectRider(rider._id)}
+                                            >
+                                                <td className="px-4 py-3">
+                                                    <input
+                                                        type="radio"
+                                                        name="rider"
+                                                        value={rider._id}
+                                                        checked={selectedRider === rider._id}
+                                                        onChange={() => handleSelectRider(rider._id)}
+                                                        className="text-blue-600 focus:ring-blue-500 h-4 w-4"
+                                                        onClick={(e) => e.stopPropagation()}
+                                                    />
+                                                </td>
+                                                <td className="px-4 py-3">
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="bg-blue-100 rounded-full p-1">
+                                                            <FaUser className="text-blue-600 text-xs" />
+                                                        </div>
+                                                        <span className="font-medium text-gray-800">{rider.fullName || rider.name}</span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-4 py-3">
+                                                    <div className="flex items-center gap-1">
+                                                        <FaMapMarkerAlt className="text-gray-400 text-xs" />
+                                                        <span className="text-gray-600">{rider.district}</span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-4 py-3">
+                                                    <div className="flex items-center gap-1">
+                                                        <FaEnvelope className="text-gray-400 text-xs" />
+                                                        <span className="text-gray-600 text-sm">{rider.email}</span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-4 py-3">
+                                                    <span className="text-gray-600">{rider.phone}</span>
+                                                </td>
+                                                <td className="px-4 py-3">
+                                                    <div className="flex items-center gap-1">
+                                                        <FaMotorcycle className="text-gray-400 text-xs" />
+                                                        <span className="text-gray-600 text-sm">{rider.vehicleType || 'Motorcycle'}</span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                    </div>
+
+                    {showFallbackRiders && (
+                        <div className="mt-4 rounded-lg border border-yellow-200 bg-yellow-50 p-3 text-sm text-yellow-800">
+                            ⚠️ No riders were available in this parcel's district, so all approved available riders are shown instead.
+                        </div>
+                    )}
+                </div>
+
+                {/* Modal Footer Buttons */}
+                <div className="p-6 bg-gray-50 border-t border-gray-200 flex gap-3 sticky bottom-0">
+                    <button
+                        onClick={onClose}
+                        disabled={isLoading}
+                        className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-medium"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={handleConfirmClick}
+                        disabled={!selectedRider || riders?.length === 0 || isLoading}
+                        className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg transition-colors font-semibold ${(!selectedRider || riders?.length === 0 || isLoading)
+                                ? 'opacity-50 cursor-not-allowed'
+                                : 'hover:bg-blue-700'
+                            }`}
+                    >
+                        {isLoading ? (
+                            <>
+                                <FaSpinner className="animate-spin" />
+                                Assigning...
+                            </>
+                        ) : (
+                            <>
+                                <FaCheckCircle />
+                                Confirm Assignment
+                            </>
+                        )}
+                    </button>
+                </div>
             </div>
-
-
-
-            <AssignRiderModal
-
-                isOpen={isModalOpen}
-
-                onClose={() => {
-
-                    setIsModalOpen(false);
-
-                    setSelectedParcel(null);
-
-                    setSelectedRider('');
-
-                }}
-
-                selectedParcel={selectedParcel}
-
-                riders={riders}
-
-                selectedRider={selectedRider}
-
-                setSelectedRider={setSelectedRider}
-
-                onConfirm={handleConfirmAssignment}
-
-                ridersLoading={ridersLoading}
-
-                showFallbackRiders={showFallbackRiders}
-
-            />
-
         </div>
-
     );
-
 };
 
-
-
-export default AssignRider;
+export default AssignRiderModal;
