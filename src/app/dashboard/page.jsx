@@ -22,6 +22,7 @@ import {
     FaUserCheck,
     FaTasks,
     FaUserPlus,
+    FaCheckCircle,
 } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import useAuth from "../(site)/hooks/useAuth";
@@ -86,6 +87,15 @@ const Sidebar = ({ children }) => {
             roles: ["rider", "user"] // Only riders
            
         },
+        {
+            name: "Completed Deliveries",
+            href: "/dashboard/completed-deliveries",
+            icon: <FaCheckCircle />, 
+            roles: ["rider", "user"] // Only riders
+           
+        },
+
+    
         {
             name: "Delivery History",
             href: "/dashboard/delivery-history",

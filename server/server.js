@@ -181,11 +181,9 @@ async function run() {
 
         app.patch('/parcels/deliverystatus/:id', async (req, res) => {
             try {
-                const { deliverystatus, acceptedBy, rejectedBy, rejectionReason } = req.body;
+                const { deliverystatus, acceptedBy, rejectedBy, rejectionReason, pickedUpBy, deliveredBy } = req.body;
                 const id = req.params.id;
                 const filter = { _id: new ObjectId(id) };
-
-                // প্রথমে current parcel ডাটা নিন
                 const currentParcel = await ParcelCollection.findOne(filter);
 
                 const updateDoc = {
@@ -200,12 +198,28 @@ async function run() {
                     updateDoc.$set.acceptedBy = acceptedBy;
                 }
 
+                if (deliverystatus === 'picked-up') {
+                    updateDoc.$set.pickedUpAt = new Date();
+                    updateDoc.$set.pickedUpBy = pickedUpBy;
+                }
+
+                if (deliverystatus === 'delivered') {
+                    updateDoc.$set.deliveredAt = new Date();
+                    updateDoc.$set.deliveredBy = deliveredBy;
+
+                    if (currentParcel?.riderId) {
+                        await RiderCollection.updateOne(
+                            { _id: new ObjectId(currentParcel.riderId) },
+                            { $set: { workstatus: 'available' } }
+                        );
+                    }
+                }
+
                 if (deliverystatus === 'pending-pickup') {
                     updateDoc.$set.rejectedAt = new Date();
                     updateDoc.$set.rejectedBy = rejectedBy;
                     updateDoc.$set.rejectionReason = rejectionReason || 'No reason provided';
 
-                    // রাইডারকে available করে দিন
                     if (currentParcel?.riderId) {
                         await RiderCollection.updateOne(
                             { _id: new ObjectId(currentParcel.riderId) },
@@ -213,7 +227,6 @@ async function run() {
                         );
                     }
 
-                    // রাইডারের তথ্য null করে দিন
                     updateDoc.$set.riderId = null;
                     updateDoc.$set.riderName = null;
                     updateDoc.$set.riderEmail = null;
@@ -234,7 +247,6 @@ async function run() {
             const session = await stripe.checkout.sessions.create({
                 line_items: [
                     {
-                        // Provide the exact Price ID (for example, price_1234) of the product you want to sell
                         price_data: {
                             currency: 'USD',
                             unit_amount: parseInt(payInfo.totalPrice) * 100,

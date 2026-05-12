@@ -26,9 +26,7 @@ const AssignRider = () => {
         queryFn: async () => {
 
             const res = await axios.get('/parcels?deliverystatus=pending-pickup');
-
             return res.data;
-
         }
 
     });
