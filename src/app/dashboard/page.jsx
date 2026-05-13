@@ -2,13 +2,12 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
     FaTachometerAlt,
     FaBox,
     FaTruck,
     FaUsers,
-    FaChartBar,
     FaCog,
     FaSignOutAlt,
     FaBars,
@@ -20,8 +19,6 @@ import {
     FaUserCircle,
     FaHistory,
     FaUserCheck,
-    FaTasks,
-    FaUserPlus,
     FaCheckCircle,
 } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
@@ -32,11 +29,28 @@ import Loading from "../components/Loading";
 const Sidebar = ({ children }) => {
     const [isOpen, setIsOpen] = useState(true);
     const [isMobile, setIsMobile] = useState(false);
+    const [isClient, setIsClient] = useState(false);
+    const [shouldRender, setShouldRender] = useState(false);
     const pathname = usePathname();
-    const { user, logout } = useAuth();
-    const { role, isLoading } = useRole(); // role can be 'user', 'rider', or 'admin'
+    const router = useRouter();
+    const { user, logout, loading: authLoading } = useAuth();
+    const { role, isLoading: roleLoading } = useRole();
 
+    // ক্লায়েন্ট সাইড মাউন্ট চেক
     useEffect(() => {
+        setIsClient(true);
+        // 1 সেকেন্ড পর রেন্ডার করবে
+        const timer = setTimeout(() => {
+            setShouldRender(true);
+        }, 100);
+
+        return () => clearTimeout(timer);
+    }, []);
+
+    // রেসপন্সিভ চেক
+    useEffect(() => {
+        if (!isClient) return;
+
         const handleResize = () => {
             setIsMobile(window.innerWidth < 768);
             if (window.innerWidth < 768) {
@@ -45,86 +59,74 @@ const Sidebar = ({ children }) => {
                 setIsOpen(true);
             }
         };
+
         handleResize();
         window.addEventListener("resize", handleResize);
         return () => window.removeEventListener("resize", handleResize);
-    }, []);
+    }, [isClient]);
 
-    // Define all navigation links with role-based access
+    // নেভিগেশন লিংক
     const allNavLinks = [
-        // Admin only links
         {
             name: "Dashboard",
             href: "/dashboard/overview",
             icon: <FaTachometerAlt />,
-            roles: ["admin", "rider", "user"] // All roles can see dashboard
+            roles: ["admin", "rider", "user"]
         },
         {
             name: "Approve Rider",
             href: "/dashboard/approverider",
             icon: <FaUserCheck />,
-            roles: ["admin"] // Only admin
+            roles: ["admin"]
         },
         {
             name: "User Management",
             href: "/dashboard/usermanagment",
             icon: <FaUserFriends />,
-            roles: ["admin"] // Only admin
+            roles: ["admin"]
         },
         {
             name: "Assign Rider",
             href: "/dashboard/assignrider",
             icon: <FaUserCheck />,
-            roles: ["admin", "user"] // Only admin
-           
+            roles: ["admin", "user"]
         },
-
-        // Rider specific links
         {
             name: "Assigned Deliveries",
             href: "/dashboard/assigned-deliveries",
             icon: <FaTruck />,
-            roles: ["rider", "user"] // Only riders
-           
+            roles: ["rider", "user"]
         },
         {
             name: "Completed Deliveries",
             href: "/dashboard/completed-deliveries",
-            icon: <FaCheckCircle />, 
-            roles: ["rider", "user"] // Only riders
-           
+            icon: <FaCheckCircle />,
+            roles: ["rider", "user"]
         },
-
-    
         {
             name: "Delivery History",
             href: "/dashboard/delivery-history",
             icon: <FaHistory />,
-            roles: ["rider"] // Only riders
+            roles: ["rider"]
         },
-
-        // User (customer) specific links
         {
             name: "Send Parcel",
             href: "/dashboard/send-parcel",
             icon: <FaBox />,
-            roles: ["user"] // Only customers
+            roles: ["user"]
         },
         {
             name: "My Parcels",
             href: "/dashboard/myparcels",
             icon: <FaClipboardList />,
-            roles: ["user", "admin"] // Only customers
-        
+            roles: ["user", "admin"]
         },
         {
             name: "Become a Rider",
             href: "/dashboard/become-rider",
             icon: <FaUsers />,
-            roles: ["user"] // Only customers
+            roles: ["user"]
         },
-
-        // Common links for all authenticated users
         {
             name: "Payment History",
             href: "/dashboard/paymentHistroy",
@@ -145,12 +147,11 @@ const Sidebar = ({ children }) => {
         },
     ];
 
-    // Filter links based on user role
-    const navLinks = allNavLinks.filter(link =>
-        !isLoading && link.roles.includes(role)
-    );
+    // রোল বেসড লিংক ফিল্টার - isLoading false হলেই শুধু ফিল্টার করবে
+    const navLinks = !roleLoading && !authLoading && role
+        ? allNavLinks.filter(link => link.roles.includes(role))
+        : [];
 
-    // Get role display name
     const getRoleDisplayName = () => {
         if (role === "admin") return "Admin";
         if (role === "rider") return "Rider";
@@ -161,9 +162,34 @@ const Sidebar = ({ children }) => {
         setIsOpen(!isOpen);
     };
 
-    if (isLoading) {
-        return <Loading />
-    
+    const handleLogout = async () => {
+        try {
+            await logout();
+            router.push("/login");
+        } catch (error) {
+            console.error("Logout error:", error);
+        }
+    };
+
+    // স্ট্রিক্ট লোডিং কন্ডিশন
+    if (!isClient || !shouldRender) {
+        return null; // সার্ভার সাইডে কিছু দেখাবে না
+    }
+
+    // শুধু মাত্র লোডিং দেখাবে যখন ইউজার লোড হচ্ছে
+    if (authLoading) {
+        return <Loading />;
+    }
+
+    // ইউজার না থাকলে লগইন পেজে রিডিরেক্ট
+    if (!user) {
+        router.push("/login");
+        return <Loading />;
+    }
+
+    // রোল লোডিং হলে লোডিং দেখাবে
+    if (roleLoading) {
+        return <Loading />;
     }
 
     return (
@@ -193,8 +219,7 @@ const Sidebar = ({ children }) => {
                 style={{ width: isOpen ? (isMobile ? "280px" : "280px") : "80px" }}
             >
                 {/* Logo Section */}
-                <div className={`p-6 border-b border-white/10 flex items-center ${isOpen ? "justify-between" : "justify-center"
-                    }`}>
+                <div className={`p-6 border-b border-white/10 flex items-center ${isOpen ? "justify-between" : "justify-center"}`}>
                     {isOpen ? (
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 bg-[#caeb66] rounded-xl flex items-center justify-center">
@@ -211,7 +236,6 @@ const Sidebar = ({ children }) => {
                         </div>
                     )}
 
-                    {/* Toggle Button */}
                     <button
                         onClick={toggleSidebar}
                         className="hidden md:flex text-white hover:bg-white/10 p-2 rounded-lg transition"
@@ -231,8 +255,7 @@ const Sidebar = ({ children }) => {
                 )}
 
                 {/* User Profile Section */}
-                <div className={`p-4 border-b border-white/10 ${isOpen ? "flex" : "flex-col"
-                    } items-center gap-3`}>
+                <div className={`p-4 border-b border-white/10 ${isOpen ? "flex" : "flex-col"} items-center gap-3`}>
                     <div className="w-12 h-12 bg-[#caeb66]/20 rounded-full flex items-center justify-center border-2 border-[#caeb66]">
                         {user?.photoURL ? (
                             <img
@@ -279,7 +302,6 @@ const Sidebar = ({ children }) => {
                                                 className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 cursor-pointer ${isActive
                                                     ? "bg-[#caeb66] text-[#03373d] shadow-lg"
                                                     : "text-white/80 hover:bg-white/10 hover:text-white"
-                                                       
                                                     }`}
                                             >
                                                 <span className="text-xl">{link.icon}</span>
@@ -333,9 +355,8 @@ const Sidebar = ({ children }) => {
                 {/* Footer Section */}
                 <div className="p-4 border-t border-white/10">
                     <button
-                        onClick={logout}
-                        className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-white/80 hover:bg-white/10 hover:text-white transition-all duration-200 ${isOpen ? "" : "justify-center"
-                            }`}
+                        onClick={handleLogout}
+                        className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-white/80 hover:bg-white/10 hover:text-white transition-all duration-200 ${isOpen ? "" : "justify-center"}`}
                     >
                         <FaSignOutAlt className="text-xl" />
                         {isOpen && <span className="font-medium text-sm">Logout</span>}

@@ -133,14 +133,17 @@ const Navbar = () => {
 
                     {
                         user ? (
-                            <motion.a
-                                href="/dashboard/overview"
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                className="btn bg-[#caeb66] text-[#03373d] cursor-pointer hover:bg-[#d4ff6e] transition-all duration-300 rounded-lg px-6 font-semibold shadow-md"
-                            >
-                                Dashboard
-                            </motion.a>
+                            <Link href="/dashboard/overview">
+                                <motion
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    className="btn bg-[#caeb66] text-[#03373d] cursor-pointer hover:bg-[#d4ff6e] transition-all duration-300 rounded-lg px-6 font-semibold shadow-md"
+                                >
+                                    Dashboard
+                                </motion>
+                            
+                            
+                            </Link>
                         ) : <motion.a
                             href="/login"
                             whileHover={{ scale: 1.05 }}
