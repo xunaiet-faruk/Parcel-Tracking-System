@@ -20,11 +20,16 @@ import {
     FaHistory,
     FaUserCheck,
     FaCheckCircle,
+    FaUsersCog,
+    FaHome,
+    FaTasks,
 } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import useAuth from "../(site)/hooks/useAuth";
 import useRole from "../(site)/hooks/useRole";
 import Loading from "../components/Loading";
+import { BiSupport } from "react-icons/bi";
+import { MdSpatialTracking } from "react-icons/md";
 
 const Sidebar = ({ children }) => {
     const [isOpen, setIsOpen] = useState(true);
@@ -88,20 +93,26 @@ const Sidebar = ({ children }) => {
         {
             name: "Assign Rider",
             href: "/dashboard/assignrider",
-            icon: <FaUserCheck />,
-            roles: ["admin", "user"]
+            icon: <FaTasks />,
+            roles: ["admin"]
         },
+        // {
+        //     name: "Rider Managment",
+        //     href: "/dashboard/riderManagment",
+        //     icon: <FaUsersCog />,
+        //     roles: ["admin"]
+        // },
         {
             name: "Assigned Deliveries",
             href: "/dashboard/assigned-deliveries",
             icon: <FaTruck />,
-            roles: ["rider", "user"]
+            roles: ["rider"]
         },
         {
             name: "Completed Deliveries",
             href: "/dashboard/completed-deliveries",
             icon: <FaCheckCircle />,
-            roles: ["rider", "user"]
+            roles: ["rider"]
         },
         {
             name: "Delivery History",
@@ -111,7 +122,7 @@ const Sidebar = ({ children }) => {
         },
         {
             name: "Send Parcel",
-            href: "/dashboard/send-parcel",
+            href: "/parcel",
             icon: <FaBox />,
             roles: ["user"]
         },
@@ -119,11 +130,11 @@ const Sidebar = ({ children }) => {
             name: "My Parcels",
             href: "/dashboard/myparcels",
             icon: <FaClipboardList />,
-            roles: ["user", "admin"]
+            roles: ["user"]
         },
         {
             name: "Become a Rider",
-            href: "/dashboard/become-rider",
+            href: "/rider",
             icon: <FaUsers />,
             roles: ["user"]
         },
@@ -131,20 +142,27 @@ const Sidebar = ({ children }) => {
             name: "Payment History",
             href: "/dashboard/paymentHistroy",
             icon: <FaHistory />,
-            roles: ["admin", "rider", "user"]
+            roles: ["user"]
         },
         {
-            name: "Support",
-            href: "/dashboard/support",
-            icon: <FaHeadset />,
-            roles: ["admin", "rider", "user"]
+            name: "Track-Parcel",
+            href: "/dashboard/track-parcel",
+            icon: <MdSpatialTracking />,
+            roles: ["user"]
         },
+        // {
+        //     name: "Support",
+        //     href: "/dashboard/paymentHistroy",
+        //     icon: <BiSupport />,
+        //     roles: ["user","rider"]
+        // },
         {
-            name: "Settings",
-            href: "/dashboard/settings",
-            icon: <FaCog />,
-            roles: ["admin", "rider", "user"]
+            name: "Home",
+            href: "/",
+            icon: <FaHome/>,
+            roles: ["user","admin","rider"]
         },
+       
     ];
 
     // রোল বেসড লিংক ফিল্টার - isLoading false হলেই শুধু ফিল্টার করবে
@@ -290,7 +308,7 @@ const Sidebar = ({ children }) => {
                                 Main Menu
                             </p>
                         )}
-                        <ul className="space-y-2">
+                        <ul className="space-y-3">
                             {navLinks.map((link) => {
                                 const isActive = pathname === link.href;
                                 return (
@@ -322,41 +340,14 @@ const Sidebar = ({ children }) => {
                         </ul>
                     </div>
 
-                    {/* Notifications Section */}
-                    <div className="mt-6 px-4">
-                        {isOpen && (
-                            <p className="text-white/50 text-xs uppercase tracking-wider mb-3 px-3">
-                                Notifications
-                            </p>
-                        )}
-                        <div className="bg-white/5 rounded-xl p-3">
-                            {isOpen ? (
-                                <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 bg-[#caeb66]/20 rounded-full flex items-center justify-center">
-                                        <FaBell className="text-[#caeb66] text-sm" />
-                                    </div>
-                                    <div className="flex-1">
-                                        <p className="text-white text-xs font-medium">New Update!</p>
-                                        <p className="text-white/50 text-xs">Your parcel is on the way</p>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="flex justify-center">
-                                    <div className="w-8 h-8 bg-[#caeb66]/20 rounded-full flex items-center justify-center relative">
-                                        <FaBell className="text-[#caeb66] text-sm" />
-                                        <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
+                  
                 </nav>
 
                 {/* Footer Section */}
                 <div className="p-4 border-t border-white/10">
                     <button
                         onClick={handleLogout}
-                        className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-white/80 hover:bg-white/10 hover:text-white transition-all duration-200 ${isOpen ? "" : "justify-center"}`}
+                        className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-white/80 hover:bg-red-500 cursor-pointer hover:text-white transition-all duration-200 ${isOpen ? "" : "justify-center"}`}
                     >
                         <FaSignOutAlt className="text-xl" />
                         {isOpen && <span className="font-medium text-sm">Logout</span>}

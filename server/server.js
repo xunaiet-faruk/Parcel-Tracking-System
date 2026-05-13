@@ -76,15 +76,27 @@ async function run() {
         const UsersCollection = client.db("ZapshiptDB").collection("Users");
         const RiderCollection = client.db("ZapshiptDB").collection("Rider");
 
-        // const veryFyadmin =async(req,res,next) =>{
-        //     const email = req.decoded_email;
-        //     const query = {email : email};
-        //     const user = await UsersCollection.findOne(query);
-        //     if(user?.role !== 'admin'){
-        //         return res.status(403).send({message : 'forbiden access'})
-        //     }
-        //     next();
-        // }
+        // Admin verification middleware
+        const verifyAdmin = async (req, res, next) => {
+            try {
+                const email = req.decoded_email;
+                const user = await UsersCollection.findOne({ email: email });
+
+                if (user?.role !== 'admin') {
+                    return res.status(403).send({
+                        success: false,
+                        message: 'Forbidden access. Admin rights required.'
+                    });
+                }
+                next();
+            } catch (error) {
+                console.error('Admin verification error:', error);
+                res.status(500).send({
+                    success: false,
+                    message: 'Internal server error'
+                });
+            }
+        };
 
         app.post('/parcels', async (req, res) => {
             const parcel = req.body;
@@ -104,7 +116,6 @@ async function run() {
                 query.riderEmail = riderEmail;
             }
 
-            // 🔥 MAIN FIX
             if (deliverystatus === 'pending-pickup') {
                 query.deliverystatus = {
                     $in: ['pending-pickup', 'assigned']
@@ -119,6 +130,49 @@ async function run() {
 
             const parcels = await ParcelCollection.find(query).toArray();
             res.send(parcels);
+        });
+
+      
+        app.get('/admin/parcels/all', veryFytoken, verifyAdmin, async (req, res) => {
+            try {
+                const parcels = await ParcelCollection.find({}).sort({ createdAt: -1 }).toArray();
+                res.send(parcels);
+            } catch (error) {
+                console.error('Error fetching admin parcels:', error);
+                res.status(500).send({ error: error.message });
+            }
+        });
+
+  
+        app.get('/admin/dashboard/stats', veryFytoken, verifyAdmin, async (req, res) => {
+            try {
+                const allParcels = await ParcelCollection.find({}).toArray();
+
+                const delivered = allParcels.filter(p => p.deliverystatus === 'delivered').length;
+                const pending = allParcels.filter(p => p.deliverystatus === 'pending-pickup' || p.deliverystatus === 'assigned').length;
+                const totalRevenue = allParcels.reduce((sum, p) => sum + (p.totalPrice || 0), 0);
+                const uniqueUsers = new Set(allParcels.map(p => p.senderEmail).filter(Boolean)).size;
+                const activeDeliveries = allParcels.filter(p =>
+                    p.deliverystatus === 'pending-pickup' ||
+                    p.deliverystatus === 'assigned' ||
+                    p.deliverystatus === 'picked-up'
+                ).length;
+                const totalUsers = await UsersCollection.countDocuments();
+                const totalRiders = await RiderCollection.countDocuments({ status: 'approved' });
+
+                res.send({
+                    totalParcels: allParcels.length,
+                    deliveredParcels: delivered,
+                    pendingParcels: pending,
+                    totalRevenue: totalRevenue,
+                    totalUsers: totalUsers,
+                    activeDeliveries: activeDeliveries,
+                    totalRiders: totalRiders
+                });
+            } catch (error) {
+                console.error('Error fetching admin stats:', error);
+                res.status(500).send({ error: error.message });
+            }
         });
 
         app.get('/parcels/:id', async (req, res) => {
@@ -151,7 +205,7 @@ async function run() {
             res.send(result);
         });
 
-        app.patch('/parcels/:id', async (req, res) => {
+        app.patch('/parcels/:id', veryFytoken, async (req, res) => {
             const { riderId, riderName, riderEmail, riderPhone, parentId, deliverystatus, assignedAt } = req.body;
             const id = req.params.id;
             const filter = { _id: new ObjectId(id) };
@@ -168,7 +222,6 @@ async function run() {
             };
             const result = await ParcelCollection.updateOne(filter, updateDoc);
 
-            // রাইডারের স্ট্যাটাস আপডেট
             if (riderId) {
                 await RiderCollection.updateOne(
                     { _id: new ObjectId(riderId) },
@@ -179,7 +232,7 @@ async function run() {
             res.send(result);
         });
 
-        app.patch('/parcels/deliverystatus/:id', async (req, res) => {
+        app.patch('/parcels/deliverystatus/:id', veryFytoken, async (req, res) => {
             try {
                 const { deliverystatus, acceptedBy, rejectedBy, rejectionReason, pickedUpBy, deliveredBy } = req.body;
                 const id = req.params.id;
@@ -251,11 +304,9 @@ async function run() {
                             currency: 'USD',
                             unit_amount: parseInt(payInfo.totalPrice) * 100,
                             product_data: {
-                                name: payInfo.
-                                    parcelName,
+                                name: payInfo.parcelName,
                             }
                         },
-
                         quantity: 1,
                     },
                 ],
@@ -270,7 +321,6 @@ async function run() {
             });
 
             res.send({ url: session.url });
-
         })
 
         app.patch('/paymentSuccess', async (req, res) => {
@@ -283,7 +333,6 @@ async function run() {
                     return res.status(400).send({ error: 'Session ID required' });
                 }
 
-                // First, retrieve the Stripe session
                 const session = await stripe.checkout.sessions.retrieve(sessionId);
                 console.log('Session payment status:', session.payment_status);
                 console.log('Session metadata:', session.metadata);
@@ -303,7 +352,6 @@ async function run() {
                     });
                 }
 
-                // Generate tracking ID
                 const trackingId = generateTrackingId();
                 const parcelId = session.metadata.parcelId;
 
@@ -311,7 +359,6 @@ async function run() {
                     return res.status(400).send({ error: 'Parcel ID not found in session metadata' });
                 }
 
-                // Update parcel status
                 const updateQuery = { _id: new ObjectId(parcelId) };
                 const updateDoc = {
                     $set: {
@@ -331,7 +378,6 @@ async function run() {
                     return res.status(404).send({ error: 'Parcel not found or already updated' });
                 }
 
-                // Create payment record
                 const payment = {
                     amount: session.amount_total / 100,
                     currency: session.currency,
@@ -347,7 +393,6 @@ async function run() {
 
                 const resultPayment = await PaymentCollection.insertOne(payment);
 
-                // Send success response
                 res.send({
                     success: true,
                     trackingId: trackingId,
@@ -376,10 +421,7 @@ async function run() {
             res.send(result)
         })
 
-
-
         // user details
-
         app.post('/users', async (req, res) => {
             const user = req.body;
 
@@ -409,7 +451,6 @@ async function run() {
                 $set: {
                     role: role
                 }
-
             }
             const result = await UsersCollection.updateOne(filter, updatedDoc);
             res.send(result);
@@ -430,7 +471,6 @@ async function run() {
         });
 
         // rider data 
-
         app.post('/rider', async (req, res) => {
             try {
                 const rider = req.body;
@@ -531,7 +571,6 @@ async function run() {
                     }
                 };
 
-
                 if (status === "approved") {
                     const userEmail = rider.email;
                     const userQuery = { email: userEmail };
@@ -546,7 +585,6 @@ async function run() {
 
                     if (userResult.matchedCount === 0) {
                         console.log("User not found in UsersCollection with email:", userEmail);
-
                     }
                 }
 

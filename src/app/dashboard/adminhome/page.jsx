@@ -9,12 +9,15 @@ import {
     FaArrowUp,
     FaArrowDown,
     FaTruck,
+    FaUsers,
+    FaSearch,
+    FaFilter,
 } from "react-icons/fa";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import useAuth from "../../(site)/hooks/useAuth";
 import useAxios from "../../(site)/hooks/useAxios";
 import Loading from "@/app/components/Loading";
-
+import AdminOverview from './AdminOverview'
 export default function Adminhome() {
     const { user } = useAuth();
     const axios = useAxios();
@@ -22,37 +25,67 @@ export default function Adminhome() {
         totalParcels: 0,
         deliveredParcels: 0,
         pendingParcels: 0,
-        totalSpent: 0,
+        totalRevenue: 0,
+        totalUsers: 0,
+        activeDeliveries: 0,
+        totalRiders: 0,
     });
-    const [recentParcels, setRecentParcels] = useState([]);
+    const [allParcels, setAllParcels] = useState([]);
+    const [filteredParcels, setFilteredParcels] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [statusFilter, setStatusFilter] = useState("all");
 
     useEffect(() => {
-        fetchDashboardData();
+        fetchAdminDashboardData();
+        const interval = setInterval(fetchAdminDashboardData, 30000);
+        return () => clearInterval(interval);
     }, []);
 
-    const fetchDashboardData = async () => {
+    useEffect(() => {
+        filterParcels();
+    }, [searchTerm, statusFilter, allParcels]);
+
+    const fetchAdminDashboardData = async () => {
         try {
-            const response = await axios.get('/parcels/user');
-            const parcels = response.data || [];
+            const [statsResponse, parcelsResponse] = await Promise.all([
+                axios.get('/admin/dashboard/stats'),
+                axios.get('/admin/parcels/all')
+            ]);
 
-            const delivered = parcels.filter(p => p.status === 'delivered').length;
-            const pending = parcels.filter(p => p.status === 'pending').length;
-            const totalSpent = parcels.reduce((sum, p) => sum + (p.totalPrice || 0), 0);
-
-            setStats({
-                totalParcels: parcels.length,
-                deliveredParcels: delivered,
-                pendingParcels: pending,
-                totalSpent: totalSpent,
-            });
-
-            setRecentParcels(parcels.slice(0, 5));
+            setStats(statsResponse.data);
+            setAllParcels(parcelsResponse.data);
             setLoading(false);
         } catch (error) {
-            console.error("Error fetching dashboard data:", error);
+            console.error("Error fetching admin dashboard data:", error);
             setLoading(false);
         }
+    };
+
+    const filterParcels = () => {
+        let filtered = [...allParcels];
+
+        if (searchTerm) {
+            filtered = filtered.filter(parcel =>
+                parcel.trackingId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                parcel.parcelName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                parcel.senderName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                parcel.senderEmail?.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+
+        if (statusFilter !== "all") {
+            if (statusFilter === "pending") {
+                filtered = filtered.filter(parcel =>
+                    parcel.deliverystatus === 'pending-pickup' ||
+                    parcel.deliverystatus === 'assigned'
+                );
+            } else {
+                filtered = filtered.filter(parcel => parcel.deliverystatus === statusFilter);
+            }
+        }
+
+        setFilteredParcels(filtered);
     };
 
     const statCards = [
@@ -84,22 +117,53 @@ export default function Adminhome() {
             trend: "down",
         },
         {
-            title: "Total Spent",
-            value: `৳${stats.totalSpent.toLocaleString()}`,
+            title: "Total Revenue",
+            value: `৳${stats.totalRevenue.toLocaleString()}`,
             icon: <FaMoneyBillWave className="text-3xl" />,
             bgColor: "bg-purple-50",
             textColor: "text-purple-600",
             change: "+15%",
             trend: "up",
         },
+        {
+            title: "Total Users",
+            value: stats.totalUsers,
+            icon: <FaUsers className="text-3xl" />,
+            bgColor: "bg-indigo-50",
+            textColor: "text-indigo-600",
+            change: "+5%",
+            trend: "up",
+        },
+        {
+            title: "Active Deliveries",
+            value: stats.activeDeliveries,
+            icon: <FaTruck className="text-3xl" />,
+            bgColor: "bg-cyan-50",
+            textColor: "text-cyan-600",
+            change: "-2%",
+            trend: "down",
+        },
     ];
 
     const getStatusColor = (status) => {
         switch (status) {
             case 'delivered': return 'bg-green-100 text-green-700';
-            case 'pending': return 'bg-yellow-100 text-yellow-700';
+            case 'pending-pickup': return 'bg-yellow-100 text-yellow-700';
+            case 'assigned': return 'bg-blue-100 text-blue-700';
+            case 'picked-up': return 'bg-purple-100 text-purple-700';
             case 'cancelled': return 'bg-red-100 text-red-700';
             default: return 'bg-gray-100 text-gray-700';
+        }
+    };
+
+    const getStatusText = (status) => {
+        switch (status) {
+            case 'delivered': return 'Delivered';
+            case 'pending-pickup': return 'Pending';
+            case 'assigned': return 'Assigned';
+            case 'picked-up': return 'Picked Up';
+            case 'cancelled': return 'Cancelled';
+            default: return status || 'Pending';
         }
     };
 
@@ -114,17 +178,27 @@ export default function Adminhome() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
+                className="flex justify-between items-center"
             >
-                <h1 className="text-3xl md:text-4xl font-bold text-[#03373d] mb-2">
-                    Welcome back, {user?.displayName || "User"}! 👋
-                </h1>
-                <p className="text-gray-600">
-                    Here's what's happening with your deliveries today.
-                </p>
+                <div>
+                    <h1 className="text-3xl md:text-4xl font-bold text-[#03373d] mb-2">
+                        Welcome back, {user?.displayName || "Admin"}! 👋
+                    </h1>
+                    <p className="text-gray-600">
+                        Here's what's happening with all deliveries today.
+                    </p>
+                </div>
+                <button
+                    onClick={fetchAdminDashboardData}
+                    className="bg-[#03373d] text-white px-4 py-2 rounded-lg hover:bg-[#caeb66] hover:text-[#03373d] transition flex items-center gap-2"
+                >
+                    <FaBox className="text-sm" />
+                    Refresh
+                </button>
             </motion.div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {statCards.map((stat, index) => (
                     <motion.div
                         key={index}
@@ -155,7 +229,44 @@ export default function Adminhome() {
                 ))}
             </div>
 
-            {/* Recent Parcels Section */}
+            {/* Filter Section */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                className="bg-white rounded-2xl shadow-lg p-6"
+            >
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="relative">
+                        <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                        <input
+                            type="text"
+                            placeholder="Search by ID, name, or email..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#caeb66]"
+                        />
+                    </div>
+
+                    <div className="relative">
+                        <FaFilter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                        <select
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value)}
+                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#caeb66]"
+                        >
+                            <option value="all">All Status</option>
+                            <option value="pending-pickup">Pending</option>
+                            <option value="assigned">Assigned</option>
+                            <option value="picked-up">Picked Up</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+            </motion.div>
+
+            {/* All Parcels Section */}
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -163,10 +274,12 @@ export default function Adminhome() {
                 className="bg-white rounded-2xl shadow-lg p-6"
             >
                 <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-xl font-bold text-[#03373d]">Recent Parcels</h2>
-                    <button className="text-[#caeb66] hover:text-[#03373d] transition text-sm font-semibold">
-                        View All →
-                    </button>
+                    <div>
+                        <h2 className="text-xl font-bold text-[#03373d]">All Parcels</h2>
+                        <p className="text-sm text-gray-500 mt-1">
+                            Showing {filteredParcels.length} of {allParcels.length} parcels
+                        </p>
+                    </div>
                 </div>
 
                 <div className="overflow-x-auto">
@@ -174,6 +287,7 @@ export default function Adminhome() {
                         <thead>
                             <tr className="border-b border-gray-200">
                                 <th className="text-left py-3 px-4 text-gray-600 font-semibold text-sm">Tracking ID</th>
+                                <th className="text-left py-3 px-4 text-gray-600 font-semibold text-sm">Sender</th>
                                 <th className="text-left py-3 px-4 text-gray-600 font-semibold text-sm">Parcel Name</th>
                                 <th className="text-left py-3 px-4 text-gray-600 font-semibold text-sm">Weight</th>
                                 <th className="text-left py-3 px-4 text-gray-600 font-semibold text-sm">Price</th>
@@ -181,66 +295,51 @@ export default function Adminhome() {
                             </tr>
                         </thead>
                         <tbody>
-                            {recentParcels.length > 0 ? (
-                                recentParcels.map((parcel, index) => (
-                                    <tr key={index} className="border-b border-gray-100 hover:bg-gray-50 transition">
-                                        <td className="py-3 px-4 text-sm text-gray-700">#ZAP{index + 1001}</td>
-                                        <td className="py-3 px-4 text-sm text-gray-700">{parcel.parcelName}</td>
-                                        <td className="py-3 px-4 text-sm text-gray-700">{parcel.parcelWeight} kg</td>
-                                        <td className="py-3 px-4 text-sm font-semibold text-[#03373d]">৳{parcel.totalPrice}</td>
-                                        <td className="py-3 px-4">
-                                            <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(parcel.status)}`}>
-                                                {parcel.status || "Pending"}
-                                            </span>
+                            <AnimatePresence>
+                                {filteredParcels.length > 0 ? (
+                                    filteredParcels.map((parcel, index) => (
+                                        <motion.tr
+                                            key={parcel._id || index}
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            exit={{ opacity: 0 }}
+                                            transition={{ duration: 0.3 }}
+                                            className="border-b border-gray-100 hover:bg-gray-50 transition"
+                                        >
+                                            <td className="py-3 px-4 text-sm font-mono font-semibold text-[#03373d]">
+                                                {parcel.trackingId || `#ZAP${index + 1001}`}
+                                            </td>
+                                            <td className="py-3 px-4">
+                                                <div className="text-sm text-gray-700">{parcel.senderName || "N/A"}</div>
+                                                <div className="text-xs text-gray-500">{parcel.senderEmail || "N/A"}</div>
+                                            </td>
+                                            <td className="py-3 px-4 text-sm text-gray-700">{parcel.parcelName}</td>
+                                            <td className="py-3 px-4 text-sm text-gray-700">{parcel.parcelWeight} kg</td>
+                                            <td className="py-3 px-4 text-sm font-semibold text-[#03373d]">৳{parcel.totalPrice}</td>
+                                            <td className="py-3 px-4">
+                                                <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(parcel.deliverystatus)}`}>
+                                                    {getStatusText(parcel.deliverystatus)}
+                                                </span>
+                                            </td>
+                                        </motion.tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="6" className="text-center py-8 text-gray-500">
+                                            <FaBox className="text-4xl mx-auto mb-2 text-gray-300" />
+                                            No parcels found.
                                         </td>
                                     </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan="5" className="text-center py-8 text-gray-500">
-                                        No parcels found. Send your first parcel!
-                                    </td>
-                                </tr>
-                            )}
+                                )}
+                            </AnimatePresence>
                         </tbody>
                     </table>
                 </div>
             </motion.div>
 
-            {/* Quick Actions */}
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.5 }}
-                className="grid grid-cols-1 md:grid-cols-3 gap-6"
-            >
-                <div className="bg-gradient-to-r from-[#03373d] to-[#1a5c64] rounded-2xl p-6 text-white">
-                    <FaTruck className="text-4xl mb-3" />
-                    <h3 className="text-xl font-bold mb-2">Send a Parcel</h3>
-                    <p className="text-gray-200 text-sm mb-4">Book a delivery for your parcel</p>
-                    <button className="bg-[#caeb66] text-[#03373d] px-4 py-2 rounded-lg font-semibold text-sm hover:scale-105 transition">
-                        Send Now →
-                    </button>
-                </div>
-
-                <div className="bg-gradient-to-r from-[#caeb66] to-[#e0ff80] rounded-2xl p-6 text-[#03373d]">
-                    <FaCheckCircle className="text-4xl mb-3" />
-                    <h3 className="text-xl font-bold mb-2">Track Parcel</h3>
-                    <p className="text-gray-700 text-sm mb-4">Track your delivery in real-time</p>
-                    <button className="bg-[#03373d] text-white px-4 py-2 rounded-lg font-semibold text-sm hover:scale-105 transition">
-                        Track Now →
-                    </button>
-                </div>
-
-                <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
-                    <FaMoneyBillWave className="text-4xl mb-3 text-[#03373d]" />
-                    <h3 className="text-xl font-bold text-[#03373d] mb-2">Check Pricing</h3>
-                    <p className="text-gray-600 text-sm mb-4">View delivery rates</p>
-                    <button className="bg-[#03373d] text-white px-4 py-2 rounded-lg font-semibold text-sm hover:scale-105 transition">
-                        View Pricing →
-                    </button>
-                </div>
-            </motion.div>
+            {/* Chart Actions */}
+            <AdminOverview/>
+            
         </div>
     );
 }
