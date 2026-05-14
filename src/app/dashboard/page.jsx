@@ -29,7 +29,7 @@ import useAuth from "../(site)/hooks/useAuth";
 import useRole from "../(site)/hooks/useRole";
 import Loading from "../components/Loading";
 import { BiSupport } from "react-icons/bi";
-import { MdSpatialTracking } from "react-icons/md";
+import { MdOutlineSupportAgent, MdSpatialTracking } from "react-icons/md";
 
 const Sidebar = ({ children }) => {
     const [isOpen, setIsOpen] = useState(true);
@@ -96,12 +96,25 @@ const Sidebar = ({ children }) => {
             icon: <FaTasks />,
             roles: ["admin"]
         },
-        // {
-        //     name: "Rider Managment",
-        //     href: "/dashboard/riderManagment",
-        //     icon: <FaUsersCog />,
-        //     roles: ["admin"]
-        // },
+        {
+            name: "All Parcel",
+            href: "/dashboard/allparcel",
+            icon: <FaBox />,
+            roles: ["admin"]
+        },
+        {
+            name: "Rider Managment",
+            href: "/dashboard/ridermanagment",
+            icon: <FaUsersCog />,
+            roles: ["admin"]
+        },
+        {
+            name: "Issu Support",
+            href: "/dashboard/issusupport",
+            icon: <MdOutlineSupportAgent />,
+            roles: ["admin"]
+        },
+      
         {
             name: "Assigned Deliveries",
             href: "/dashboard/assigned-deliveries",
@@ -150,12 +163,12 @@ const Sidebar = ({ children }) => {
             icon: <MdSpatialTracking />,
             roles: ["user"]
         },
-        // {
-        //     name: "Support",
-        //     href: "/dashboard/paymentHistroy",
-        //     icon: <BiSupport />,
-        //     roles: ["user","rider"]
-        // },
+        {
+            name: "Support",
+            href: "/dashboard/support",
+            icon: <BiSupport />,
+            roles: ["user","rider"]
+        },
         {
             name: "Home",
             href: "/",

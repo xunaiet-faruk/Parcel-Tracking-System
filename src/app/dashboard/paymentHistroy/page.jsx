@@ -5,6 +5,7 @@ import Loading from "@/app/components/Loading";
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { FaSearch, FaFilter, FaDownload, FaEye, FaCopy } from "react-icons/fa";
+import Swal from "sweetalert2";
 
 const PaymentHistory = () => {
     const axios = useAxios();
@@ -146,7 +147,11 @@ const PaymentHistory = () => {
 
     const copyToClipboard = (text) => {
         navigator.clipboard.writeText(text);
-        alert("Copied to clipboard!");
+        Swal.fire({
+            title: "Copied to clipboard!",
+            icon: "success",
+            draggable: true
+        });
     };
 
     if (loading) {
@@ -176,11 +181,6 @@ const PaymentHistory = () => {
                     Track and manage all your payment transactions
                 </p>
             </motion.div>
-
-       
-
-        
-
             {/* Table Section */}
             <motion.div
                 initial={{ opacity: 0, y: 20 }}

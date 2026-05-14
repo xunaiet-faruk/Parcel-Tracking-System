@@ -75,6 +75,8 @@ async function run() {
         const PaymentCollection = client.db("ZapshiptDB").collection("payment");
         const UsersCollection = client.db("ZapshiptDB").collection("Users");
         const RiderCollection = client.db("ZapshiptDB").collection("Rider");
+        const SupportCollection = client.db("ZapshiptDB").collection("support_messages");
+
 
         // Admin verification middleware
         const verifyAdmin = async (req, res, next) => {
@@ -603,6 +605,178 @@ async function run() {
                     message: "Failed to update rider status",
                     error: error.message
                 });
+            }
+        });
+
+        // ============= SUPPORT SYSTEM API =============
+
+
+     
+        app.get('/support/messages', veryFytoken, async (req, res) => {
+            try {
+                const email = req.query.email;
+                if (email !== req.decoded_email) {
+                    return res.status(403).send({ message: 'Forbidden access' });
+                }
+
+                const messages = await SupportCollection.find({ email: email })
+                    .sort({ createdAt: -1 })
+                    .toArray();
+
+                res.send(messages);
+            } catch (error) {
+                console.error("Error fetching messages:", error);
+                res.status(500).send({ error: error.message });
+            }
+        });
+
+        // GET - অ্যাডমিনের জন্য সব মেসেজ
+        app.get('/admin/support/messages', veryFytoken, async (req, res) => {
+            try {
+                const email = req.decoded_email;
+                const user = await UsersCollection.findOne({ email: email });
+
+                if (user?.role !== 'admin') {
+                    return res.status(403).send({ message: 'Admin access required' });
+                }
+
+                const messages = await SupportCollection.find({})
+                    .sort({ createdAt: -1 })
+                    .toArray();
+
+                res.send(messages);
+            } catch (error) {
+                console.error("Error fetching all messages:", error);
+                res.status(500).send({ error: error.message });
+            }
+        });
+
+        // POST - নতুন মেসেজ তৈরি
+        app.post('/support/messages', veryFytoken, async (req, res) => {
+            try {
+                const { subject, message, name, role } = req.body;
+                const email = req.decoded_email;
+
+                if (!subject || !message) {
+                    return res.status(400).send({ error: 'Subject and message are required' });
+                }
+
+                const newMessage = {
+                    _id: new ObjectId(),
+                    email: email,
+                    name: name || email.split('@')[0],
+                    role: role || 'user',
+                    subject: subject,
+                    message: message,
+                    status: 'pending',
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    replies: []
+                };
+
+                const result = await SupportCollection.insertOne(newMessage);
+                res.status(201).send({ ...newMessage, _id: result.insertedId });
+            } catch (error) {
+                console.error("Error creating message:", error);
+                res.status(500).send({ error: error.message });
+            }
+        });
+
+        // POST - মেসেজে রিপ্লাই করা (অ্যাডমিন/সাপোর্ট)
+        app.post('/support/messages/:id/reply', veryFytoken, async (req, res) => {
+            try {
+                const { id } = req.params;
+                const { message, repliedByName, repliedByRole } = req.body;
+                const repliedBy = req.decoded_email;
+
+                if (!message) {
+                    return res.status(400).send({ error: 'Reply message is required' });
+                }
+
+                const reply = {
+                    _id: new ObjectId(),
+                    message: message,
+                    repliedBy: repliedBy,
+                    repliedByName: repliedByName || 'Support Team',
+                    repliedByRole: repliedByRole || 'admin',
+                    createdAt: new Date()
+                };
+
+                const result = await SupportCollection.updateOne(
+                    { _id: new ObjectId(id) },
+                    {
+                        $push: { replies: reply },
+                        $set: {
+                            status: 'answered',
+                            updatedAt: new Date(),
+                            lastRepliedAt: new Date(),
+                            lastRepliedBy: repliedBy
+                        }
+                    }
+                );
+
+                if (result.modifiedCount === 0) {
+                    return res.status(404).send({ error: 'Message not found' });
+                }
+
+                res.send(reply);
+            } catch (error) {
+                console.error("Error adding reply:", error);
+                res.status(500).send({ error: error.message });
+            }
+        });
+
+        // PATCH - মেসেজ স্ট্যাটাস আপডেট
+        app.patch('/support/messages/:id/status', veryFytoken, async (req, res) => {
+            try {
+                const { id } = req.params;
+                const { status } = req.body;
+
+                const result = await SupportCollection.updateOne(
+                    { _id: new ObjectId(id) },
+                    { $set: { status: status, updatedAt: new Date() } }
+                );
+
+                if (result.modifiedCount === 0) {
+                    return res.status(404).send({ error: 'Message not found' });
+                }
+
+                res.send({ success: true });
+            } catch (error) {
+                console.error("Error updating status:", error);
+                res.status(500).send({ error: error.message });
+            }
+        });
+
+        // DELETE - মেসেজ ডিলিট করা
+        app.delete('/support/messages/:id', veryFytoken, async (req, res) => {
+            try {
+                const { id } = req.params;
+                const email = req.decoded_email;
+
+                // চেক করা ইউজার নিজের মেসেজ ডিলিট করছে কিনা
+                const message = await SupportCollection.findOne({ _id: new ObjectId(id) });
+
+                if (!message) {
+                    return res.status(404).send({ error: 'Message not found' });
+                }
+
+                // অ্যাডমিন বা নিজের মেসেজ ডিলিট করতে পারবে
+                const user = await UsersCollection.findOne({ email: email });
+                if (message.email !== email && user?.role !== 'admin') {
+                    return res.status(403).send({ message: 'Forbidden access' });
+                }
+
+                const result = await SupportCollection.deleteOne({ _id: new ObjectId(id) });
+
+                if (result.deletedCount === 0) {
+                    return res.status(404).send({ error: 'Message not found' });
+                }
+
+                res.send({ success: true });
+            } catch (error) {
+                console.error("Error deleting message:", error);
+                res.status(500).send({ error: error.message });
             }
         });
 
