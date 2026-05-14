@@ -23,6 +23,7 @@ import {
     FaUsersCog,
     FaHome,
     FaTasks,
+    FaWallet,
 } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import useAuth from "../(site)/hooks/useAuth";
@@ -130,7 +131,7 @@ const Sidebar = ({ children }) => {
         {
             name: "Delivery History",
             href: "/dashboard/delivery-history",
-            icon: <FaHistory />,
+            icon: < FaHistory />,
             roles: ["rider"]
         },
         {
@@ -154,7 +155,7 @@ const Sidebar = ({ children }) => {
         {
             name: "Payment History",
             href: "/dashboard/paymentHistroy",
-            icon: <FaHistory />,
+            icon: <FaWallet />,
             roles: ["user"]
         },
         {

@@ -6,10 +6,12 @@ import {
     FaBox, FaEye, FaCopy, FaSearch, FaFilter,
     FaTruck, FaUser, FaMapMarkerAlt, FaPhone, FaEnvelope,
     FaCheckCircle, FaClock, FaTimesCircle, FaArrowUp, FaArrowDown,
-    FaEdit, FaTrash, FaBan, FaCheck, FaSpinner
+    FaEdit, FaTrash, FaBan, FaCheck, FaSpinner,
+    FaFileAlt
 } from 'react-icons/fa';
 import useAxios from '../../(site)/hooks/useAxios';
 import Loading from '@/app/components/Loading';
+import Link from 'next/link';
 
 const AllParcel = () => {
     const axios = useAxios();
@@ -213,20 +215,29 @@ const AllParcel = () => {
         <div className="min-h-screen bg-gray-50 py-8 px-4">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
-                <motion.div
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="mb-8"
-                >
-                    <div className="flex items-center gap-3 mb-2">
-                        <FaBox className="text-3xl text-[#03373d]" />
-                        <h1 className="text-3xl font-bold text-[#03373d]">All Parcels</h1>
-                        <span className="bg-[#caeb66] text-[#03373d] px-3 py-1 rounded-full text-sm font-semibold">
-                            {filteredParcels.length} Total
-                        </span>
-                    </div>
-                    <p className="text-gray-500">View and manage all parcels across the platform</p>
-                </motion.div>
+            <div className='flex justify-between items-center'>
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mb-8"
+                    >
+                        <div className="flex items-center gap-3 mb-2">
+                            <FaBox className="text-3xl text-[#03373d]" />
+                            <h1 className="text-3xl font-bold text-[#03373d]">All Parcels</h1>
+                            <span className="bg-[#caeb66] text-[#03373d] px-3 py-1 rounded-full text-sm font-semibold">
+                                {filteredParcels.length} Total
+                            </span>
+                        </div>
+                        <p className="text-gray-500">View and manage all parcels across the platform</p>
+                    </motion.div>
+
+                    <Link href="/dashboard/allparcel/reports">
+                        <button className="bg-[#03373d] text-white cursor-pointer px-4 py-2 rounded-lg hover:bg-[#caeb66] hover:text-[#03373d] transition flex items-center gap-2">
+                            <FaFileAlt /> Reports & Invoices
+                        </button>
+                    </Link>
+
+            </div>
 
            
 
