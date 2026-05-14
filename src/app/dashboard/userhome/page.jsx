@@ -14,6 +14,7 @@ import useAuth from '../../(site)/hooks/useAuth';
 import useAxios from '../../(site)/hooks/useAxios';
 import Loading from '@/app/components/Loading';
 import Link from 'next/link';
+import Swal from 'sweetalert2';
 
 const Userhome = () => {
     const { user } = useAuth();
@@ -182,8 +183,12 @@ const Userhome = () => {
 
     const copyTrackingId = (trackingId) => {
         if (trackingId) {
-            navigator.clipboard.writeText(trackingId);
-            alert('Tracking ID copied!');
+            navigator.clipboard.writeText(trackingId);;
+            Swal.fire({
+                title: "Tracking ID copied!",
+                icon: "success",
+                draggable: true
+            });
         }
     };
 
@@ -304,11 +309,7 @@ const Userhome = () => {
             >
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-xl font-bold text-[#03373d]">📦 Recent Parcels</h2>
-                    <Link href="/dashboard/my-parcels">
-                        <button className="text-[#caeb66] hover:text-[#03373d] transition text-sm font-semibold">
-                            View All →
-                        </button>
-                    </Link>
+                
                 </div>
 
                 <div className="overflow-x-auto">
@@ -338,7 +339,7 @@ const Userhome = () => {
                                                         onClick={() => copyTrackingId(parcel.trackingId)}
                                                         className="text-gray-400 hover:text-[#03373d]"
                                                     >
-                                                        <FaCopy className="text-xs" />
+                                                        <FaCopy className="text-[16px] cursor-pointer" />
                                                     </button>
                                                 </div>
                                             </td>
@@ -354,7 +355,7 @@ const Userhome = () => {
                                             </td>
                                             <td className="py-3 px-4">
                                                 <Link href={"/dashboard/track-parcel"}>
-                                                    <button className="bg-[#03373d] text-white px-3 py-1 rounded-lg text-xs hover:bg-[#caeb66] hover:text-[#03373d] transition flex items-center gap-1">
+                                                    <button className="bg-[#03373d] cursor-pointer text-white px-3 py-1 rounded-lg text-xs hover:bg-[#caeb66] hover:text-[#03373d] transition flex items-center gap-1">
                                                         <FaEye className="text-xs" /> Track
                                                     </button>
                                                 </Link>
