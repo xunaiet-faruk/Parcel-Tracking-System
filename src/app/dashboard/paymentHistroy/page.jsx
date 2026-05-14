@@ -3,43 +3,133 @@ import useAuth from "@/app/(site)/hooks/useAuth";
 import useAxios from "@/app/(site)/hooks/useAxios";
 import Loading from "@/app/components/Loading";
 import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { FaSearch, FaFilter, FaDownload, FaEye, FaCopy } from "react-icons/fa";
 
 const PaymentHistory = () => {
     const axios = useAxios();
-    const {user} =useAuth()
+    const { user } = useAuth();
     const [payments, setPayments] = useState([]);
+    const [filteredPayments, setFilteredPayments] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [statusFilter, setStatusFilter] = useState("all");
+    const [selectedPayment, setSelectedPayment] = useState(null);
 
     useEffect(() => {
-        const fetchPayments = async () => {
-            try {
-                const res = await axios.get(`/payment?email=${user?.email}`);
-                setPayments(res.data);
-                console.log(res.data);
-            } catch (error) {
-                console.error("Failed to fetch payments", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchPayments();
-    }, [axios]);
+        if (user?.email) {
+            fetchPayments();
+        }
+    }, [user?.email]);
 
-    const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-        });
+    useEffect(() => {
+        filterPayments();
+    }, [searchTerm, statusFilter, payments]);
+
+    const fetchPayments = async () => {
+        try {
+            setLoading(true);
+            const email = user?.email;
+
+            // ২টি এন্ডপয়েন্ট চেষ্টা করা
+            let paymentData = [];
+
+            try {
+                // প্রথম এন্ডপয়েন্ট
+                const res = await axios.get(`/payment?email=${email}`);
+                if (res.data && Array.isArray(res.data)) {
+                    paymentData = res.data;
+                }
+            } catch (err) {
+                console.log("First endpoint failed, trying alternative...");
+            }
+
+            // যদি প্রথমে না পাওয়া যায়, তাহলে parcels থেকে ডাটা আনা
+            if (paymentData.length === 0) {
+                try {
+                    const parcelsRes = await axios.get(`/parcels?email=${email}`);
+                    const parcels = parcelsRes.data || [];
+
+                    // যেসব প্যাকেলের পেমেন্ট কমপ্লিট হয়েছে সেগুলো থেকে পেমেন্ট ডাটা তৈরি
+                    paymentData = parcels
+                        .filter(p => p.paymentStatus === 'completed' || p.status === 'paid')
+                        .map(p => ({
+                            _id: p._id,
+                            parcelName: p.parcelName,
+                            amount: p.totalPrice,
+                            currency: 'BDT',
+                            paymentMethod: 'card',
+                            paidAt: p.paidAt || p.createdAt,
+                            customer_email: p.senderEmail,
+                            transactionId: p.transactionId,
+                            paymentStatus: 'paid',
+                            trackingId: p.trackingId,
+                            parcelId: p._id
+                        }));
+                } catch (err) {
+                    console.log("Parcels endpoint failed:", err);
+                }
+            }
+
+            console.log("Payment data found:", paymentData.length);
+            setPayments(paymentData);
+            setFilteredPayments(paymentData);
+
+        } catch (error) {
+            console.error("Failed to fetch payments", error);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    
+    const filterPayments = () => {
+        let filtered = [...payments];
+
+        if (searchTerm) {
+            filtered = filtered.filter(p =>
+                p.parcelName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                p.transactionId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                p.trackingId?.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+
+        if (statusFilter !== "all") {
+            filtered = filtered.filter(p => p.paymentStatus === statusFilter);
+        }
+
+        setFilteredPayments(filtered);
+    };
+
+    const formatDate = (dateString) => {
+        if (!dateString) return "N/A";
+        try {
+            let date;
+            if (typeof dateString === 'string') {
+                date = new Date(dateString);
+            } else if (dateString._seconds) {
+                date = new Date(dateString._seconds * 1000);
+            } else {
+                date = new Date(dateString);
+            }
+
+            if (isNaN(date.getTime())) return "N/A";
+
+            return date.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+            });
+        } catch (e) {
+            return "N/A";
+        }
+    };
+
     const getStatusBadge = (status) => {
-        if (status === "paid") {
+        if (status === "paid" || status === "completed") {
             return (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-[#caeb66]/20 text-[#03373d]">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
@@ -54,275 +144,186 @@ const PaymentHistory = () => {
         );
     };
 
+    const copyToClipboard = (text) => {
+        navigator.clipboard.writeText(text);
+        alert("Copied to clipboard!");
+    };
+
     if (loading) {
-        return <Loading/>
+        return <Loading />;
     }
 
-    return (
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 ">
+    // ক্যালকুলেশন
+    const totalAmount = filteredPayments.reduce((sum, p) => sum + (p.amount || 0), 0);
+    const successfulPayments = filteredPayments.filter(p => p.paymentStatus === "paid" || p.paymentStatus === "completed").length;
+    const uniqueMethods = new Set(filteredPayments.map(p => p.paymentMethod)).size;
 
-            <div className="mb-8">
+    return (
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {/* Header */}
+            <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-8"
+            >
                 <div className="flex items-center justify-center gap-3 mb-2">
                     <div className="text-3xl">📊</div>
-                    <h1 className="text-3xl  font-bold bg-gradient-to-r from-[#03373d] to-[#1a5c64] bg-clip-text text-transparent">
+                    <h1 className="text-3xl font-bold bg-gradient-to-r from-[#03373d] to-[#1a5c64] bg-clip-text text-transparent">
                         Payment History
                     </h1>
                 </div>
-                <p className="text-gray-500 text-center ml-12">
+                <p className="text-gray-500 text-center">
                     Track and manage all your payment transactions
                 </p>
-            </div>
+            </motion.div>
 
-            {/* Stats Cards with Brand Colors */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                <div className="bg-green-50 rounded-xl shadow-lg  p-4 hover:shadow-xl transition-shadow">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-sm  text-[#03373d]">Total Payments</p>
-                            <p className="text-2xl font-bold text-gray-900">{payments.length}</p>
-                        </div>
-                        <div className="w-10 h-10 bg-[#caeb66]/20 rounded-lg flex items-center justify-center">
-                            <svg className="w-5 h-5 text-[#03373d]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-                <div className="bg-blue-50 rounded-xl shadow-lg border border-gray-100 p-4 hover:shadow-xl transition-shadow">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-sm text-gray-500">Total Amount</p>
-                            <p className="text-2xl font-bold text-gray-900">
-                                ${payments.reduce((sum, p) => sum + p.amount, 0).toFixed(2)}
-                            </p>
-                        </div>
-                        <div className="w-10 h-10 bg-[#caeb66]/20 rounded-lg flex items-center justify-center">
-                            <svg className="w-5 h-5 text-[#03373d]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-                <div className="bg-purple-50 rounded-xl shadow-lg border border-gray-100 p-4 hover:shadow-xl transition-shadow">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-sm text-gray-500">Successful Payments</p>
-                            <p className="text-2xl font-bold text-gray-900">
-                                {payments.filter(p => p.paymentStatus === "paid").length}
-                            </p>
-                        </div>
-                        <div className="w-10 h-10 bg-[#caeb66]/20 rounded-lg flex items-center justify-center">
-                            <svg className="w-5 h-5 text-[#03373d]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-                <div className="bg-orange-50 rounded-xl shadow-lg border border-gray-100 p-4 hover:shadow-xl transition-shadow">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-sm text-gray-500">Payment Methods</p>
-                            <p className="text-2xl font-bold text-gray-900">
-                                {new Set(payments.map(p => p.paymentMethod)).size}
-                            </p>
-                        </div>
-                        <div className="w-10 h-10 bg-[#caeb66]/20 rounded-lg flex items-center justify-center">
-                            <svg className="w-5 h-5 text-[#03373d]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-            </div>
+       
 
-            {/* Table Section - White Background with Shadow */}
-            <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
-                {/* Table Header */}
+        
+
+            {/* Table Section */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6 }}
+                className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden"
+            >
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead>
                             <tr className="border-b border-gray-200 bg-gradient-to-r from-[#03373d] to-[#1a5c64]">
-                                <th className="px-6 py-4 text-left">
-                                    <div className="flex items-center gap-2 text-xs font-semibold text-white uppercase tracking-wider">
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                                        </svg>
-                                        Parcel
-                                    </div>
-                                </th>
-                                <th className="px-6 py-4 text-left">
-                                    <div className="flex items-center gap-2 text-xs font-semibold text-white uppercase tracking-wider">
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        Amount
-                                    </div>
-                                </th>
-                                <th className="px-6 py-4 text-left">
-                                    <div className="flex items-center gap-2 text-xs font-semibold text-white uppercase tracking-wider">
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                                        </svg>
-                                        Payment Method
-                                    </div>
-                                </th>
-                                <th className="px-6 py-4 text-left">
-                                    <div className="flex items-center gap-2 text-xs font-semibold text-white uppercase tracking-wider">
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                        </svg>
-                                        Paid At
-                                    </div>
-                                </th>
-                                <th className="px-6 py-4 text-left">
-                                    <div className="flex items-center gap-2 text-xs font-semibold text-white uppercase tracking-wider">
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                        </svg>
-                                        Customer Email
-                                    </div>
-                                </th>
-                                <th className="px-6 py-4 text-left">
-                                    <div className="flex items-center gap-2 text-xs font-semibold text-white uppercase tracking-wider">
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
-                                        </svg>
-                                        Transaction ID
-                                    </div>
-                                </th>
-                                <th className="px-6 py-4 text-left">
-                                    <div className="flex items-center gap-2 text-xs font-semibold text-white uppercase tracking-wider">
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                                        </svg>
-                                        Status
-                                    </div>
-                                </th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Parcel</th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Amount</th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Payment Method</th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Paid At</th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Transaction ID</th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Status</th>
+                                <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Action</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
-                            {payments.map((payment) => (
-                                <tr
-                                    key={payment._id}
-                                    className="group hover:bg-[#caeb66]/5 transition-colors duration-200"
-                                >
-                                    {/* Parcel Info */}
-                                    <td className="px-6 py-4">
-                                        <div className="flex flex-col">
-                                            <span className="font-medium text-gray-900">
-                                                {payment.parcelName}
-                                            </span>
-                                            <span className="text-xs text-gray-400 font-mono">
-                                                ID: {payment.parcelId?.slice(-8)}
-                                            </span>
-                                        </div>
-                                    </td>
-
-                                    {/* Amount */}
-                                    <td className="px-6 py-4">
-                                        <div className="flex items-center gap-1">
-                                            <span className="text-gray-500 text-sm">
-                                                {payment.currency?.toUpperCase()}
-                                            </span>
-                                            <span className="font-bold text-gray-900">
-                                                {payment.amount?.toFixed(2)}
-                                            </span>
-                                        </div>
-                                    </td>
-
-                                    {/* Payment Method */}
-                                    <td className="px-6 py-4">
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-7 h-7 bg-[#caeb66]/10 rounded-lg flex items-center justify-center">
-                                                <svg className="w-3.5 h-3.5 text-[#03373d]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                                                </svg>
+                            {filteredPayments.length > 0 ? (
+                                filteredPayments.map((payment, index) => (
+                                    <tr key={payment._id || index} className="group hover:bg-[#caeb66]/5 transition-colors duration-200">
+                                        <td className="px-6 py-4">
+                                            <div className="flex flex-col">
+                                                <span className="font-medium text-gray-900">
+                                                    {payment.parcelName || "N/A"}
+                                                </span>
+                                                {payment.trackingId && (
+                                                    <span className="text-xs text-gray-400 font-mono">
+                                                        {payment.trackingId}
+                                                    </span>
+                                                )}
                                             </div>
-                                            <span className="text-gray-700 capitalize">
-                                                {payment.paymentMethod}
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className="font-bold text-gray-900">
+                                                ৳{(payment.amount || 0).toFixed(2)}
                                             </span>
-                                        </div>
-                                    </td>
-
-                                    {/* Paid At */}
-                                    <td className="px-6 py-4">
-                                        <span className="text-gray-600 text-sm">
-                                            {formatDate(payment.paidAt)}
-                                        </span>
-                                    </td>
-
-                                    {/* Customer Email */}
-                                    <td className="px-6 py-4">
-                                        {payment.customer_email ? (
-                                            <div className="flex items-center gap-1.5">
-                                                <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                                </svg>
-                                                <span className="text-gray-600 text-sm">
-                                                    {payment.customer_email}
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-7 h-7 bg-[#caeb66]/10 rounded-lg flex items-center justify-center">
+                                                    <svg className="w-3.5 h-3.5 text-[#03373d]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                                                    </svg>
+                                                </div>
+                                                <span className="text-gray-700 capitalize">
+                                                    {payment.paymentMethod || "Card"}
                                                 </span>
                                             </div>
-                                        ) : (
-                                            <span className="text-gray-400 text-sm italic">
-                                                Not provided
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className="text-gray-600 text-sm">
+                                                {formatDate(payment.paidAt)}
                                             </span>
-                                        )}
-                                    </td>
-
-                                    {/* Transaction ID */}
-                                    <td className="px-6 py-4">
-                                        <div className="flex items-center gap-1.5">
-                                            <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
-                                            </svg>
-                                            <span className="font-mono text-xs text-gray-500">
-                                                {payment.transactionId?.slice(-12)}
-                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-1.5">
+                                                <span className="font-mono text-xs text-gray-500">
+                                                    {payment.transactionId?.slice(-12) || "N/A"}
+                                                </span>
+                                                {payment.transactionId && (
+                                                    <button
+                                                        onClick={() => copyToClipboard(payment.transactionId)}
+                                                        className="text-gray-400 hover:text-[#03373d]"
+                                                    >
+                                                        <FaCopy className="w-3 h-3" />
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            {getStatusBadge(payment.paymentStatus)}
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <button
+                                                onClick={() => setSelectedPayment(payment)}
+                                                className="text-gray-500 hover:text-[#03373d] transition"
+                                            >
+                                                <FaEye className="w-4 h-4" />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="7" className="px-6 py-16 text-center">
+                                        <div className="flex flex-col items-center justify-center">
+                                            <div className="text-6xl mb-4 opacity-50">📭</div>
+                                            <h3 className="text-lg font-medium text-gray-900 mb-1">
+                                                No payment history
+                                            </h3>
+                                            <p className="text-gray-500 text-sm">
+                                                Your payment transactions will appear here
+                                            </p>
                                         </div>
                                     </td>
-
-                                    {/* Status */}
-                                    <td className="px-6 py-4">
-                                        {getStatusBadge(payment.paymentStatus)}
-                                    </td>
                                 </tr>
-                            ))}
+                            )}
                         </tbody>
                     </table>
                 </div>
 
-                {/* Empty State */}
-                {payments.length === 0 && (
-                    <div className="flex flex-col items-center justify-center py-16 px-4 bg-white">
-                        <div className="text-6xl mb-4 opacity-50">📭</div>
-                        <h3 className="text-lg font-medium text-gray-900 mb-1">
-                            No payment history
-                        </h3>
-                        <p className="text-gray-500 text-sm">
-                            Your payment transactions will appear here
-                        </p>
-                    </div>
-                )}
+            
+            </motion.div>
 
-                {/* Table Footer */}
-                {payments.length > 0 && (
-                    <div className="px-6 py-4 border-t border-gray-100 bg-gray-50">
-                        <div className="flex items-center justify-between">
-                            <p className="text-sm text-gray-500">
-                                Showing <span className="font-medium text-[#03373d]">{payments.length}</span> payments
-                            </p>
-                            <div className="flex gap-2">
-                                <button className="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-[#caeb66]/20 hover:border-[#caeb66]/50 transition-colors">
-                                    Previous
-                                </button>
-                                <button className="px-3 py-1.5 text-sm rounded-lg bg-gradient-to-r from-[#03373d] to-[#1a5c64] text-white hover:opacity-90 transition-all hover:shadow-md">
-                                    Next
-                                </button>
+            {/* Payment Details Modal */}
+            {selectedPayment && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setSelectedPayment(null)}>
+                    <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+                        <div className="p-6 border-b border-gray-200">
+                            <div className="flex justify-between items-center">
+                                <h2 className="text-xl font-bold text-[#03373d]">Payment Details</h2>
+                                <button onClick={() => setSelectedPayment(null)} className="text-gray-400 hover:text-gray-600 text-2xl">×</button>
+                            </div>
+                        </div>
+                        <div className="p-6 space-y-4">
+                            <div className="flex justify-between py-2 border-b">
+                                <span className="text-gray-500">Parcel Name:</span>
+                                <span className="font-semibold">{selectedPayment.parcelName}</span>
+                            </div>
+                            <div className="flex justify-between py-2 border-b">
+                                <span className="text-gray-500">Amount:</span>
+                                <span className="font-semibold text-green-600">৳{selectedPayment.amount}</span>
+                            </div>
+                            <div className="flex justify-between py-2 border-b">
+                                <span className="text-gray-500">Transaction ID:</span>
+                                <span className="font-mono text-sm">{selectedPayment.transactionId}</span>
+                            </div>
+                            <div className="flex justify-between py-2 border-b">
+                                <span className="text-gray-500">Payment Date:</span>
+                                <span>{formatDate(selectedPayment.paidAt)}</span>
+                            </div>
+                            <div className="flex justify-between py-2 border-b">
+                                <span className="text-gray-500">Status:</span>
+                                {getStatusBadge(selectedPayment.paymentStatus)}
                             </div>
                         </div>
                     </div>
-                )}
-            </div>
+                </div>
+            )}
         </div>
     );
 };

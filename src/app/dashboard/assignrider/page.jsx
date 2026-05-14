@@ -199,7 +199,7 @@ const AssignRider = () => {
 
     return (
 
-        <div className="min-h-screen bg-gray-50 p-6">
+        <div className=" p-6">
 
             <div className="container mx-auto">
 
@@ -217,9 +217,9 @@ const AssignRider = () => {
 
                         </div>
 
-                        <div className="bg-blue-50 rounded-lg px-4 py-2">
+                        <div className="  bg-gray-100 shadow-xl rounded-lg px-4 py-2">
 
-                            <span className="text-blue-600 font-semibold">Pending Pickup: {filteredParcels.length}</span>
+                            <span className="text-[#1a5c64] font-semibold">Pending Pickup: {filteredParcels.length}</span>
 
                         </div>
 
@@ -427,7 +427,7 @@ const AssignRider = () => {
 
                                         onClick={() => handleAssignRiderClick(parcel)}
 
-                                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium shadow-sm"
+                                        className="flex-1 cursor-pointer flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-br from-[#03373d] to-[#1a5c64] text-white rounded-lg transition-colors font-medium shadow-sm"
 
                                     >
 

@@ -66,11 +66,11 @@ const AssignRiderModal = ({
                 <div className="p-6 overflow-y-auto flex-1">
                     {/* Parcel Information */}
                     <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
-                        <h4 className="font-semibold text-blue-800 mb-2">Parcel Information</h4>
+                        <h4 className="font-semibold  text-[#1a5c64] mb-2">Parcel Information</h4>
                         <div className="grid grid-cols-2 gap-3 text-sm">
                             <div>
                                 <p className="text-gray-600">Tracking ID:</p>
-                                <p className="font-mono font-bold text-blue-700">{selectedParcel?.trackingId}</p>
+                                <p className="font-mono font-bold text-[#1a5c64]">{selectedParcel?.trackingId}</p>
                             </div>
                             <div>
                                 <p className="text-gray-600">Parcel Name:</p>
@@ -95,7 +95,7 @@ const AssignRiderModal = ({
 
                         {ridersLoading ? (
                             <div className="flex flex-col items-center py-10">
-                                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
+                                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#1a5c64]"></div>
                                 <p className="mt-2 text-gray-500">Loading riders...</p>
                             </div>
                         ) : riders?.length === 0 ? (
@@ -133,7 +133,7 @@ const AssignRiderModal = ({
                                             <tr
                                                 key={rider._id}
                                                 className={`cursor-pointer transition-colors ${selectedRow === rider._id
-                                                    ? 'bg-blue-50 border-l-4 border-l-blue-500'
+                                                    ? 'bg-blue-50 border-l-4 border-l-[#1a5c64]'
                                                     : 'hover:bg-gray-50'
                                                     }`}
                                                 onClick={() => handleSelectRider(rider._id)}
@@ -145,14 +145,14 @@ const AssignRiderModal = ({
                                                         value={rider._id}
                                                         checked={selectedRider === rider._id}
                                                         onChange={() => handleSelectRider(rider._id)}
-                                                        className="text-blue-600 focus:ring-blue-500 h-4 w-4"
+                                                        className="text-[#1a5c64] focus:ring-[#1a5c64] h-4 w-4"
                                                         onClick={(e) => e.stopPropagation()}
                                                     />
                                                 </td>
                                                 <td className="px-4 py-3">
                                                     <div className="flex items-center gap-2">
                                                         <div className="bg-blue-100 rounded-full p-1">
-                                                            <FaUser className="text-blue-600 text-xs" />
+                                                            <FaUser className="text-[#1a5c64] text-xs" />
                                                         </div>
                                                         <span className="font-medium text-gray-800">{rider.fullName || rider.name}</span>
                                                     </div>
@@ -198,16 +198,16 @@ const AssignRiderModal = ({
                     <button
                         onClick={onClose}
                         disabled={isLoading}
-                        className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-medium"
+                        className="flex-1 px-4 py-2 border cursor-pointer border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-medium"
                     >
                         Cancel
                     </button>
                     <button
                         onClick={handleConfirmClick}
                         disabled={!selectedRider || riders?.length === 0 || isLoading}
-                        className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg transition-colors font-semibold ${(!selectedRider || riders?.length === 0 || isLoading)
+                        className={`flex-1 flex items-center justify-center cursor-pointer gap-2 px-4 py-2 bg-gradient-to-br from-[#03373d] to-[#1a5c64] text-white rounded-lg transition-colors font-semibold ${(!selectedRider || riders?.length === 0 || isLoading)
                                 ? 'opacity-50 cursor-not-allowed'
-                                : 'hover:bg-blue-700'
+                                : 'hover:bg-[#1a5c64]'
                             }`}
                     >
                         {isLoading ? (
