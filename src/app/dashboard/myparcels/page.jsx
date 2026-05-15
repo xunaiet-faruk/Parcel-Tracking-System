@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import { FiSearch, FiEdit2, FiTrash2, FiCreditCard, FiCheckCircle, FiXCircle } from 'react-icons/fi';
 import UpdateField from './UpdateField';
 import Link from 'next/link';
+import Userprotract from '../Userprotuct/Userprotract';
 
 const MyParcels = () => {
     const { user } = useAuth();
@@ -171,166 +172,168 @@ const MyParcels = () => {
     }
 
     return (
-        <div className="min-h-screen p-4 md:p-8">
-            <div className="max-w-7xl mx-auto">
-                <div className="mb-8 text-center">
-                    <h1 className="text-3xl md:text-4xl font-bold text-black mb-2">📮 My Parcels</h1>
-                    <p className="text-gray-400">You have {filteredParcels.length} parcel(s) in total</p>
-                </div>
-
-                <div className="mb-6 max-w-md mx-auto">
-                    <div className="relative">
-                        <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                        <input
-                            type="text"
-                            placeholder="Search by parcel, sender or receiver name..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#03373d] focus:border-transparent"
-                        />
+       <Userprotract>
+            <div className=" p-4 md:p-8">
+                <div className="max-w-7xl mx-auto">
+                    <div className="mb-8 text-center">
+                        <h1 className="text-3xl md:text-4xl font-bold text-black mb-2">📮 My Parcels</h1>
+                        <p className="text-gray-400">You have {filteredParcels.length} parcel(s) in total</p>
                     </div>
-                </div>
 
-                <div className="grid gap-6 md:grid-cols-2">
-                    {filteredParcels.map((parcel, index) => {
-                        const cancelled = isCancelled(parcel);
-                        const delivered = isDelivered(parcel);
-                        const paid = isPaid(parcel);
+                    <div className="mb-6 max-w-md mx-auto">
+                        <div className="relative">
+                            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                            <input
+                                type="text"
+                                placeholder="Search by parcel, sender or receiver name..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#03373d] focus:border-transparent"
+                            />
+                        </div>
+                    </div>
 
-                        return (
-                            <div key={index} className={`bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300
+                    <div className="grid gap-6 md:grid-cols-2">
+                        {filteredParcels.map((parcel, index) => {
+                            const cancelled = isCancelled(parcel);
+                            const delivered = isDelivered(parcel);
+                            const paid = isPaid(parcel);
+
+                            return (
+                                <div key={index} className={`bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300
                                 ${cancelled ? 'border-l-4 border-l-red-500 opacity-75' : ''}
                                 ${delivered ? 'border-l-4 border-l-green-500' : ''}
                             `}>
-                                <div className={`px-6 py-3 ${cancelled ? 'bg-red-50' : delivered ? 'bg-green-50' : 'bg-gradient-to-r from-[#03373d] to-[#1a5c64]'}`}>
-                                    <div className="flex justify-between items-center">
-                                        <h3 className={`font-semibold text-lg ${cancelled || delivered ? 'text-gray-700' : 'text-white'}`}>
-                                            {parcel.parcelName}
-                                        </h3>
-                                        <span className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${getStatusColor(parcel.status, parcel.deliverystatus)}`}>
-                                            {getStatusText(parcel.status, parcel.deliverystatus)}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div className="p-6">
-                                    <div className="flex justify-between items-center mb-4">
-                                        <div className="text-3xl font-bold text-[#213d03]">৳{parcel.totalPrice}</div>
-                                        <div className="text-sm text-gray-500">📅 {formatDate(parcel.bookingDate)}</div>
-                                    </div>
-
-                                    <div className="grid md:grid-cols-2 gap-4 mb-4">
-                                        <div className="bg-[#03373d]/10 rounded-lg p-3">
-                                            <p className="text-xs text-[#03373d] font-medium mb-1">SENDER</p>
-                                            <p className="font-medium text-gray-800">{parcel.senderName}</p>
-                                            <p className="text-sm text-gray-600">{parcel.senderPhone}</p>
-                                            <p className="text-xs text-gray-500">{parcel.senderDistrict}</p>
-                                        </div>
-
-                                        <div className="bg-[#caeb66]/30 rounded-lg p-3">
-                                            <p className="text-xs text-[#03373d] font-medium mb-1">RECEIVER</p>
-                                            <p className="font-medium text-gray-800">{parcel.receiverName}</p>
-                                            <p className="text-sm text-gray-600">{parcel.receiverPhone}</p>
-                                            <p className="text-xs text-gray-500">{parcel.receiverDistrict}</p>
+                                    <div className={`px-6 py-3 ${cancelled ? 'bg-red-50' : delivered ? 'bg-green-50' : 'bg-gradient-to-r from-[#03373d] to-[#1a5c64]'}`}>
+                                        <div className="flex justify-between items-center">
+                                            <h3 className={`font-semibold text-lg ${cancelled || delivered ? 'text-gray-700' : 'text-white'}`}>
+                                                {parcel.parcelName}
+                                            </h3>
+                                            <span className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${getStatusColor(parcel.status, parcel.deliverystatus)}`}>
+                                                {getStatusText(parcel.status, parcel.deliverystatus)}
+                                            </span>
                                         </div>
                                     </div>
 
-                                    <div className="border-t pt-3 mt-2">
-                                        <div className="flex justify-between text-sm mb-3">
-                                            <div>
-                                                <p className="text-gray-500">Weight</p>
-                                                <p className="font-medium">{parcel.parcelWeight} kg</p>
+                                    <div className="p-6">
+                                        <div className="flex justify-between items-center mb-4">
+                                            <div className="text-3xl font-bold text-[#213d03]">৳{parcel.totalPrice}</div>
+                                            <div className="text-sm text-gray-500">📅 {formatDate(parcel.bookingDate)}</div>
+                                        </div>
+
+                                        <div className="grid md:grid-cols-2 gap-4 mb-4">
+                                            <div className="bg-[#03373d]/10 rounded-lg p-3">
+                                                <p className="text-xs text-[#03373d] font-medium mb-1">SENDER</p>
+                                                <p className="font-medium text-gray-800">{parcel.senderName}</p>
+                                                <p className="text-sm text-gray-600">{parcel.senderPhone}</p>
+                                                <p className="text-xs text-gray-500">{parcel.senderDistrict}</p>
                                             </div>
-                                            <div>
-                                                <p className="text-gray-500">Discount</p>
-                                                <p className="font-medium capitalize">{parcel.discount || 'none'}</p>
+
+                                            <div className="bg-[#caeb66]/30 rounded-lg p-3">
+                                                <p className="text-xs text-[#03373d] font-medium mb-1">RECEIVER</p>
+                                                <p className="font-medium text-gray-800">{parcel.receiverName}</p>
+                                                <p className="text-sm text-gray-600">{parcel.receiverPhone}</p>
+                                                <p className="text-xs text-gray-500">{parcel.receiverDistrict}</p>
                                             </div>
                                         </div>
 
-                                        {/* Action Buttons */}
-                                        <div className="flex gap-2 pt-2 border-t">
-                                            {/* Edit Button - ক্যান্সেল বা ডেলিভারি হলে বন্ধ */}
-                                            <button
-                                                onClick={() => handleEdit(parcel)}
-                                                disabled={paid || cancelled || delivered}
-                                                className={`flex-1 px-3 py-2 rounded-lg flex items-center justify-center gap-2 transition-colors
-                                                    ${(paid || cancelled || delivered)
-                                                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                                        : 'bg-[#03373d]/10 text-[#03373d] hover:bg-[#03373d]/20 cursor-pointer'
-                                                    }`}
-                                            >
-                                                <FiEdit2 className="w-4 h-4" />
-                                                <span className="text-sm font-medium">Edit</span>
-                                            </button>
+                                        <div className="border-t pt-3 mt-2">
+                                            <div className="flex justify-between text-sm mb-3">
+                                                <div>
+                                                    <p className="text-gray-500">Weight</p>
+                                                    <p className="font-medium">{parcel.parcelWeight} kg</p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-gray-500">Discount</p>
+                                                    <p className="font-medium capitalize">{parcel.discount || 'none'}</p>
+                                                </div>
+                                            </div>
 
-                                            {/* Delete Button - ক্যান্সেল বা ডেলিভারি বা পেমেন্ট হলে বন্ধ */}
-                                            <button
-                                                onClick={() => handleDelete(parcel._id, parcel)}
-                                                disabled={paid || cancelled || delivered}
-                                                className={`flex-1 px-3 py-2 rounded-lg flex items-center justify-center gap-2 transition-colors
+                                            {/* Action Buttons */}
+                                            <div className="flex gap-2 pt-2 border-t">
+                                                {/* Edit Button - ক্যান্সেল বা ডেলিভারি হলে বন্ধ */}
+                                                <button
+                                                    onClick={() => handleEdit(parcel)}
+                                                    disabled={paid || cancelled || delivered}
+                                                    className={`flex-1 px-3 py-2 rounded-lg flex items-center justify-center gap-2 transition-colors
                                                     ${(paid || cancelled || delivered)
-                                                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                                        : 'bg-red-500/10 text-red-500 hover:bg-red-500/20 cursor-pointer'
-                                                    }`}
-                                            >
-                                                <FiTrash2 className="w-4 h-4" />
-                                                <span className="text-sm font-medium">Delete</span>
-                                            </button>
+                                                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                                            : 'bg-[#03373d]/10 text-[#03373d] hover:bg-[#03373d]/20 cursor-pointer'
+                                                        }`}
+                                                >
+                                                    <FiEdit2 className="w-4 h-4" />
+                                                    <span className="text-sm font-medium">Edit</span>
+                                                </button>
 
-                                            {/* Pay Button - শুধু পেন্ডিং এবং ক্যান্সেল নয় এমন প্যার্সেলের জন্য */}
-                                            {!paid && !cancelled && !delivered && (
-                                                <Link href={`/dashboard/payment/${parcel._id}`} className="flex-1">
-                                                    <button className="w-full cursor-pointer bg-gradient-to-r from-[#03373d] to-[#1a5c64] text-white px-3 py-2 rounded-lg hover:shadow-lg transition-all flex items-center justify-center gap-2">
-                                                        <FiCreditCard className="w-4 h-4" />
-                                                        <span className="text-sm font-medium">Pay Now</span>
+                                                {/* Delete Button - ক্যান্সেল বা ডেলিভারি বা পেমেন্ট হলে বন্ধ */}
+                                                <button
+                                                    onClick={() => handleDelete(parcel._id, parcel)}
+                                                    disabled={paid || cancelled || delivered}
+                                                    className={`flex-1 px-3 py-2 rounded-lg flex items-center justify-center gap-2 transition-colors
+                                                    ${(paid || cancelled || delivered)
+                                                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                                            : 'bg-red-500/10 text-red-500 hover:bg-red-500/20 cursor-pointer'
+                                                        }`}
+                                                >
+                                                    <FiTrash2 className="w-4 h-4" />
+                                                    <span className="text-sm font-medium">Delete</span>
+                                                </button>
+
+                                                {/* Pay Button - শুধু পেন্ডিং এবং ক্যান্সেল নয় এমন প্যার্সেলের জন্য */}
+                                                {!paid && !cancelled && !delivered && (
+                                                    <Link href={`/dashboard/payment/${parcel._id}`} className="flex-1">
+                                                        <button className="w-full cursor-pointer bg-gradient-to-r from-[#03373d] to-[#1a5c64] text-white px-3 py-2 rounded-lg hover:shadow-lg transition-all flex items-center justify-center gap-2">
+                                                            <FiCreditCard className="w-4 h-4" />
+                                                            <span className="text-sm font-medium">Pay Now</span>
+                                                        </button>
+                                                    </Link>
+                                                )}
+
+                                                {/* Paid Button - পেমেন্ট করা হলে */}
+                                                {paid && !cancelled && (
+                                                    <button disabled className="flex-1 bg-green-100 text-green-600 px-3 py-2 rounded-lg flex items-center justify-center gap-2 cursor-default">
+                                                        <FiCheckCircle className="w-4 h-4" />
+                                                        <span className="text-sm font-medium">Paid</span>
                                                     </button>
-                                                </Link>
-                                            )}
+                                                )}
 
-                                            {/* Paid Button - পেমেন্ট করা হলে */}
-                                            {paid && !cancelled && (
-                                                <button disabled className="flex-1 bg-green-100 text-green-600 px-3 py-2 rounded-lg flex items-center justify-center gap-2 cursor-default">
-                                                    <FiCheckCircle className="w-4 h-4" />
-                                                    <span className="text-sm font-medium">Paid</span>
-                                                </button>
-                                            )}
+                                                {/* Cancelled Badge - ক্যান্সেল হলে */}
+                                                {cancelled && (
+                                                    <button disabled className="flex-1 bg-red-100 text-red-600 px-3 py-2 rounded-lg flex items-center justify-center gap-2 cursor-default">
+                                                        <FiXCircle className="w-4 h-4" />
+                                                        <span className="text-sm font-medium">Cancelled</span>
+                                                    </button>
+                                                )}
 
-                                            {/* Cancelled Badge - ক্যান্সেল হলে */}
-                                            {cancelled && (
-                                                <button disabled className="flex-1 bg-red-100 text-red-600 px-3 py-2 rounded-lg flex items-center justify-center gap-2 cursor-default">
-                                                    <FiXCircle className="w-4 h-4" />
-                                                    <span className="text-sm font-medium">Cancelled</span>
-                                                </button>
-                                            )}
-
-                                            {/* Delivered Badge - ডেলিভারি হলে */}
-                                            {delivered && !cancelled && (
-                                                <button disabled className="flex-1 bg-green-100 text-green-600 px-3 py-2 rounded-lg flex items-center justify-center gap-2 cursor-default">
-                                                    <FiCheckCircle className="w-4 h-4" />
-                                                    <span className="text-sm font-medium">Delivered</span>
-                                                </button>
-                                            )}
+                                                {/* Delivered Badge - ডেলিভারি হলে */}
+                                                {delivered && !cancelled && (
+                                                    <button disabled className="flex-1 bg-green-100 text-green-600 px-3 py-2 rounded-lg flex items-center justify-center gap-2 cursor-default">
+                                                        <FiCheckCircle className="w-4 h-4" />
+                                                        <span className="text-sm font-medium">Delivered</span>
+                                                    </button>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        );
-                    })}
+                            );
+                        })}
+                    </div>
+
+                    {filteredParcels.length === 0 && (
+                        <div className="text-center py-12">
+                            <p className="text-gray-500">No parcels match your search.</p>
+                        </div>
+                    )}
                 </div>
 
-                {filteredParcels.length === 0 && (
-                    <div className="text-center py-12">
-                        <p className="text-gray-500">No parcels match your search.</p>
-                    </div>
-                )}
+                <UpdateField
+                    editParcel={editParcel}
+                    setEditParcel={setEditParcel}
+                    refetch={refetch}
+                />
             </div>
-
-            <UpdateField
-                editParcel={editParcel}
-                setEditParcel={setEditParcel}
-                refetch={refetch}
-            />
-        </div>
+       </Userprotract>
     );
 };
 

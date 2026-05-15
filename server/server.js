@@ -100,6 +100,51 @@ async function run() {
             }
         };
 
+        // Verify Rider middleware
+        const verifyRider = async (req, res, next) => {
+            try {
+                const email = req.decoded_email;
+                const user = await UsersCollection.findOne({ email: email });
+
+                if (user?.role !== 'rider' && user?.role !== 'admin') {
+                    return res.status(403).send({
+                        success: false,
+                        message: 'Forbidden access. Rider rights required.'
+                    });
+                }
+                next();
+            } catch (error) {
+                console.error('Rider verification error:', error);
+                res.status(500).send({
+                    success: false,
+                    message: 'Internal server error'
+                });
+            }
+        };
+
+        // Verify User middleware (any authenticated user)
+        const verifyUser = async (req, res, next) => {
+            try {
+                const email = req.decoded_email;
+                const user = await UsersCollection.findOne({ email: email });
+
+                if (!user) {
+                    return res.status(403).send({
+                        success: false,
+                        message: 'User not found'
+                    });
+                }
+                req.user = user;
+                next();
+            } catch (error) {
+                console.error('User verification error:', error);
+                res.status(500).send({
+                    success: false,
+                    message: 'Internal server error'
+                });
+            }
+        };
+
         app.post('/parcels', async (req, res) => {
             const parcel = req.body;
             const result = await ParcelCollection.insertOne(parcel);
@@ -207,7 +252,7 @@ async function run() {
             res.send(result);
         });
 
-        app.patch('/parcels/:id', veryFytoken, async (req, res) => {
+        app.patch('/parcels/:id', veryFytoken,verifyRider, async (req, res) => {
             const { riderId, riderName, riderEmail, riderPhone, parentId, deliverystatus, assignedAt } = req.body;
             const id = req.params.id;
             const filter = { _id: new ObjectId(id) };
@@ -555,7 +600,7 @@ async function run() {
             }
         });
 
-        app.patch('/rider/:id', veryFytoken, async (req, res) => {
+        app.patch('/rider/:id', veryFytoken,verifyAdmin, async (req, res) => {
             try {
                 const status = req.body.status;
                 const id = req.params.id;

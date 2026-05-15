@@ -3,7 +3,7 @@ import useAxios from '@/app/(site)/hooks/useAxios';
 import { useQuery } from '@tanstack/react-query';
 import React, { useState } from 'react';
 import Swal from 'sweetalert2';
-import AdminRouters from '../AdminRoutes/AdminRouters';
+import AdminRouters from '../Adminprotuct/AdminRouters';
 import Loading from '@/app/components/Loading';
 
 const AppoveRider = () => {
@@ -138,7 +138,7 @@ const AppoveRider = () => {
     };
 
     if (isLoading) {
-        return <Loading/>
+        return <Loading />
     }
 
     return (

@@ -10,6 +10,7 @@ import {
     FaTag, FaCalendarAlt, FaCreditCard, FaTruck
 } from 'react-icons/fa';
 import AssignRiderModal from './AssignriderModal';
+import AdminRouters from '../Adminprotuct/AdminRouters';
 
 const AssignRider = () => {
 
@@ -199,286 +200,288 @@ const AssignRider = () => {
 
     return (
 
-        <div className=" p-6">
+      <AdminRouters>
+            <div className=" p-6">
 
-            <div className="container mx-auto">
+                <div className="container mx-auto">
 
-                {/* Header Section */}
+                    {/* Header Section */}
 
-                <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+                    <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
 
-                    <div className="flex justify-between items-center flex-wrap gap-4">
+                        <div className="flex justify-between items-center flex-wrap gap-4">
 
-                        <div>
+                            <div>
 
-                            <h1 className="text-2xl font-bold text-gray-800">Assign Riders</h1>
+                                <h1 className="text-2xl font-bold text-gray-800">Assign Riders</h1>
 
-                            <p className="text-gray-600 mt-1">Manage and assign delivery riders to pending parcels</p>
-
-                        </div>
-
-                        <div className="  bg-gray-100 shadow-xl rounded-lg px-4 py-2">
-
-                            <span className="text-[#1a5c64] font-semibold">Pending Pickup: {filteredParcels.length}</span>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-
-                {/* Search Section */}
-
-                <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
-
-                    <div className="relative">
-
-                        <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-
-                        <input
-
-                            type="text"
-
-                            value={searchTerm}
-
-                            onChange={(e) => setSearchTerm(e.target.value)}
-
-                            placeholder="Search by Tracking ID, Receiver, or Sender..."
-
-                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-
-                        />
-
-                    </div>
-
-                </div>
-
-
-
-                {/* Parcels Grid */}
-
-                {filteredParcels.length === 0 ? (
-
-                    <div className="bg-white rounded-xl shadow-sm p-12 text-center">
-
-                        <FaBox className="text-6xl text-gray-300 mx-auto mb-4" />
-
-                        <h3 className="text-lg font-semibold text-gray-600">No pending parcels</h3>
-
-                        <p className="text-gray-400 mt-1">
-
-                            {searchTerm ? 'No parcels match your search criteria' : 'All parcels have been assigned to riders'}
-
-                        </p>
-
-                    </div>
-
-                ) : (
-
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-                        {filteredParcels.map((parcel) => (
-
-                            <div key={parcel._id} className="bg-white rounded-xl shadow-xl border border-gray-100 hover:shadow-md transition-shadow duration-300">
-
-                                {/* Parcel Header */}
-
-                                <div className="p-5 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-white rounded-t-xl">
-
-                                    <div className="flex justify-between items-start flex-wrap gap-2">
-
-                                        <div>
-
-                                            <div className="flex items-center gap-2 mb-2">
-
-                                                <FaHashtag className="text-blue-500 text-sm" />
-
-                                                <span className="text-xs font-mono text-gray-600 bg-gray-100 px-2 py-1 rounded">{parcel.trackingId}</span>
-
-                                            </div>
-
-                                            <div className="flex items-center gap-4 mt-2 flex-wrap">
-
-                                                <div className="flex items-center gap-2 text-sm text-gray-500">
-
-                                                    <FaCalendarAlt className="text-green-500" />
-
-                                                    <span>{formatDate(parcel.bookingDate)} at {formatTime(parcel.bookingDate)}</span>
-
-                                                </div>
-
-                                                <div className="flex items-center gap-2 text-sm font-semibold text-green-600">
-
-                                                    <FaCreditCard />
-
-                                                    <span>${parcel.totalPrice}</span>
-
-                                                </div>
-
-                                            </div>
-
-                                        </div>
-
-                                        {/* স্ট্যাটাস ব্যাজ - পেন্ডিং এবং রিজেক্টেড উভয় দেখাবে */}
-
-                                        <div className="flex gap-2">
-
-                                            {parcel.deliverystatus === 'rejected' ? (
-
-                                                <span className="px-3 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full uppercase">
-
-                                                    REJECTED
-
-                                                </span>
-
-                                            ) : (
-
-                                                <span className="px-3 py-1 bg-yellow-100 text-yellow-700 text-xs font-medium rounded-full uppercase">
-
-                                                    {parcel.deliverystatus?.replace('-', ' ')}
-
-                                                </span>
-
-                                            )}
-
-                                            <span className="px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full uppercase">
-
-                                                {parcel.paymentStatus}
-
-                                            </span>
-
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
-
-
-                                {/* Parcel Info Body */}
-
-                                <div className="p-5 space-y-4">
-
-                                    <div className="bg-gray-50 rounded-lg p-3 flex justify-between items-center">
-
-                                        <div className="flex items-center gap-2">
-
-                                            <FaBox className="text-purple-500" />
-
-                                            <span className="font-medium text-gray-700">{parcel.parcelName}</span>
-
-                                        </div>
-
-                                        <span className="text-sm text-gray-600"><FaWeightHanging className="inline mr-1 text-orange-500" />{parcel.parcelWeight} kg</span>
-
-                                    </div>
-
-
-
-                                    {/* Sender Info */}
-
-                                    <div className="border-l-4 border-blue-400 pl-3">
-
-                                        <h4 className="text-sm font-semibold text-gray-700 flex items-center gap-2 mb-2"><FaTruck className="text-blue-500 text-xs" /> Sender Information</h4>
-
-                                        <div className="ml-2 text-sm text-gray-600 space-y-1">
-
-                                            <p className="font-medium text-gray-800">{parcel.senderName}</p>
-
-                                            <p><FaMapMarkerAlt className="inline mr-1 text-red-400" /> {parcel.senderAddress} ({parcel.senderDistrict})</p>
-
-                                            <p><FaPhone className="inline mr-1 text-blue-400" /> {parcel.senderPhone}</p>
-
-                                        </div>
-
-                                    </div>
-
-
-
-                                    {/* Receiver Info */}
-
-                                    <div className="border-l-4 border-green-400 pl-3">
-
-                                        <h4 className="text-sm font-semibold text-gray-700 flex items-center gap-2 mb-2"><FaUser className="text-green-500 text-xs" /> Receiver Information</h4>
-
-                                        <div className="ml-2 text-sm text-gray-600 space-y-1">
-
-                                            <p className="font-medium text-gray-800">{parcel.receiverName}</p>
-
-                                            <p><FaMapMarkerAlt className="inline mr-1 text-green-400" /> {parcel.receiverAddress} ({parcel.receiverDistrict})</p>
-
-                                            <p><FaPhone className="inline mr-1 text-blue-400" /> {parcel.receiverPhone}</p>
-
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
-
-
-                                {/* Action Button */}
-
-                                <div className="p-5 bg-gray-50 rounded-b-xl flex gap-3">
-
-                                    <button
-
-                                        onClick={() => handleAssignRiderClick(parcel)}
-
-                                        className="flex-1 cursor-pointer flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-br from-[#03373d] to-[#1a5c64] text-white rounded-lg transition-colors font-medium shadow-sm"
-
-                                    >
-
-                                        <FaMotorcycle /> Assign Rider
-
-                                    </button>
-
-                                </div>
+                                <p className="text-gray-600 mt-1">Manage and assign delivery riders to pending parcels</p>
 
                             </div>
 
-                        ))}
+                            <div className="  bg-gray-100 shadow-xl rounded-lg px-4 py-2">
+
+                                <span className="text-[#1a5c64] font-semibold">Pending Pickup: {filteredParcels.length}</span>
+
+                            </div>
+
+                        </div>
 
                     </div>
 
-                )}
 
+
+                    {/* Search Section */}
+
+                    <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
+
+                        <div className="relative">
+
+                            <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+
+                            <input
+
+                                type="text"
+
+                                value={searchTerm}
+
+                                onChange={(e) => setSearchTerm(e.target.value)}
+
+                                placeholder="Search by Tracking ID, Receiver, or Sender..."
+
+                                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+
+                            />
+
+                        </div>
+
+                    </div>
+
+
+
+                    {/* Parcels Grid */}
+
+                    {filteredParcels.length === 0 ? (
+
+                        <div className="bg-white rounded-xl shadow-sm p-12 text-center">
+
+                            <FaBox className="text-6xl text-gray-300 mx-auto mb-4" />
+
+                            <h3 className="text-lg font-semibold text-gray-600">No pending parcels</h3>
+
+                            <p className="text-gray-400 mt-1">
+
+                                {searchTerm ? 'No parcels match your search criteria' : 'All parcels have been assigned to riders'}
+
+                            </p>
+
+                        </div>
+
+                    ) : (
+
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                            {filteredParcels.map((parcel) => (
+
+                                <div key={parcel._id} className="bg-white rounded-xl shadow-xl border border-gray-100 hover:shadow-md transition-shadow duration-300">
+
+                                    {/* Parcel Header */}
+
+                                    <div className="p-5 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-white rounded-t-xl">
+
+                                        <div className="flex justify-between items-start flex-wrap gap-2">
+
+                                            <div>
+
+                                                <div className="flex items-center gap-2 mb-2">
+
+                                                    <FaHashtag className="text-blue-500 text-sm" />
+
+                                                    <span className="text-xs font-mono text-gray-600 bg-gray-100 px-2 py-1 rounded">{parcel.trackingId}</span>
+
+                                                </div>
+
+                                                <div className="flex items-center gap-4 mt-2 flex-wrap">
+
+                                                    <div className="flex items-center gap-2 text-sm text-gray-500">
+
+                                                        <FaCalendarAlt className="text-green-500" />
+
+                                                        <span>{formatDate(parcel.bookingDate)} at {formatTime(parcel.bookingDate)}</span>
+
+                                                    </div>
+
+                                                    <div className="flex items-center gap-2 text-sm font-semibold text-green-600">
+
+                                                        <FaCreditCard />
+
+                                                        <span>${parcel.totalPrice}</span>
+
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+
+                                            {/* স্ট্যাটাস ব্যাজ - পেন্ডিং এবং রিজেক্টেড উভয় দেখাবে */}
+
+                                            <div className="flex gap-2">
+
+                                                {parcel.deliverystatus === 'rejected' ? (
+
+                                                    <span className="px-3 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-full uppercase">
+
+                                                        REJECTED
+
+                                                    </span>
+
+                                                ) : (
+
+                                                    <span className="px-3 py-1 bg-yellow-100 text-yellow-700 text-xs font-medium rounded-full uppercase">
+
+                                                        {parcel.deliverystatus?.replace('-', ' ')}
+
+                                                    </span>
+
+                                                )}
+
+                                                <span className="px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full uppercase">
+
+                                                    {parcel.paymentStatus}
+
+                                                </span>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+
+
+                                    {/* Parcel Info Body */}
+
+                                    <div className="p-5 space-y-4">
+
+                                        <div className="bg-gray-50 rounded-lg p-3 flex justify-between items-center">
+
+                                            <div className="flex items-center gap-2">
+
+                                                <FaBox className="text-purple-500" />
+
+                                                <span className="font-medium text-gray-700">{parcel.parcelName}</span>
+
+                                            </div>
+
+                                            <span className="text-sm text-gray-600"><FaWeightHanging className="inline mr-1 text-orange-500" />{parcel.parcelWeight} kg</span>
+
+                                        </div>
+
+
+
+                                        {/* Sender Info */}
+
+                                        <div className="border-l-4 border-blue-400 pl-3">
+
+                                            <h4 className="text-sm font-semibold text-gray-700 flex items-center gap-2 mb-2"><FaTruck className="text-blue-500 text-xs" /> Sender Information</h4>
+
+                                            <div className="ml-2 text-sm text-gray-600 space-y-1">
+
+                                                <p className="font-medium text-gray-800">{parcel.senderName}</p>
+
+                                                <p><FaMapMarkerAlt className="inline mr-1 text-red-400" /> {parcel.senderAddress} ({parcel.senderDistrict})</p>
+
+                                                <p><FaPhone className="inline mr-1 text-blue-400" /> {parcel.senderPhone}</p>
+
+                                            </div>
+
+                                        </div>
+
+
+
+                                        {/* Receiver Info */}
+
+                                        <div className="border-l-4 border-green-400 pl-3">
+
+                                            <h4 className="text-sm font-semibold text-gray-700 flex items-center gap-2 mb-2"><FaUser className="text-green-500 text-xs" /> Receiver Information</h4>
+
+                                            <div className="ml-2 text-sm text-gray-600 space-y-1">
+
+                                                <p className="font-medium text-gray-800">{parcel.receiverName}</p>
+
+                                                <p><FaMapMarkerAlt className="inline mr-1 text-green-400" /> {parcel.receiverAddress} ({parcel.receiverDistrict})</p>
+
+                                                <p><FaPhone className="inline mr-1 text-blue-400" /> {parcel.receiverPhone}</p>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+
+
+                                    {/* Action Button */}
+
+                                    <div className="p-5 bg-gray-50 rounded-b-xl flex gap-3">
+
+                                        <button
+
+                                            onClick={() => handleAssignRiderClick(parcel)}
+
+                                            className="flex-1 cursor-pointer flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-br from-[#03373d] to-[#1a5c64] text-white rounded-lg transition-colors font-medium shadow-sm"
+
+                                        >
+
+                                            <FaMotorcycle /> Assign Rider
+
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            ))}
+
+                        </div>
+
+                    )}
+
+                </div>
+
+
+
+                <AssignRiderModal
+
+                    isOpen={isModalOpen}
+
+                    onClose={() => {
+
+                        setIsModalOpen(false);
+
+                        setSelectedParcel(null);
+
+                        setSelectedRider('');
+
+                    }}
+
+                    selectedParcel={selectedParcel}
+
+                    riders={riders}
+
+                    selectedRider={selectedRider}
+
+                    setSelectedRider={setSelectedRider}
+
+                    onConfirm={handleConfirmAssignment}
+
+                    ridersLoading={ridersLoading}
+
+                    showFallbackRiders={showFallbackRiders}
+
+                />
             </div>
-
-
-
-            <AssignRiderModal
-
-                isOpen={isModalOpen}
-
-                onClose={() => {
-
-                    setIsModalOpen(false);
-
-                    setSelectedParcel(null);
-
-                    setSelectedRider('');
-
-                }}
-
-                selectedParcel={selectedParcel}
-
-                riders={riders}
-
-                selectedRider={selectedRider}
-
-                setSelectedRider={setSelectedRider}
-
-                onConfirm={handleConfirmAssignment}
-
-                ridersLoading={ridersLoading}
-
-                showFallbackRiders={showFallbackRiders}
-
-            />
-        </div>
+      </AdminRouters>
     );
 
 };

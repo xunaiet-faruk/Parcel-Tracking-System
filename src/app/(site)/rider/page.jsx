@@ -201,7 +201,7 @@ const RiderPage = () => {
                             <h2 className="text-4xl font-bold text-white mb-4">Welcome Aboard! 🎉</h2>
                             <p className="text-xl text-white/90 mb-8">
                                 Congratulations! Your application has been approved.
-                                You're now an official rider of Zapwork.
+                                You're now an official rider of SpeedyX.
                             </p>
                             <div className="bg-white rounded-2xl p-6 text-left max-w-md mx-auto shadow-xl">
                                 <h3 className="font-bold text-gray-800 mb-4 text-lg flex items-center gap-2">
@@ -531,7 +531,7 @@ const RiderPage = () => {
                         <div className="bg-gradient-to-br from-[#03373d] to-[#1a5c64] rounded-3xl overflow-hidden shadow-2xl">
                             <div className="relative h-96">
                                 <img
-                                    src="/assets/agent-pending.png"
+                                    src="/assets/rider.png"
                                     alt="Delivery Rider"
                                     className="w-full h-full object-cover"
                                 />
@@ -546,7 +546,7 @@ const RiderPage = () => {
                         <div className="bg-white rounded-3xl shadow-xl p-6">
                             <h3 className="text-xl font-bold text-[#03373d] mb-4 flex items-center gap-2">
                                 <span className="text-2xl">🎯</span>
-                                Why Join Zapwork?
+                                Why Join SpeedyX?
                             </h3>
                             <div className="space-y-3">
                                 <div className="flex items-start gap-3">
@@ -594,7 +594,7 @@ const RiderPage = () => {
                         <div className="bg-[#caeb66] rounded-3xl p-6 text-center">
                             <p className="text-[#03373d] font-semibold mb-2">Questions?</p>
                             <p className="text-sm text-gray-800">Call: <span className="font-bold">+880 1234 567890</span></p>
-                            <p className="text-sm text-gray-800">Email: <span className="font-bold">careers@zapwork.com</span></p>
+                            <p className="text-sm text-gray-800">Email: <span className="font-bold">careers@SpeedyX.com</span></p>
                         </div>
                     </div>
                 </div>

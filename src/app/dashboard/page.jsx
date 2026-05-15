@@ -135,21 +135,9 @@ const Sidebar = ({ children }) => {
             roles: ["rider"]
         },
         {
-            name: "Send Parcel",
-            href: "/parcel",
-            icon: <FaBox />,
-            roles: ["user"]
-        },
-        {
             name: "My Parcels",
             href: "/dashboard/myparcels",
             icon: <FaClipboardList />,
-            roles: ["user"]
-        },
-        {
-            name: "Become a Rider",
-            href: "/rider",
-            icon: <FaUsers />,
             roles: ["user"]
         },
         {
@@ -164,6 +152,21 @@ const Sidebar = ({ children }) => {
             icon: <MdSpatialTracking />,
             roles: ["user"]
         },
+        {
+            name: "Send Parcel",
+            href: "/parcel",
+            icon: <FaBox />,
+            roles: ["user"]
+        },
+       
+        {
+            name: "Become a Rider",
+            href: "/rider",
+            icon: <FaUsers />,
+            roles: ["user"]
+        },
+       
+     
         {
             name: "Support",
             href: "/dashboard/support",
@@ -258,7 +261,7 @@ const Sidebar = ({ children }) => {
                                 <FaTruck className="text-[#03373d] text-xl" />
                             </div>
                             <div>
-                                <h1 className="text-white font-bold text-xl">Zapwork</h1>
+                                <h1 className="text-white font-bold text-xl">SpeedyX</h1>
                                 <p className="text-[#caeb66] text-xs">Delivery Solutions</p>
                             </div>
                         </div>
@@ -384,7 +387,7 @@ const Sidebar = ({ children }) => {
                             <div className="w-8 h-8 bg-[#caeb66] rounded-lg flex items-center justify-center">
                                 <FaTruck className="text-[#03373d] text-sm" />
                             </div>
-                            <h1 className="text-[#03373d] font-bold text-lg">Zapwork</h1>
+                            <h1 className="text-[#03373d] font-bold text-lg">SpeedyX</h1>
                         </div>
                     </div>
                 )}

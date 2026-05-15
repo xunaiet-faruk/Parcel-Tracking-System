@@ -11,6 +11,7 @@ import {
 import useAxios from '../../(site)/hooks/useAxios';
 import Loading from '@/app/components/Loading';
 import Swal from 'sweetalert2';
+import AdminRouters from '../Adminprotuct/AdminRouters';
 
 const Ridermangment = () => {
     const axios = useAxios();
@@ -160,228 +161,230 @@ const Ridermangment = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8 px-4">
-            <div className="max-w-7xl mx-auto">
-                {/* Header */}
-                <div className="mb-6">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 bg-[#03373d] rounded-lg">
-                            <FaUsers className="text-xl text-[#caeb66]" />
+        <AdminRouters>
+            <div className="min-h-screen bg-gray-50 py-8 px-4">
+                <div className="max-w-7xl mx-auto">
+                    {/* Header */}
+                    <div className="mb-6">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-[#03373d] rounded-lg">
+                                <FaUsers className="text-xl text-[#caeb66]" />
+                            </div>
+                            <div>
+                                <h1 className="text-2xl font-bold text-[#03373d]">Rider Management</h1>
+                                <p className="text-gray-500 text-sm">Manage all delivery riders</p>
+                            </div>
                         </div>
-                        <div>
-                            <h1 className="text-2xl font-bold text-[#03373d]">Rider Management</h1>
-                            <p className="text-gray-500 text-sm">Manage all delivery riders</p>
-                        </div>
+                    </div>
+
+                    {/* Riders Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                        {riders.length > 0 ? (
+                            riders.map((rider, index) => (
+                                <div
+                                    key={rider._id || index}
+                                    className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all overflow-hidden border border-gray-100"
+                                >
+                                    {/* Header with status color */}
+                                    <div className={`p-4 ${rider.status === 'approved' ? 'bg-green-50' : rider.status === 'blocked' ? 'bg-red-50' : 'bg-yellow-50'}`}>
+                                        <div className="flex justify-between items-start">
+                                            <div className="flex items-center gap-3">
+                                                <div className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold text-white ${rider.status === 'approved' ? 'bg-green-600' : rider.status === 'blocked' ? 'bg-red-600' : 'bg-yellow-600'}`}>
+                                                    {rider.name?.charAt(0).toUpperCase() || 'R'}
+                                                </div>
+                                                <div>
+                                                    <h3 className="font-semibold text-gray-800">{rider.name || 'N/A'}</h3>
+                                                    <p className="text-xs text-gray-500">{rider.email}</p>
+                                                </div>
+                                            </div>
+                                            {getStatusBadge(rider.status)}
+                                        </div>
+                                    </div>
+
+                                    {/* Body */}
+                                    <div className="p-4 space-y-3">
+                                        {/* Contact Info */}
+                                        <div className="space-y-2 text-sm">
+                                            <div className="flex items-center gap-2 text-gray-600">
+                                                <FaPhone className="text-gray-400 text-xs w-4" />
+                                                <span>{rider.phone || 'N/A'}</span>
+                                            </div>
+                                            <div className="flex items-center gap-2 text-gray-600">
+                                                <FaMapMarkerAlt className="text-gray-400 text-xs w-4" />
+                                                <span>{rider.district || 'N/A'}</span>
+                                            </div>
+                                            <div className="flex items-center gap-2 text-gray-600">
+                                                <FaCalendarAlt className="text-gray-400 text-xs w-4" />
+                                                <span>Joined {formatDate(rider.createAt)}</span>
+                                            </div>
+                                        </div>
+
+                                        {/* Performance Stats */}
+                                        <div className="border-t pt-3 mt-2">
+                                            <div className="grid grid-cols-3 gap-2 text-center">
+                                                <div>
+                                                    <p className="text-lg font-bold text-[#03373d]">{rider.totalDeliveries || 0}</p>
+                                                    <p className="text-xs text-gray-500">Deliveries</p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-lg font-bold text-green-600">{rider.completedDeliveries || 0}</p>
+                                                    <p className="text-xs text-gray-500">Completed</p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-lg font-bold text-[#caeb66]">৳{rider.totalEarnings || 0}</p>
+                                                    <p className="text-xs text-gray-500">Earnings</p>
+                                                </div>
+                                            </div>
+
+                                            {/* Rating */}
+                                            <div className="flex items-center justify-between mt-2 pt-2 border-t">
+                                                <div className="flex items-center gap-1">
+                                                    {renderStars(rider.rating)}
+                                                    <span className="text-xs text-gray-500 ml-1">({rider.rating})</span>
+                                                </div>
+                                                <div className="text-xs">
+                                                    <span className="text-gray-500">Rate:</span>
+                                                    <span className="font-semibold text-[#03373d] ml-1">{rider.completionRate || 0}%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Actions - শুধু Block/Unblock এবং Delete */}
+                                    <div className="p-4 bg-gray-50 border-t flex gap-2">
+                                        <button
+                                            onClick={() => setSelectedRider(rider)}
+                                            className="flex-1 bg-[#03373d] text-white px-3 py-2 rounded-lg text-sm hover:bg-[#caeb66] hover:text-[#03373d] transition"
+                                        >
+                                            <FaEye className="inline mr-1 text-xs" /> View
+                                        </button>
+
+                                        {(rider.status === 'approved' || rider.status === 'blocked') && (
+                                            <>
+                                                <button
+                                                    onClick={() => toggleBlockRider(rider._id, rider.status)}
+                                                    disabled={updatingId === rider._id}
+                                                    className={`flex-1 px-3 py-2 rounded-lg text-sm transition disabled:opacity-50
+                                                    ${rider.status === 'blocked'
+                                                            ? 'bg-green-600 text-white hover:bg-green-700'
+                                                            : 'bg-orange-600 text-white hover:bg-orange-700'
+                                                        }`}
+                                                >
+                                                    {updatingId === rider._id ? <FaSpinner className="animate-spin inline" /> : rider.status === 'blocked' ? <FaUserCheck className="inline mr-1 text-xs" /> : <FaUserSlash className="inline mr-1 text-xs" />}
+                                                    {rider.status === 'blocked' ? 'Unblock' : 'Block'}
+                                                </button>
+                                                <button
+                                                    onClick={() => deleteRider(rider._id)}
+                                                    disabled={updatingId === rider._id}
+                                                    className="flex-1 bg-red-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-red-700 transition disabled:opacity-50"
+                                                >
+                                                    Delete
+                                                </button>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="col-span-full text-center py-16 bg-white rounded-xl">
+                                <FaUsers className="text-5xl text-gray-300 mx-auto mb-3" />
+                                <p className="text-gray-500">No riders found</p>
+                            </div>
+                        )}
                     </div>
                 </div>
 
-                {/* Riders Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                    {riders.length > 0 ? (
-                        riders.map((rider, index) => (
-                            <div
-                                key={rider._id || index}
-                                className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all overflow-hidden border border-gray-100"
+                {/* Rider Details Modal */}
+                <AnimatePresence>
+                    {selectedRider && (
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+                            onClick={() => setSelectedRider(null)}
+                        >
+                            <motion.div
+                                initial={{ scale: 0.9, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                exit={{ scale: 0.9, opacity: 0 }}
+                                className="bg-white rounded-xl shadow-xl max-w-md w-full"
+                                onClick={(e) => e.stopPropagation()}
                             >
-                                {/* Header with status color */}
-                                <div className={`p-4 ${rider.status === 'approved' ? 'bg-green-50' : rider.status === 'blocked' ? 'bg-red-50' : 'bg-yellow-50'}`}>
-                                    <div className="flex justify-between items-start">
-                                        <div className="flex items-center gap-3">
-                                            <div className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold text-white ${rider.status === 'approved' ? 'bg-green-600' : rider.status === 'blocked' ? 'bg-red-600' : 'bg-yellow-600'}`}>
-                                                {rider.name?.charAt(0).toUpperCase() || 'R'}
-                                            </div>
-                                            <div>
-                                                <h3 className="font-semibold text-gray-800">{rider.name || 'N/A'}</h3>
-                                                <p className="text-xs text-gray-500">{rider.email}</p>
-                                            </div>
-                                        </div>
-                                        {getStatusBadge(rider.status)}
+                                <div className="bg-[#03373d] p-5 rounded-t-xl">
+                                    <div className="flex justify-between items-center">
+                                        <h2 className="text-lg font-bold text-white">Rider Details</h2>
+                                        <button onClick={() => setSelectedRider(null)} className="text-white/80 hover:text-white text-xl">×</button>
                                     </div>
+                                    <p className="text-white/70 text-sm">{selectedRider.email}</p>
                                 </div>
 
-                                {/* Body */}
-                                <div className="p-4 space-y-3">
-                                    {/* Contact Info */}
-                                    <div className="space-y-2 text-sm">
-                                        <div className="flex items-center gap-2 text-gray-600">
-                                            <FaPhone className="text-gray-400 text-xs w-4" />
-                                            <span>{rider.phone || 'N/A'}</span>
+                                <div className="p-5 space-y-4">
+                                    {/* Basic Info */}
+                                    <div className="flex items-center gap-3 pb-3 border-b">
+                                        <div className={`w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold text-white ${selectedRider.status === 'approved' ? 'bg-green-600' : selectedRider.status === 'blocked' ? 'bg-red-600' : 'bg-yellow-600'}`}>
+                                            {selectedRider.name?.charAt(0).toUpperCase() || 'R'}
                                         </div>
-                                        <div className="flex items-center gap-2 text-gray-600">
-                                            <FaMapMarkerAlt className="text-gray-400 text-xs w-4" />
-                                            <span>{rider.district || 'N/A'}</span>
-                                        </div>
-                                        <div className="flex items-center gap-2 text-gray-600">
-                                            <FaCalendarAlt className="text-gray-400 text-xs w-4" />
-                                            <span>Joined {formatDate(rider.createAt)}</span>
+                                        <div>
+                                            <h3 className="font-bold text-gray-800">{selectedRider.name}</h3>
+                                            {getStatusBadge(selectedRider.status)}
                                         </div>
                                     </div>
 
-                                    {/* Performance Stats */}
-                                    <div className="border-t pt-3 mt-2">
+                                    {/* Contact Info */}
+                                    <div className="space-y-2 text-sm">
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-500">Phone:</span>
+                                            <span className="font-medium">{selectedRider.phone || 'N/A'}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-500">District:</span>
+                                            <span className="font-medium">{selectedRider.district || 'N/A'}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-500">Joined:</span>
+                                            <span className="font-medium">{formatDate(selectedRider.createAt)}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-500">Vehicle:</span>
+                                            <span className="font-medium">{selectedRider.vehicleType || 'N/A'}</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Performance */}
+                                    <div className="bg-gray-50 rounded-lg p-3">
+                                        <h4 className="font-semibold text-[#03373d] mb-2 text-sm">Performance</h4>
                                         <div className="grid grid-cols-3 gap-2 text-center">
                                             <div>
-                                                <p className="text-lg font-bold text-[#03373d]">{rider.totalDeliveries || 0}</p>
+                                                <p className="text-xl font-bold text-[#03373d]">{selectedRider.totalDeliveries || 0}</p>
                                                 <p className="text-xs text-gray-500">Deliveries</p>
                                             </div>
                                             <div>
-                                                <p className="text-lg font-bold text-green-600">{rider.completedDeliveries || 0}</p>
+                                                <p className="text-xl font-bold text-green-600">{selectedRider.completedDeliveries || 0}</p>
                                                 <p className="text-xs text-gray-500">Completed</p>
                                             </div>
                                             <div>
-                                                <p className="text-lg font-bold text-[#caeb66]">৳{rider.totalEarnings || 0}</p>
+                                                <p className="text-xl font-bold text-[#caeb66]">৳{selectedRider.totalEarnings || 0}</p>
                                                 <p className="text-xs text-gray-500">Earnings</p>
                                             </div>
                                         </div>
-
-                                        {/* Rating */}
-                                        <div className="flex items-center justify-between mt-2 pt-2 border-t">
-                                            <div className="flex items-center gap-1">
-                                                {renderStars(rider.rating)}
-                                                <span className="text-xs text-gray-500 ml-1">({rider.rating})</span>
+                                        <div className="mt-2">
+                                            <div className="flex justify-between text-xs mb-1">
+                                                <span className="text-gray-500">Completion Rate</span>
+                                                <span className="font-semibold text-[#03373d]">{selectedRider.completionRate || 0}%</span>
                                             </div>
-                                            <div className="text-xs">
-                                                <span className="text-gray-500">Rate:</span>
-                                                <span className="font-semibold text-[#03373d] ml-1">{rider.completionRate || 0}%</span>
+                                            <div className="w-full bg-gray-200 rounded-full h-1.5">
+                                                <div className="bg-[#caeb66] h-1.5 rounded-full" style={{ width: `${selectedRider.completionRate || 0}%` }}></div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-
-                                {/* Actions - শুধু Block/Unblock এবং Delete */}
-                                <div className="p-4 bg-gray-50 border-t flex gap-2">
-                                    <button
-                                        onClick={() => setSelectedRider(rider)}
-                                        className="flex-1 bg-[#03373d] text-white px-3 py-2 rounded-lg text-sm hover:bg-[#caeb66] hover:text-[#03373d] transition"
-                                    >
-                                        <FaEye className="inline mr-1 text-xs" /> View
-                                    </button>
-
-                                    {(rider.status === 'approved' || rider.status === 'blocked') && (
-                                        <>
-                                            <button
-                                                onClick={() => toggleBlockRider(rider._id, rider.status)}
-                                                disabled={updatingId === rider._id}
-                                                className={`flex-1 px-3 py-2 rounded-lg text-sm transition disabled:opacity-50
-                                                    ${rider.status === 'blocked'
-                                                        ? 'bg-green-600 text-white hover:bg-green-700'
-                                                        : 'bg-orange-600 text-white hover:bg-orange-700'
-                                                    }`}
-                                            >
-                                                {updatingId === rider._id ? <FaSpinner className="animate-spin inline" /> : rider.status === 'blocked' ? <FaUserCheck className="inline mr-1 text-xs" /> : <FaUserSlash className="inline mr-1 text-xs" />}
-                                                {rider.status === 'blocked' ? 'Unblock' : 'Block'}
-                                            </button>
-                                            <button
-                                                onClick={() => deleteRider(rider._id)}
-                                                disabled={updatingId === rider._id}
-                                                className="flex-1 bg-red-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-red-700 transition disabled:opacity-50"
-                                            >
-                                                Delete
-                                            </button>
-                                        </>
-                                    )}
-                                </div>
-                            </div>
-                        ))
-                    ) : (
-                        <div className="col-span-full text-center py-16 bg-white rounded-xl">
-                            <FaUsers className="text-5xl text-gray-300 mx-auto mb-3" />
-                            <p className="text-gray-500">No riders found</p>
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            {/* Rider Details Modal */}
-            <AnimatePresence>
-                {selectedRider && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-                        onClick={() => setSelectedRider(null)}
-                    >
-                        <motion.div
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.9, opacity: 0 }}
-                            className="bg-white rounded-xl shadow-xl max-w-md w-full"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <div className="bg-[#03373d] p-5 rounded-t-xl">
-                                <div className="flex justify-between items-center">
-                                    <h2 className="text-lg font-bold text-white">Rider Details</h2>
-                                    <button onClick={() => setSelectedRider(null)} className="text-white/80 hover:text-white text-xl">×</button>
-                                </div>
-                                <p className="text-white/70 text-sm">{selectedRider.email}</p>
-                            </div>
-
-                            <div className="p-5 space-y-4">
-                                {/* Basic Info */}
-                                <div className="flex items-center gap-3 pb-3 border-b">
-                                    <div className={`w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold text-white ${selectedRider.status === 'approved' ? 'bg-green-600' : selectedRider.status === 'blocked' ? 'bg-red-600' : 'bg-yellow-600'}`}>
-                                        {selectedRider.name?.charAt(0).toUpperCase() || 'R'}
-                                    </div>
-                                    <div>
-                                        <h3 className="font-bold text-gray-800">{selectedRider.name}</h3>
-                                        {getStatusBadge(selectedRider.status)}
-                                    </div>
-                                </div>
-
-                                {/* Contact Info */}
-                                <div className="space-y-2 text-sm">
-                                    <div className="flex justify-between">
-                                        <span className="text-gray-500">Phone:</span>
-                                        <span className="font-medium">{selectedRider.phone || 'N/A'}</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-gray-500">District:</span>
-                                        <span className="font-medium">{selectedRider.district || 'N/A'}</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-gray-500">Joined:</span>
-                                        <span className="font-medium">{formatDate(selectedRider.createAt)}</span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-gray-500">Vehicle:</span>
-                                        <span className="font-medium">{selectedRider.vehicleType || 'N/A'}</span>
-                                    </div>
-                                </div>
-
-                                {/* Performance */}
-                                <div className="bg-gray-50 rounded-lg p-3">
-                                    <h4 className="font-semibold text-[#03373d] mb-2 text-sm">Performance</h4>
-                                    <div className="grid grid-cols-3 gap-2 text-center">
-                                        <div>
-                                            <p className="text-xl font-bold text-[#03373d]">{selectedRider.totalDeliveries || 0}</p>
-                                            <p className="text-xs text-gray-500">Deliveries</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-xl font-bold text-green-600">{selectedRider.completedDeliveries || 0}</p>
-                                            <p className="text-xs text-gray-500">Completed</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-xl font-bold text-[#caeb66]">৳{selectedRider.totalEarnings || 0}</p>
-                                            <p className="text-xs text-gray-500">Earnings</p>
-                                        </div>
-                                    </div>
-                                    <div className="mt-2">
-                                        <div className="flex justify-between text-xs mb-1">
-                                            <span className="text-gray-500">Completion Rate</span>
-                                            <span className="font-semibold text-[#03373d]">{selectedRider.completionRate || 0}%</span>
-                                        </div>
-                                        <div className="w-full bg-gray-200 rounded-full h-1.5">
-                                            <div className="bg-[#caeb66] h-1.5 rounded-full" style={{ width: `${selectedRider.completionRate || 0}%` }}></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            </motion.div>
                         </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </div>
+                    )}
+                </AnimatePresence>
+            </div>
+        </AdminRouters>
     );
 };
 

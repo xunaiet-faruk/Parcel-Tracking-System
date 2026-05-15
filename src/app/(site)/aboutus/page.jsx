@@ -62,7 +62,7 @@ const Page = () => {
         },
         story: {
             title: "Our Story",
-            description: "Founded in 2020, Zapwork started with a simple idea: make delivery simple, fast, and accessible for everyone in Bangladesh.",
+            description: "Founded in 2020, SpeedyX started with a simple idea: make delivery simple, fast, and accessible for everyone in Bangladesh.",
             points: [
                 "Started with just 5 delivery partners in Dhaka",
                 "Grew to 500+ active delivery professionals within first year",
@@ -98,7 +98,7 @@ const Page = () => {
         },
         team: {
             title: "Leadership Team",
-            description: "Meet the passionate leaders driving Zapwork's mission forward.",
+            description: "Meet the passionate leaders driving SpeedyX mission forward.",
             points: [
                 "Led by experienced entrepreneurs with 20+ years in logistics",
                 "Team of 50+ technology and operations experts",
@@ -195,7 +195,7 @@ const Page = () => {
                         Who We Are
                     </h2>
                     <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                        Discover our journey, values, and the team behind Zapwork
+                        Discover our journey, values, and the team behind SpeedyX
                     </p>
                 </motion.div>
 

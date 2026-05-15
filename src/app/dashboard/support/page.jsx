@@ -166,7 +166,7 @@ const Support = () => {
     const supportChannels = [
         { icon: <FaPhone />, title: "Phone Support", info: "+880 1234 567890", hours: "24/7 Available", link: "tel:+8801234567890" },
         { icon: <FaWhatsapp />, title: "WhatsApp", info: "+880 1234 567890", hours: "9 AM - 9 PM", link: "https://wa.me/8801234567890" },
-        { icon: <FaFacebook />, title: "Facebook", info: "@zapshift", hours: "9 AM - 6 PM", link: "https://facebook.com/zapshift" }
+        { icon: <FaFacebook />, title: "Facebook", info: "@SpeedyX", hours: "9 AM - 6 PM", link: "https://facebook.com/SpeedyX" }
     ];
 
     return (

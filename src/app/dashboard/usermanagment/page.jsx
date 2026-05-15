@@ -15,7 +15,7 @@ import {
     HiOutlineChevronDown,
     HiOutlineX
 } from "react-icons/hi";
-import AdminRouters from "../AdminRoutes/AdminRouters";
+import AdminRouters from "../Adminprotuct/AdminRouters";
 import Loading from "@/app/components/Loading";
 
 const UsermanagMent = () => {

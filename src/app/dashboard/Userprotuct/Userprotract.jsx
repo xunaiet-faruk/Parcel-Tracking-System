@@ -1,0 +1,32 @@
+"use client";
+
+import useAuth from '@/app/(site)/hooks/useAuth';
+import useRole from '@/app/(site)/hooks/useRole';
+import Loading from '@/app/components/Loading';
+import React from 'react';
+
+const Userprotract = ({ children }) => {
+    const { role, isLoading } = useRole();
+    const { user, loading } = useAuth();
+
+    if (loading || isLoading) {
+        return <Loading/>
+    }
+
+    if (role !== 'user') {
+        return (
+            <div className='flex justify-center items-center h-screen'>
+                <div className='text-center'>
+                    <div className='bg-red-100 border border-red-400 text-red-700 px-6 py-4 rounded-lg'>
+                        <h2 className='text-xl font-bold mb-2'>Access Denied</h2>
+                        <p>You do not have rider privileges to access this page.</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    return <>{children}</>;
+};
+
+export default Userprotract;

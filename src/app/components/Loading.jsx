@@ -23,7 +23,7 @@ export default function Loading() {
                     <div className="w-10 h-10 bg-[#caeb66] rounded-xl flex items-center justify-center">
                         <span className="text-[#03373d] text-xl font-bold">Z</span>
                     </div>
-                    <h1 className="text-3xl font-bold text-white">Zapwork</h1>
+                    <h1 className="text-3xl font-bold text-white">SpeedyX</h1>
                 </div>
 
                 {/* Waiting Text */}
