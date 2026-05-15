@@ -13,7 +13,6 @@ const Navbar = () => {
 
     const publicLinks = [
         { name: 'Home', href: '/' },
-        { name: 'Services', href: '/services' },
         { name: 'Coverage', href: '/coverage' },
         { name: 'About Us', href: '/aboutus' },
         { name: 'Send Parcel', href: '/parcel' },
