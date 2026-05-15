@@ -1,3 +1,5 @@
+// app/layout.tsx (আপনার ফাইলটি modify করুন)
+
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import AuthProvider from "./(site)/context/Authprovider";
@@ -24,10 +26,26 @@ export default function RootLayout({ children }) {
             data-theme="light"
             className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
         >
-            <body className="min-h-full flex flex-col">
-                <AuthProvider>
-                    {children}
-                </AuthProvider>
+            <body className="min-h-full flex flex-col relative">
+                {/* Global Hexagon Background Pattern - সব জায়গায় থাকবে */}
+                <div className="fixed inset-0 opacity-20 pointer-events-none z-0">
+                    <svg width="100%" height="100%">
+                        <defs>
+                            <pattern id="hexagons" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse" patternTransform="scale(0.8)">
+                                <path d="M30 0 L60 15 L60 45 L30 60 L0 45 L0 15 Z" fill="none" stroke="#03373d" strokeWidth="0.5" />
+                                <path d="M30 30 L45 22.5 L45 37.5 Z" fill="#03373d" opacity="0.1" />
+                            </pattern>
+                        </defs>
+                        <rect width="100%" height="100%" fill="url(#hexagons)" />
+                    </svg>
+                </div>
+
+                {/* Main Content - z-index higher than background */}
+                <div className="relative z-10 flex-1">
+                    <AuthProvider>
+                        {children}
+                    </AuthProvider>
+                </div>
             </body>
         </html>
     );

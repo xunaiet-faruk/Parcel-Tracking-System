@@ -47,7 +47,7 @@ const Navbar = () => {
 
     return (
         <div>
-            <div className="navbar bg-white shadow-md">
+            <div className="navbar bg-white ">
                 <div className="navbar-start">
                     <div className="dropdown">
                         <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
@@ -72,8 +72,8 @@ const Navbar = () => {
                         </ul>
                     </div>
                     <Link href="/" className="flex items-end">
-                        <img className="mb-2 w-7" src="/assets/logo.png" alt="Logo" />
-                        <h1 className="text-2xl font-semibold text-[#03373d]">Profast</h1>
+                        <img className=" w-[82px]" src="/assets/mainlogo.png" alt="Logo" />
+                      
                     </Link>
                 </div>
 

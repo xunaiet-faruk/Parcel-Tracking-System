@@ -108,7 +108,7 @@ const Page = () => {
     };
 
     return (
-        <div className="min-h-screen">
+        <div className="">
             {/* Hero Section */}
             <div className="relative bg-gradient-to-r from-[#03373d] to-[#1a5c64] text-white overflow-hidden rounded-b-4xl">
                 <div className="relative max-w-7xl mx-auto px-6 py-52 text-center">
