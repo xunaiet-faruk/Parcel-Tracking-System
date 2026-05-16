@@ -11,7 +11,7 @@ const useAxios = () => {
     const axiosInstance = useMemo(() => {
         return axios.create({
 
-            baseURL: 'https://parcel-tracking-system.vercel.app'
+            baseURL: 'http://localhost:5000'
 
 
         })
