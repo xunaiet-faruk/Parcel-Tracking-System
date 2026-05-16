@@ -11,9 +11,7 @@ const useAxios = () => {
     const axiosInstance = useMemo(() => {
         return axios.create({
 
-            baseURL: 'http://localhost:5000'
-
-
+            baseURL: 'https://parcel-managment-server-nine.vercel.app'
         })
 
 
