@@ -19,6 +19,11 @@ const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        if (!auth) {
+            setLoading(false);
+            return;
+        }
+
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             console.log("user here", currentUser);
             setUser(currentUser);
@@ -30,6 +35,7 @@ const AuthProvider = ({ children }) => {
 
     // Email/Password login
     const login = (email, password) => {
+        if (!auth) return Promise.reject(new Error("Firebase auth not initialized"));
         return signInWithEmailAndPassword(auth, email, password);
     };
 
