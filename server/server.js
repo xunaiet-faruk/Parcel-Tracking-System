@@ -29,6 +29,10 @@ const stripe = require('stripe')(process.env.STRIPE);
 dns.setServers(['1.1.1.1', '8.8.8.8']);
 
 
+const allowedOrigins = [
+    'http://localhost:3000',
+    'https://parcel-tracking-system.vercel.app'
+];
 app.use(cors());
 app.use(express.json());
 
