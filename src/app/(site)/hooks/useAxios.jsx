@@ -14,8 +14,6 @@ const useAxios = () => {
             baseURL: 'https://parcel-managment-server-nine.vercel.app'
         })
 
-
-
     }, [])
 
     useEffect(() => {
