@@ -516,7 +516,7 @@ app.post('/users', async (req, res) => {
     }
 });
 
-app.get('/users', veryFytoken, async (req, res) => {
+app.get('/users', async (req, res) => {
     try {
         const result = await UsersCollection.find().toArray();
         res.send(result);
