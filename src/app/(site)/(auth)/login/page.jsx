@@ -47,35 +47,34 @@ const LoginPage = () => {
     };
 
     const handleGoogleLogin = async () => {
-        setError("");
-        setLoading(true);
-        try {
-            await googleLogin();
-            const userInfo = {
-                name: result.user.displayName,
-                email: result.user.email,
-                photo: result.user.photoURL,
-            };
-
-            const res = await axios.post("/users", userInfo);
-            Swal.fire({
-                title: "Google Login Successful",
-                icon: "success",
-                draggable: true
-            });
-            router.push("/");
-        } catch (error) {
-            console.error("Google login failed:", error);
-            Swal.fire({
-                title: "Google Login Failed",
-                icon: "error",
-                draggable: true
-            });
-            setError("Google login failed. Please try again.");
-        } finally {
-            setLoading(false);
-        }
-    };
+         setError("");
+         setLoading(true);
+ 
+         try {
+             const result = await googleLogin();
+ 
+             const userInfo = {
+                 name: result.user.displayName,
+                 email: result.user.email,
+                 photo: result.user.photoURL,
+             };
+ 
+             const res = await axios.post("/users", userInfo);
+ 
+             console.log("Google user saved:", res.data);
+ 
+             Swal.fire({
+                 title: "Google Registration Successful",
+                 icon: "success",
+             });
+ 
+             router.push("/");
+         } catch (error) {
+             console.error("Google registration failed:", error);
+         } finally {
+             setLoading(false);
+         }
+     };
 
     const containerVariants = {
         hidden: { opacity: 0 },

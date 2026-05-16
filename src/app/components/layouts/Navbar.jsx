@@ -1,7 +1,7 @@
 "use client";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion } from "framer-motion"; 
 import useAuth from "@/app/(site)/hooks/useAuth";
 import Loading from "../Loading";
 
@@ -133,13 +133,13 @@ const Navbar = () => {
                     {
                         user ? (
                             <Link href="/dashboard/overview">
-                                <motion
+                                <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
                                     className="btn bg-[#caeb66] text-[#03373d] cursor-pointer hover:bg-[#d4ff6e] transition-all duration-300 rounded-lg px-6 font-semibold shadow-md"
                                 >
                                     Dashboard
-                                </motion>
+                                </motion.button>
                             
                             
                             </Link>
