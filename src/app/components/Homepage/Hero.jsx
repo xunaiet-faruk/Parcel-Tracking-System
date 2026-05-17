@@ -75,7 +75,7 @@ const Hero = () => {
     };
 
     return (
-        <section className="relative py-16 flex items-center overflow-hidden">
+        <section className="relative py-20 flex items-center overflow-hidden">
 
             {/* Floating animated blobs */}
             <div className="absolute top-20 right-10 w-72 h-72 bg-[#caeb66]/20 rounded-full blur-3xl animate-pulse pointer-events-none" />

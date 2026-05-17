@@ -11,7 +11,7 @@ const useAxios = () => {
     const axiosInstance = useMemo(() => {
         return axios.create({
 
-            baseURL: 'https://je-server-mashud.vercel.app'
+            baseURL: 'https://server-six-zeta-57.vercel.app'
 
 
         })
