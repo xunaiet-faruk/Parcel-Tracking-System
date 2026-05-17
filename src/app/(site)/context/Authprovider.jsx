@@ -24,13 +24,18 @@ const AuthProvider = ({ children }) => {
             return;
         }
 
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            console.log("user here", currentUser);
-            setUser(currentUser);
-            setLoading(false);
-        });
+        try {
+            const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+                console.log("user here", currentUser);
+                setUser(currentUser);
+                setLoading(false);
+            });
 
-        return () => unsubscribe();
+            return () => unsubscribe();
+        } catch (error) {
+            console.error("Auth state change error:", error);
+            setLoading(false);
+        }
     }, []);
 
     // Email/Password login
@@ -74,7 +79,7 @@ const AuthProvider = ({ children }) => {
 
     return (
         <AuthContext.Provider value={value}>
-            {!loading && children}
+            {children}
         </AuthContext.Provider>
     );
 };

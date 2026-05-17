@@ -10,8 +10,21 @@ const firebaseConfig = {
     appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-const app = typeof window !== "undefined"
-    ? (getApps().length ? getApp() : initializeApp(firebaseConfig))
-    : null;
+let app = null;
+let auth = null;
 
-export const auth = app ? getAuth(app) : null;
+if (typeof window !== "undefined") {
+    try {
+        // Check if all required config values are present
+        if (firebaseConfig.apiKey && firebaseConfig.authDomain && firebaseConfig.projectId) {
+            app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+            auth = getAuth(app);
+        } else {
+            console.warn("Firebase config is incomplete, auth will not be initialized");
+        }
+    } catch (error) {
+        console.error("Failed to initialize Firebase:", error);
+    }
+}
+
+export { app, auth };

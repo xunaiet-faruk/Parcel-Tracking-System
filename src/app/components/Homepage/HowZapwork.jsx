@@ -90,8 +90,8 @@ const HowZapwork = () => {
 
     return (
         <section className="relative py-24 px-6 overflow-hidden ">
-          
-         
+
+
 
             {/* Floating Particles */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -100,8 +100,8 @@ const HowZapwork = () => {
                         key={i}
                         className="absolute w-1 h-1 bg-[#03373d]/20 rounded-full"
                         initial={{
-                            x: Math.random() * window.innerWidth,
-                            y: Math.random() * window.innerHeight,
+                            x: typeof window !== "undefined" ? Math.random() * window.innerWidth : 0,
+                            y: typeof window !== "undefined" ? Math.random() * window.innerHeight : 0,
                         }}
                         animate={{
                             y: [null, -100, -200],
@@ -127,7 +127,7 @@ const HowZapwork = () => {
                     }}
                     className="text-center mb-16"
                 >
-               
+
 
                     <h2 className="text-5xl md:text-6xl font-bold  text-[#03373d] mb-4">
                         How It Works
