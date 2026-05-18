@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import useAxios from '@/app/(site)/hooks/useAxios';
 import Loading from '@/app/components/Loading';
 
-// Animation variants for better organization
 const fadeInUp = {
     initial: { y: 20, opacity: 0 },
     animate: { y: 0, opacity: 1 },
@@ -45,12 +44,12 @@ const PaymentSuccess = () => {
                     transactionId: response.data.transactionId || '',
                     trackingId: response.data.trackingId || ''
                 });
-              
+
             } catch (err) {
                 console.error('Payment verification failed:', err);
                 setError('Failed to verify payment. Please contact support.');
             } finally {
-               
+
                 setTimeout(() => setIsLoading(false), 500);
             }
         };
@@ -66,7 +65,7 @@ const PaymentSuccess = () => {
         window.location.reload();
     };
 
-    // Loading state
+
     if (isLoading) {
         return <Loading/>
     }
@@ -98,7 +97,7 @@ const PaymentSuccess = () => {
         );
     }
 
-    // Success state
+
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
             <AnimatePresence mode="wait">
@@ -110,7 +109,7 @@ const PaymentSuccess = () => {
                     transition={{ duration: 0.5, type: "spring", stiffness: 200 }}
                     className="bg-white p-8 rounded-2xl shadow-xl text-center max-w-md mx-4"
                 >
-                    {/* Animated Checkmark */}
+
                     <motion.div
                         variants={fadeInUp}
                         initial="initial"
@@ -144,7 +143,7 @@ const PaymentSuccess = () => {
                         </motion.svg>
                     </motion.div>
 
-                    {/* Success Message */}
+
                     <motion.div
                         variants={fadeInUp}
                         initial="initial"
@@ -159,7 +158,7 @@ const PaymentSuccess = () => {
                         </p>
                     </motion.div>
 
-                    {/* Payment Details Card */}
+
                     <motion.div
                         variants={fadeInUp}
                         initial="initial"
@@ -185,7 +184,7 @@ const PaymentSuccess = () => {
                         )}
                     </motion.div>
 
-                    {/* Action Buttons */}
+
                     <motion.div
                         variants={fadeInUp}
                         initial="initial"
@@ -212,7 +211,7 @@ const PaymentSuccess = () => {
                         </motion.button>
                     </motion.div>
 
-                    {/* Confirmation Message */}
+
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}

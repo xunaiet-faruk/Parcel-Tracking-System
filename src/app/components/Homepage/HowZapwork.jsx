@@ -92,8 +92,6 @@ const HowZapwork = () => {
         <section className="relative py-24 px-6 overflow-hidden ">
 
 
-
-            {/* Floating Particles */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 {[...Array(20)].map((_, i) => (
                     <motion.div
@@ -118,7 +116,7 @@ const HowZapwork = () => {
             </div>
 
             <div className="relative z-10 max-w-7xl mx-auto" ref={ref}>
-                {/* Heading Section with Animation */}
+
                 <motion.div
                     initial={{ opacity: 0, y: -30 }}
                     animate={controls}
@@ -127,7 +125,6 @@ const HowZapwork = () => {
                     }}
                     className="text-center mb-16"
                 >
-
 
                     <h2 className="text-5xl md:text-6xl font-bold  text-[#03373d] mb-4">
                         How It Works
@@ -145,7 +142,7 @@ const HowZapwork = () => {
                     </p>
                 </motion.div>
 
-                {/* Cards Grid */}
+
                 <motion.div
                     variants={containerVariants}
                     initial="hidden"
@@ -167,16 +164,16 @@ const HowZapwork = () => {
                             <div className="absolute inset-0 bg-gradient-to-r from-[#caeb66] to-[#03373d] rounded-2xl blur opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
 
                             <div className="relative bg-white rounded-2xl shadow-xl overflow-hidden transform transition-all duration-300 hover:shadow-2xl">
-                                {/* Gradient Top Bar */}
+
                                 <div className={`h-1 bg-gradient-to-r ${item.gradient} transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left`}></div>
 
                                 <div className="p-8">
-                                    {/* Step Number */}
+
                                     <div className="absolute top-4 right-4 w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-sm font-bold text-gray-500">
                                         {index + 1}
                                     </div>
 
-                                    {/* Icon Container with Animation */}
+
                                     <motion.div
                                         whileHover={{ rotate: 360, scale: 1.1 }}
                                         transition={{ duration: 0.5 }}
@@ -187,17 +184,17 @@ const HowZapwork = () => {
                                         </div>
                                     </motion.div>
 
-                                    {/* Title */}
+
                                     <h3 className="text-xl font-bold text-gray-800 mb-3 group-hover:text-[#03373d] transition-colors">
                                         {item.title}
                                     </h3>
 
-                                    {/* Description */}
+
                                     <p className="text-gray-600 text-sm leading-relaxed mb-4">
                                         {item.text}
                                     </p>
 
-                                    {/* Stat Badge */}
+
                                     <motion.div
                                         initial={{ opacity: 0, y: 20 }}
                                         animate={hoveredIndex === index ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
@@ -210,7 +207,7 @@ const HowZapwork = () => {
                                         </div>
                                     </motion.div>
 
-                                    {/* Learn More Link */}
+
                                     <motion.div
                                         initial={{ opacity: 0 }}
                                         animate={hoveredIndex === index ? { opacity: 1 } : { opacity: 0 }}
@@ -228,7 +225,7 @@ const HowZapwork = () => {
                     ))}
                 </motion.div>
 
-                {/* Additional Information Section */}
+
                 <motion.div
                     initial={{ opacity: 0, y: 50 }}
                     animate={controls}
@@ -255,7 +252,7 @@ const HowZapwork = () => {
                         </div>
                     </div>
 
-                    {/* CTA Button */}
+
                     <div className="text-center mt-8">
                         <motion.button
                             whileHover={{ scale: 1.05 }}

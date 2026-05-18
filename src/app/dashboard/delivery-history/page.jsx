@@ -47,7 +47,7 @@ const Deliveryhistory = () => {
 
             setDeliveries(parcels);
 
-        
+
             setLoading(false);
         } catch (error) {
             console.error("Error fetching delivery history:", error);
@@ -58,7 +58,7 @@ const Deliveryhistory = () => {
     const filterAndSortDeliveries = () => {
         let filtered = [...deliveries];
 
-        // সার্চ ফিল্টার
+
         if (searchTerm) {
             filtered = filtered.filter(d =>
                 d.trackingId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -68,12 +68,12 @@ const Deliveryhistory = () => {
             );
         }
 
-        // স্ট্যাটাস ফিল্টার
+
         if (statusFilter !== 'all') {
             filtered = filtered.filter(d => d.deliverystatus === statusFilter);
         }
 
-        // সোর্টিং
+
         filtered.sort((a, b) => {
             let aVal, bVal;
             switch (sortBy) {
@@ -186,7 +186,7 @@ const Deliveryhistory = () => {
        <Riderprotract>
             <div className=" bg-gradient-to-br from-gray-50 to-blue-50 py-8 px-4">
                 <div className="max-w-7xl mx-auto">
-                    {/* Header */}
+
                     <motion.div
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -201,8 +201,6 @@ const Deliveryhistory = () => {
                     </motion.div>
 
 
-
-                    {/* Search and Filter */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -255,7 +253,7 @@ const Deliveryhistory = () => {
                         </div>
                     </motion.div>
 
-                    {/* Delivery List */}
+
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -345,7 +343,7 @@ const Deliveryhistory = () => {
                         </div>
                     </motion.div>
 
-                    {/* Pagination */}
+
                     {filteredDeliveries.length > 10 && (
                         <div className="flex justify-center gap-2 mt-6">
                             <button className="px-4 py-2 bg-white rounded-lg shadow hover:bg-gray-50 transition">Previous</button>
@@ -356,7 +354,7 @@ const Deliveryhistory = () => {
                         </div>
                     )}
 
-                    {/* Delivery Details Modal */}
+
                     <AnimatePresence>
                         {selectedDelivery && (
                             <motion.div
@@ -387,7 +385,7 @@ const Deliveryhistory = () => {
                                     </div>
 
                                     <div className="p-6 space-y-4">
-                                        {/* Parcel Info */}
+
                                         <div className="bg-gray-50 rounded-xl p-4">
                                             <h3 className="font-semibold text-[#03373d] mb-3 flex items-center gap-2">
                                                 <FaBox /> Parcel Information
@@ -401,7 +399,7 @@ const Deliveryhistory = () => {
                                             </div>
                                         </div>
 
-                                        {/* Sender Info */}
+
                                         <div className="bg-gray-50 rounded-xl p-4">
                                             <h3 className="font-semibold text-[#03373d] mb-3 flex items-center gap-2">
                                                 <FaUser /> Sender Information
@@ -414,7 +412,7 @@ const Deliveryhistory = () => {
                                             </div>
                                         </div>
 
-                                        {/* Receiver Info */}
+
                                         <div className="bg-gray-50 rounded-xl p-4">
                                             <h3 className="font-semibold text-[#03373d] mb-3 flex items-center gap-2">
                                                 <FaMapMarkerAlt /> Receiver Information
@@ -427,7 +425,7 @@ const Deliveryhistory = () => {
                                             </div>
                                         </div>
 
-                                        {/* Timeline */}
+
                                         {(selectedDelivery.deliveredAt || selectedDelivery.pickedUpAt) && (
                                             <div className="bg-gray-50 rounded-xl p-4">
                                                 <h3 className="font-semibold text-[#03373d] mb-3 flex items-center gap-2">

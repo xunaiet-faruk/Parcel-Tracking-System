@@ -37,7 +37,7 @@ const Benefits = () => {
         },
     ];
 
-    
+
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: {
@@ -122,14 +122,14 @@ const Benefits = () => {
 
     return (
         <div className="py-20 px-4 md:px-8 lg:px-16  overflow-hidden">
-           
+
             <motion.div
                 initial={{ opacity: 0, y: -30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
                 className="text-center mb-16"
             >
-               
+
                 <h2 className="text-4xl md:text-5xl font-bold text-[#03373d] mb-4">
                     Amazing Benefits
                     <motion.span
@@ -144,7 +144,7 @@ const Benefits = () => {
                 </p>
             </motion.div>
 
-           
+
             <motion.div
                 ref={containerRef}
                 variants={containerVariants}
@@ -171,7 +171,7 @@ const Benefits = () => {
                         }}
                     >
                         <div className="p-6 md:p-8 flex flex-col md:flex-row items-center gap-6 md:gap-12">
-                            {/* Left Image with Animation */}
+
                             <motion.div
                                 variants={imageVariants}
                                 className="relative group"
@@ -179,7 +179,7 @@ const Benefits = () => {
                                 transition={{ type: "spring", stiffness: 300 }}
                             >
                                 <div className={`
-                                    absolute inset-0 rounded-full blur-2xl opacity-30 
+                                    absolute inset-0 rounded-full blur-2xl opacity-30
                                     ${item.iconBg} group-hover:opacity-50 transition-opacity
                                 `} />
                                 <img
@@ -188,16 +188,16 @@ const Benefits = () => {
                                     className="h-44 w-44 md:h-52 md:w-52 object-contain relative z-10
                                     drop-shadow-lg group-hover:drop-shadow-2xl transition-all duration-300"
                                 />
-                               
+
                             </motion.div>
 
-                            {/* Animated Dotted Line */}
+
                             <motion.div
                                 variants={lineVariants}
                                 className="hidden md:block h-44 md:h-52 border-l-4 border-dotted border-[#03373d] border-opacity-30"
                             />
 
-                            {/* Right Content with Animation */}
+
                             <motion.div
                                 variants={contentVariants}
                                 className="flex-1 text-center md:text-left"
@@ -225,11 +225,11 @@ const Benefits = () => {
                                     {item.desc}
                                 </motion.p>
 
-                                {/* Interactive Read More Button */}
+
                                 <motion.button
                                     whileHover={{ x: 10, scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
-                                    className="mt-4 text-[#03373d] font-semibold text-sm flex items-center gap-2 
+                                    className="mt-4 text-[#03373d] font-semibold text-sm flex items-center gap-2
                                     group-hover:gap-3 transition-all"
                                 >
                                     Learn More
@@ -243,7 +243,7 @@ const Benefits = () => {
                             </motion.div>
                         </div>
 
-                        {/* Animated Progress Bar on Hover */}
+
                         <motion.div
                             initial={{ scaleX: 0 }}
                             whileHover={{ scaleX: 1 }}
@@ -254,9 +254,9 @@ const Benefits = () => {
                 ))}
             </motion.div>
 
-            {/* Floating Animation Decoration */}
 
-           
+
+
         </div>
     );
 };

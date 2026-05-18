@@ -65,20 +65,20 @@ const FrequentlyQuestion = () => {
         }
     };
 
-    // Image mapping based on category
+
     const getImageForCategory = (category) => {
         const images = {
-            "Tracking": "https://images.unsplash.com/photo-1526570207772-784d36084510?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-            "Delivery": "https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-            "Merchant": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-            "Safety": "https://images.unsplash.com/photo-1563013544-824ae1b704d3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-            "Payment": "https://images.unsplash.com/photo-1563013544-824ae1b704d3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-            "Support": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+            "Tracking": "https:
+            "Delivery": "https:
+            "Merchant": "https:
+            "Safety": "https:
+            "Payment": "https:
+            "Support": "https:
         };
         return images[category] || images["Tracking"];
     };
 
-    // Get current open FAQ category for the image
+
     const currentCategory = openIndex !== null ? faqs[openIndex].category : "Tracking";
     const currentImage = getImageForCategory(currentCategory);
     const currentQuestion = openIndex !== null ? faqs[openIndex].question : "";
@@ -86,7 +86,7 @@ const FrequentlyQuestion = () => {
     return (
         <div className="relative overflow-hidden py-20 px-4 ">
             <div className="max-w-7xl mx-auto">
-                {/* Header */}
+
                 <div className="text-center mb-12">
                     <h2 className="text-4xl md:text-5xl font-bold text-[#03373d] mb-4">
                         Frequently Asked Questions
@@ -97,9 +97,9 @@ const FrequentlyQuestion = () => {
                     </p>
                 </div>
 
-                {/* Two Column Layout */}
+
                 <div className="flex flex-col lg:flex-row gap-8">
-                    {/* Left Side - Questions */}
+
                     <div className="lg:w-1/2 space-y-4">
                         {faqs.map((faq, index) => (
                             <motion.div
@@ -188,7 +188,7 @@ const FrequentlyQuestion = () => {
                         ))}
                     </div>
 
-                    {/* Right Side - Relevant Image */}
+
                     <div className="lg:w-1/2">
                         <div className="sticky top-24 bg-gradient-to-br from-[#03373d]/5 to-cyan-50 rounded-2xl overflow-hidden shadow-xl border border-gray-100">
                             <div className="relative h-[400px] md:h-[500px] w-full">

@@ -1,4 +1,4 @@
-// app/layout.tsx (আপনার ফাইলটি modify করুন)
+
 
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -27,7 +27,7 @@ export default function RootLayout({ children }) {
             className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
         >
             <body className="min-h-full flex flex-col relative">
-                {/* Global Hexagon Background Pattern - সব জায়গায় থাকবে */}
+
                 <div className="fixed inset-0 opacity-20 pointer-events-none z-0">
                     <svg width="100%" height="100%">
                         <defs>
@@ -40,7 +40,7 @@ export default function RootLayout({ children }) {
                     </svg>
                 </div>
 
-                {/* Main Content - z-index higher than background */}
+
                 <div className="relative z-10 flex-1">
                     <AuthProvider>
                         {children}

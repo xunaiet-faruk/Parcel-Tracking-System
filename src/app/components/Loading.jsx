@@ -6,7 +6,7 @@ export default function Loading() {
     return (
         <div className="fixed inset-0 bg-gradient-to-br from-[#03373d] to-[#1a5c64] z-50 flex items-center justify-center">
             <div className="text-center">
-                {/* Running Truck */}
+
                 <div className="w-72 overflow-hidden mb-8">
                     <motion.div
                         animate={{ x: [120, -120] }}
@@ -18,7 +18,7 @@ export default function Loading() {
                     </motion.div>
                 </div>
 
-                {/* Logo */}
+
                 <div className="flex items-center justify-center gap-2 mb-6">
                     <div className="w-10 h-10 bg-[#caeb66] rounded-xl flex items-center justify-center">
                         <span className="text-[#03373d] text-xl font-bold">Z</span>
@@ -26,7 +26,7 @@ export default function Loading() {
                     <h1 className="text-3xl font-bold text-white">SpeedyX</h1>
                 </div>
 
-                {/* Waiting Text */}
+
                 <div className="space-y-3">
                     <p className="text-white text-lg">
                         Just a moment please...

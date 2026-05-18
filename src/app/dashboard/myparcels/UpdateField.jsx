@@ -44,7 +44,7 @@ const UpdateField = ({ editParcel, setEditParcel, refetch }) => {
                 senderDistrict: editParcel.senderDistrict || ''
             });
 
-            // Calculate price when editParcel loads
+
             if (editParcel.parcelWeight && editParcel.receiverDistrict && editParcel.senderDistrict) {
                 calculatePrice(
                     editParcel.parcelWeight,
@@ -74,7 +74,7 @@ const UpdateField = ({ editParcel, setEditParcel, refetch }) => {
 
         let basePrice = 0;
         let extraPrice = 0;
-        let priceBreakdown = {};
+        let priceBreakdown = ;
 
         if (isWithinCity) {
             if (weightNum <= 3) {
@@ -137,7 +137,7 @@ const UpdateField = ({ editParcel, setEditParcel, refetch }) => {
 
         setCalculatedPrice(finalPrice);
 
-        // Auto update total price in form
+
         setFormData(prev => ({
             ...prev,
             totalPrice: Math.round(finalPrice)
@@ -149,7 +149,7 @@ const UpdateField = ({ editParcel, setEditParcel, refetch }) => {
         const newFormData = { ...formData, [name]: value };
         setFormData(newFormData);
 
-        // Recalculate price when relevant fields change
+
         if (name === "parcelWeight" || name === "receiverDistrict" || name === "discount") {
             calculatePrice(
                 name === "parcelWeight" ? value : formData.parcelWeight,
@@ -326,7 +326,7 @@ const UpdateField = ({ editParcel, setEditParcel, refetch }) => {
                         <p className="text-xs text-gray-500 mt-1">Changing discount will update price automatically</p>
                     </div>
 
-                    {/* Price Details Section */}
+
                     {priceDetails && (
                         <div className="bg-gradient-to-r from-[#03373d] to-[#1a5c64] rounded-lg p-4 text-white">
                             <h3 className="text-sm font-bold mb-2">💰 Price Breakdown</h3>

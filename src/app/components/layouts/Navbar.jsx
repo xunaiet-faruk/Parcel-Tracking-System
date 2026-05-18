@@ -1,10 +1,9 @@
 "use client";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
-import { motion } from "framer-motion"; 
+import { motion } from "framer-motion";
 import useAuth from "@/app/(site)/hooks/useAuth";
 import Loading from "../Loading";
-
 
 const Navbar = () => {
     const pathname = usePathname();
@@ -18,8 +17,6 @@ const Navbar = () => {
         { name: 'Send Parcel', href: '/parcel' },
         { name: 'Be a Rider', href: '/rider' },
     ];
-
-
 
     const links = [...publicLinks];
 
@@ -39,7 +36,7 @@ const Navbar = () => {
         }
     };
 
-  
+
     if (loading) {
         return <Loading/>
     }
@@ -50,7 +47,7 @@ const Navbar = () => {
                 <div className="navbar-start">
                     <div className="dropdown">
                         <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg xmlns="http:
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h8m-8 6h16" />
                             </svg>
                         </div>
@@ -72,7 +69,7 @@ const Navbar = () => {
                     </div>
                     <Link href="/" className="flex items-end">
                         <img className=" w-[82px]" src="/assets/mainlogo.png" alt="Logo" />
-                      
+
                     </Link>
                 </div>
 
@@ -140,8 +137,8 @@ const Navbar = () => {
                                 >
                                     Dashboard
                                 </motion.button>
-                            
-                            
+
+
                             </Link>
                         ) : <motion.a
                             href="/login"

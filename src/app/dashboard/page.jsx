@@ -42,10 +42,10 @@ const Sidebar = ({ children }) => {
     const { user, logout, loading: authLoading } = useAuth();
     const { role, isLoading: roleLoading } = useRole();
 
-    // ক্লায়েন্ট সাইড মাউন্ট চেক
+
     useEffect(() => {
         setIsClient(true);
-        // 1 সেকেন্ড পর রেন্ডার করবে
+
         const timer = setTimeout(() => {
             setShouldRender(true);
         }, 100);
@@ -53,7 +53,7 @@ const Sidebar = ({ children }) => {
         return () => clearTimeout(timer);
     }, []);
 
-    // রেসপন্সিভ চেক
+
     useEffect(() => {
         if (!isClient) return;
 
@@ -71,7 +71,7 @@ const Sidebar = ({ children }) => {
         return () => window.removeEventListener("resize", handleResize);
     }, [isClient]);
 
-    // নেভিগেশন লিংক
+
     const allNavLinks = [
         {
             name: "Dashboard",
@@ -115,7 +115,7 @@ const Sidebar = ({ children }) => {
             icon: <MdOutlineSupportAgent />,
             roles: ["admin"]
         },
-      
+
         {
             name: "Assigned Deliveries",
             href: "/dashboard/assigned-deliveries",
@@ -158,15 +158,15 @@ const Sidebar = ({ children }) => {
             icon: <FaBox />,
             roles: ["user"]
         },
-       
+
         {
             name: "Become a Rider",
             href: "/rider",
             icon: <FaUsers />,
             roles: ["user"]
         },
-       
-     
+
+
         {
             name: "Support",
             href: "/dashboard/support",
@@ -179,10 +179,10 @@ const Sidebar = ({ children }) => {
             icon: <FaHome/>,
             roles: ["user","admin","rider"]
         },
-       
+
     ];
 
-    // রোল বেসড লিংক ফিল্টার - isLoading false হলেই শুধু ফিল্টার করবে
+
     const navLinks = !roleLoading && !authLoading && role
         ? allNavLinks.filter(link => link.roles.includes(role))
         : [];
@@ -206,30 +206,30 @@ const Sidebar = ({ children }) => {
         }
     };
 
-    // স্ট্রিক্ট লোডিং কন্ডিশন
+
     if (!isClient || !shouldRender) {
-        return null; // সার্ভার সাইডে কিছু দেখাবে না
+        return null;
     }
 
-    // শুধু মাত্র লোডিং দেখাবে যখন ইউজার লোড হচ্ছে
+
     if (authLoading) {
         return <Loading />;
     }
 
-    // ইউজার না থাকলে লগইন পেজে রিডিরেক্ট
+
     if (!user) {
         router.push("/login");
         return <Loading />;
     }
 
-    // রোল লোডিং হলে লোডিং দেখাবে
+
     if (roleLoading) {
         return <Loading />;
     }
 
     return (
         <div className="flex h-screen bg-gray-50">
-            {/* Mobile Overlay */}
+
             <AnimatePresence>
                 {isMobile && isOpen && (
                     <motion.div
@@ -242,7 +242,7 @@ const Sidebar = ({ children }) => {
                 )}
             </AnimatePresence>
 
-            {/* Sidebar */}
+
             <motion.aside
                 initial={false}
                 animate={{
@@ -253,7 +253,7 @@ const Sidebar = ({ children }) => {
                     } md:translate-x-0 transition-transform duration-300`}
                 style={{ width: isOpen ? (isMobile ? "280px" : "280px") : "80px" }}
             >
-                {/* Logo Section */}
+
                 <div className={`p-6 border-b border-white/10 flex items-center ${isOpen ? "justify-between" : "justify-center"}`}>
                     {isOpen ? (
                         <div className="flex items-center gap-3">
@@ -279,7 +279,7 @@ const Sidebar = ({ children }) => {
                     </button>
                 </div>
 
-                {/* Mobile Close Button */}
+
                 {isMobile && isOpen && (
                     <button
                         onClick={toggleSidebar}
@@ -289,7 +289,7 @@ const Sidebar = ({ children }) => {
                     </button>
                 )}
 
-                {/* User Profile Section */}
+
                 <div className={`p-4 border-b border-white/10 ${isOpen ? "flex" : "flex-col"} items-center gap-3`}>
                     <div className="w-12 h-12 bg-[#caeb66]/20 rounded-full flex items-center justify-center border-2 border-[#caeb66]">
                         {user?.photoURL ? (
@@ -317,7 +317,7 @@ const Sidebar = ({ children }) => {
                     )}
                 </div>
 
-                {/* Navigation Links */}
+
                 <nav className="flex-1 overflow-y-auto py-6">
                     <div className="px-4">
                         {isOpen && (
@@ -357,10 +357,10 @@ const Sidebar = ({ children }) => {
                         </ul>
                     </div>
 
-                  
+
                 </nav>
 
-                {/* Footer Section */}
+
                 <div className="p-4 border-t border-white/10">
                     <button
                         onClick={handleLogout}
@@ -372,9 +372,9 @@ const Sidebar = ({ children }) => {
                 </div>
             </motion.aside>
 
-            {/* Main Content */}
+
             <main className="flex-1 overflow-auto">
-                {/* Mobile Header */}
+
                 {isMobile && !isOpen && (
                     <div className="sticky top-0 z-10 bg-white shadow-md p-4 flex items-center gap-3">
                         <button
@@ -392,7 +392,7 @@ const Sidebar = ({ children }) => {
                     </div>
                 )}
 
-                {/* Page Content */}
+
                 <div className="p-6">
                     {children}
                 </div>

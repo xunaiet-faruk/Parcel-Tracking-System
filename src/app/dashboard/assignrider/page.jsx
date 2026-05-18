@@ -40,19 +40,21 @@ const AssignRider = () => {
 
             if (!selectedParcel) return [];
             const res = await axios.get(`/rider?status=approved&workstatus=available`);
+            console.log(res.data);
             return res.data;
         },
 
         enabled: !!selectedParcel && isModalOpen,
 
-        staleTime: 10 * 60 * 1000, 
+        staleTime: 10 * 60 * 1000,
 
     });
 
-    const districtRiders = selectedParcel ? allRiders.filter(rider => rider.district === selectedParcel.senderDistrict) : [];
+    const districtRiders = selectedParcel
+        ? allRiders.filter(rider => rider.district?.toLowerCase() === selectedParcel.senderDistrict?.toLowerCase())
+        : [];
     const riders = districtRiders.length > 0 ? districtRiders : allRiders;
     const showFallbackRiders = selectedParcel && districtRiders.length === 0 && allRiders.length > 0;
-
 
     const closeModal = () => {
 
@@ -152,8 +154,6 @@ const AssignRider = () => {
 
                 setSelectedRider('');
 
-
-
                 return res.data;
 
             }
@@ -178,8 +178,6 @@ const AssignRider = () => {
 
     };
 
-
-
     const filteredParcels = assignRider.filter(parcel =>
 
         parcel.trackingId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -190,13 +188,9 @@ const AssignRider = () => {
 
     );
 
-
-
     const formatDate = (dateString) => new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 
     const formatTime = (dateString) => new Date(dateString).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-
-
 
     return (
 
@@ -205,7 +199,7 @@ const AssignRider = () => {
 
                 <div className="container mx-auto">
 
-                    {/* Header Section */}
+
 
                     <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
 
@@ -230,8 +224,6 @@ const AssignRider = () => {
                     </div>
 
 
-
-                    {/* Search Section */}
 
                     <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
 
@@ -259,8 +251,6 @@ const AssignRider = () => {
 
 
 
-                    {/* Parcels Grid */}
-
                     {filteredParcels.length === 0 ? (
 
                         <div className="bg-white rounded-xl shadow-sm p-12 text-center">
@@ -285,7 +275,7 @@ const AssignRider = () => {
 
                                 <div key={parcel._id} className="bg-white rounded-xl shadow-xl border border-gray-100 hover:shadow-md transition-shadow duration-300">
 
-                                    {/* Parcel Header */}
+
 
                                     <div className="p-5 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-white rounded-t-xl">
 
@@ -323,7 +313,7 @@ const AssignRider = () => {
 
                                             </div>
 
-                                            {/* স্ট্যাটাস ব্যাজ - পেন্ডিং এবং রিজেক্টেড উভয় দেখাবে */}
+
 
                                             <div className="flex gap-2">
 
@@ -359,8 +349,6 @@ const AssignRider = () => {
 
 
 
-                                    {/* Parcel Info Body */}
-
                                     <div className="p-5 space-y-4">
 
                                         <div className="bg-gray-50 rounded-lg p-3 flex justify-between items-center">
@@ -379,8 +367,6 @@ const AssignRider = () => {
 
 
 
-                                        {/* Sender Info */}
-
                                         <div className="border-l-4 border-blue-400 pl-3">
 
                                             <h4 className="text-sm font-semibold text-gray-700 flex items-center gap-2 mb-2"><FaTruck className="text-blue-500 text-xs" /> Sender Information</h4>
@@ -398,8 +384,6 @@ const AssignRider = () => {
                                         </div>
 
 
-
-                                        {/* Receiver Info */}
 
                                         <div className="border-l-4 border-green-400 pl-3">
 
@@ -420,8 +404,6 @@ const AssignRider = () => {
                                     </div>
 
 
-
-                                    {/* Action Button */}
 
                                     <div className="p-5 bg-gray-50 rounded-b-xl flex gap-3">
 
@@ -448,8 +430,6 @@ const AssignRider = () => {
                     )}
 
                 </div>
-
-
 
                 <AssignRiderModal
 
@@ -485,7 +465,5 @@ const AssignRider = () => {
     );
 
 };
-
-
 
 export default AssignRider;

@@ -39,14 +39,14 @@ const Trackingparcel = () => {
         setError('');
 
         try {
-            // সব প্যাকেল আনা এবং trackingId ম্যাচ করা
+
             const response = await axios.get('/parcels');
             const allParcels = response.data || [];
 
             console.log('All parcels:', allParcels);
             console.log('Searching for tracking ID:', trackingId);
 
-            // trackingId দিয়ে খোঁজা
+
             const foundParcel = allParcels.find(p =>
                 p.trackingId === trackingId ||
                 p.trackingId?.toLowerCase() === trackingId.toLowerCase()
@@ -89,7 +89,7 @@ const Trackingparcel = () => {
         }
     };
 
-    // তারিখ ফরম্যাট করার ফাংশন
+
     const formatDate = (dateValue) => {
         if (!dateValue) return 'N/A';
 
@@ -154,7 +154,7 @@ const Trackingparcel = () => {
         return icons[status] || <FaBox className="text-2xl text-gray-600" />;
     };
 
-    // স্ট্যাটাস অনুযায়ী প্রোগ্রেস স্টেপস
+
     const getProgressSteps = (status) => {
         const steps = [
             { key: 'pending', label: 'Order Placed', description: 'Your parcel has been booked successfully' },
@@ -179,7 +179,7 @@ const Trackingparcel = () => {
        <Userprotract>
             <div className=" py-8 px-4">
                 <div className="max-w-6xl mx-auto">
-                    {/* Header */}
+
                     <motion.div
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -193,7 +193,7 @@ const Trackingparcel = () => {
                         </p>
                     </motion.div>
 
-                    {/* Search Box */}
+
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -218,10 +218,10 @@ const Trackingparcel = () => {
                             </div>
                         </form>
 
-                     
+
                     </motion.div>
 
-                    {/* Error Message */}
+
                     <AnimatePresence>
                         {error && (
                             <motion.div
@@ -235,7 +235,7 @@ const Trackingparcel = () => {
                         )}
                     </AnimatePresence>
 
-                    {/* Parcel Details */}
+
                     <AnimatePresence>
                         {parcel && !loading && (
                             <motion.div
@@ -244,7 +244,7 @@ const Trackingparcel = () => {
                                 exit={{ opacity: 0, y: -20 }}
                                 className="space-y-6"
                             >
-                                {/* Status Header Card */}
+
                                 <div className={`rounded-2xl shadow-xl p-6 ${getStatusColor(parcel.deliverystatus || parcel.status)}`}>
                                     <div className="flex justify-between items-center flex-wrap gap-4">
                                         <div className="flex items-center gap-3">
@@ -270,7 +270,7 @@ const Trackingparcel = () => {
                                     </div>
                                 </div>
 
-                                {/* Progress Timeline */}
+
                                 <div className="bg-white rounded-2xl shadow-xl p-6">
                                     <h3 className="text-lg font-bold text-[#03373d] mb-6 flex items-center gap-2">
                                         <FaClock /> Delivery Progress
@@ -312,9 +312,9 @@ const Trackingparcel = () => {
                                     </div>
                                 </div>
 
-                                {/* Parcel & Customer Info */}
+
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                    {/* Parcel Details */}
+
                                     <div className="bg-white rounded-2xl shadow-xl p-6">
                                         <h3 className="text-lg font-bold text-[#03373d] mb-4 flex items-center gap-2">
                                             <FaBox /> Parcel Details
@@ -351,7 +351,7 @@ const Trackingparcel = () => {
                                         </div>
                                     </div>
 
-                                    {/* Sender Details */}
+
                                     <div className="bg-white rounded-2xl shadow-xl p-6">
                                         <h3 className="text-lg font-bold text-[#03373d] mb-4 flex items-center gap-2">
                                             <FaUser /> Sender Details
@@ -377,7 +377,7 @@ const Trackingparcel = () => {
                                     </div>
                                 </div>
 
-                                {/* Delivery Address */}
+
                                 <div className="bg-white rounded-2xl shadow-xl p-6">
                                     <h3 className="text-lg font-bold text-[#03373d] mb-4 flex items-center gap-2">
                                         <FaMapMarkerAlt /> Delivery Address
@@ -398,7 +398,7 @@ const Trackingparcel = () => {
                                     </div>
                                 </div>
 
-                                {/* Rider Info */}
+
                                 {parcel.riderName && (
                                     <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl shadow-xl p-6">
                                         <h3 className="text-lg font-bold text-[#03373d] mb-4 flex items-center gap-2">
@@ -421,7 +421,7 @@ const Trackingparcel = () => {
                                     </div>
                                 )}
 
-                                {/* Action Buttons */}
+
                                 <div className="flex flex-wrap gap-4 justify-center">
 
                                     <Link href="/parcel">
@@ -434,7 +434,7 @@ const Trackingparcel = () => {
                         )}
                     </AnimatePresence>
 
-                    {/* Help Section */}
+
                     {!parcel && !loading && !error && (
                         <motion.div
                             initial={{ opacity: 0 }}

@@ -3,11 +3,11 @@ import React from 'react';
 const Footer = () => {
     return (
         <div>
-            
+
             <footer className="footer sm:footer-horizontal bg-gray-200 text-base-content p-10">
                 <aside>
                     <div className="flex items-end">
-                        <img className="mb-2 w-7" src="/assets/logo.png" alt="Logo" />
+                        <img className="mb-2 w-7" src="/assets/mainlogo.png" alt="Logo" />
                         <h1 className="text-2xl font-semibold">Profast</h1>
                     </div>
                     <p>

@@ -144,7 +144,7 @@ const AppoveRider = () => {
     return (
         <AdminRouters>
             <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {/* Header Section */}
+
                 <div className="mb-8">
                     <div className="flex items-center gap-3 mb-2">
                         <div className="text-3xl">🏍️</div>
@@ -165,7 +165,7 @@ const AppoveRider = () => {
                                 key={rider._id}
                                 className={`bg-white rounded-2xl shadow-${style.shadow} border ${style.border} hover:shadow-2xl transition-all duration-300 overflow-hidden relative`}
                             >
-                                {/* Status Badge Overlay */}
+
                                 <div className="absolute top-4 right-4 z-10">
                                     {rider.status === 'approved' && (
                                         <div className="bg-emerald-500 rounded-full p-2 shadow-lg animate-bounce">
@@ -191,7 +191,7 @@ const AppoveRider = () => {
                                 </div>
 
                                 <div className="flex flex-col lg:flex-row">
-                                    {/* Left Section - Profile & Basic Info */}
+
                                     <div className={`lg:w-1/4 ${style.leftBg} p-6 flex flex-col items-center text-center relative`}>
                                         <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mb-3">
                                             <span className="text-4xl">🏍️</span>
@@ -209,10 +209,10 @@ const AppoveRider = () => {
                                         </div>
                                     </div>
 
-                                    {/* Middle Section - Details */}
+
                                     <div className="lg:w-1/2 p-6 flex-1">
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            {/* Contact Info */}
+
                                             <div className="space-y-2">
                                                 <div className="flex items-center gap-2 text-sm">
                                                     <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -235,7 +235,7 @@ const AppoveRider = () => {
                                                 </div>
                                             </div>
 
-                                            {/* Vehicle Info */}
+
                                             <div className="space-y-2">
                                                 <div className="flex items-center gap-2 text-sm">
                                                     <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -258,7 +258,7 @@ const AppoveRider = () => {
                                             </div>
                                         </div>
 
-                                        {/* Emergency Contact Badge */}
+
                                         <div className="mt-4 bg-red-50 rounded-lg p-3">
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-2">
@@ -272,7 +272,7 @@ const AppoveRider = () => {
                                         </div>
                                     </div>
 
-                                    {/* Right Section - Actions */}
+
                                     <div className={`lg:w-1/4 ${rider.status === 'pending' ? 'bg-gray-50' : 'bg-gray-100'} p-6 flex flex-col justify-center items-center gap-3 border-t lg:border-t-0 lg:border-l border-gray-100`}>
                                         {style.showActions ? (
                                             <>
@@ -362,7 +362,7 @@ const AppoveRider = () => {
                     })}
                 </div>
 
-                {/* Empty State */}
+
                 {(!riders || riders.length === 0) && (
                     <div className="flex flex-col items-center justify-center py-16 px-4 bg-white rounded-2xl shadow-lg border border-gray-100">
                         <div className="text-6xl mb-4 opacity-50">🏍️</div>
@@ -371,7 +371,7 @@ const AppoveRider = () => {
                     </div>
                 )}
 
-                {/* Approval Modal */}
+
                 {showModal && selectedRider && (
                     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                         <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
@@ -385,7 +385,7 @@ const AppoveRider = () => {
                             </div>
 
                             <div className="p-6 space-y-6">
-                                {/* Personal Information */}
+
                                 <div>
                                     <h3 className="text-lg font-semibold text-[#03373d] mb-3 flex items-center gap-2">
                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -402,7 +402,7 @@ const AppoveRider = () => {
                                     </div>
                                 </div>
 
-                                {/* Vehicle Information */}
+
                                 <div>
                                     <h3 className="text-lg font-semibold text-[#03373d] mb-3 flex items-center gap-2">
                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -418,7 +418,7 @@ const AppoveRider = () => {
                                     </div>
                                 </div>
 
-                                {/* Emergency Contact */}
+
                                 <div>
                                     <h3 className="text-lg font-semibold text-[#03373d] mb-3 flex items-center gap-2">
                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

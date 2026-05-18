@@ -25,7 +25,7 @@ const Support = () => {
     const [replyMessage, setReplyMessage] = useState('');
     const messagesEndRef = useRef(null);
 
-    // React Query দিয়ে মেসেজ লোড করা - অটো রিফ্রেশ
+
     const { data: messages = [], isLoading, refetch } = useQuery({
         queryKey: ['user-support-messages', user?.email],
         queryFn: async () => {
@@ -33,11 +33,11 @@ const Support = () => {
             return response.data || [];
         },
         enabled: !!user?.email,
-        refetchInterval: 5000, // প্রতি 5 সেকেন্ডে অটো রিফ্রেশ
+        refetchInterval: 5000,
         refetchOnWindowFocus: true,
     });
 
-    // সেন্ড মেসেজ মিউটেশন
+
     const sendMessageMutation = useMutation({
         mutationFn: async (data) => {
             const response = await axios.post('/support/messages', data);
@@ -54,7 +54,7 @@ const Support = () => {
         }
     });
 
-    // রিপ্লাই মিউটেশন
+
     const replyMutation = useMutation({
         mutationFn: async ({ messageId, replyMsg }) => {
             const response = await axios.post(`/support/messages/${messageId}/reply`, {
@@ -75,19 +75,46 @@ const Support = () => {
         }
     });
 
-    // ডিলিট মিউটেশন
+
+
     const deleteMutation = useMutation({
         mutationFn: async (messageId) => {
-            await axios.delete(`/support/messages/${messageId}`);
+
+            const response = await axios.delete(`/support/messages/${messageId}?email=${user?.email}`);
+            return response.data;
         },
-        onSuccess: () => {
+        onSuccess: (data) => {
             queryClient.invalidateQueries(['user-support-messages']);
-            Swal.fire("Deleted", "Message has been deleted", "success");
+            Swal.fire("Deleted", data.message || "Message has been deleted", "success");
         },
-        onError: () => {
-            Swal.fire("Error", "Failed to delete message", "error");
+        onError: (error) => {
+            console.error('Delete error:', error);
+            const errorMessage = error.response?.data?.message || error.response?.data?.error || "Failed to delete message";
+
+
+            if (error.response?.status === 403 || error.response?.status === 401) {
+                Swal.fire("Permission Denied", errorMessage, "error");
+            } else {
+                Swal.fire("Error", errorMessage, "error");
+            }
         }
     });
+
+    const handleDelete = (messageId) => {
+        Swal.fire({
+            title: "Delete Message?",
+            text: "This action cannot be undone",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#03373d",
+            confirmButtonText: "Yes, delete"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                deleteMutation.mutate(messageId);
+            }
+        });
+    };
 
     const handleSendMessage = (e) => {
         e.preventDefault();
@@ -108,22 +135,6 @@ const Support = () => {
     const handleReply = (messageId) => {
         if (!replyMessage.trim()) return;
         replyMutation.mutate({ messageId, replyMsg: replyMessage.trim() });
-    };
-
-    const handleDelete = (messageId) => {
-        Swal.fire({
-            title: "Delete Message?",
-            text: "This action cannot be undone",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#d33",
-            cancelButtonColor: "#03373d",
-            confirmButtonText: "Yes, delete"
-        }).then((result) => {
-            if (result.isConfirmed) {
-                deleteMutation.mutate(messageId);
-            }
-        });
     };
 
     const getStatusBadge = (status) => {
@@ -156,7 +167,7 @@ const Support = () => {
         return 'Customer Support';
     };
 
-    // Auto scroll
+
     useEffect(() => {
         if (messagesEndRef.current) {
             messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -166,13 +177,13 @@ const Support = () => {
     const supportChannels = [
         { icon: <FaPhone />, title: "Phone Support", info: "+880 1234 567890", hours: "24/7 Available", link: "tel:+8801234567890" },
         { icon: <FaWhatsapp />, title: "WhatsApp", info: "+880 1234 567890", hours: "9 AM - 9 PM", link: "https://wa.me/8801234567890" },
-        { icon: <FaFacebook />, title: "Facebook", info: "@SpeedyX", hours: "9 AM - 6 PM", link: "https://facebook.com/SpeedyX" }
+        { icon: <FaFacebook />, title: "Facebook", info: "@SpeedyX", hours: "9 AM - 6 PM", link: "https://facebook.com/SpeedyX" },
     ];
 
     return (
         <div className="min-h-screen bg-gray-50 py-8 px-4">
             <div className="max-w-6xl mx-auto">
-                {/* Header */}
+
                 <div className="text-center mb-8">
                     <div className="inline-flex items-center justify-center p-3 bg-[#03373d] rounded-full mb-4">
                         {getRoleIcon()}
@@ -181,7 +192,7 @@ const Support = () => {
                     <p className="text-gray-500 text-sm mt-1">How can we help you? | {getRoleName()}</p>
                 </div>
 
-                {/* Tabs */}
+
                 <div className="flex flex-wrap justify-center gap-2 mb-8">
                     <button
                         onClick={() => setActiveTab('messages')}
@@ -206,7 +217,7 @@ const Support = () => {
                     </button>
                 </div>
 
-                {/* Messages Section */}
+
                 {activeTab === 'messages' && (
                     <div className="space-y-4">
                         {isLoading ? (
@@ -237,7 +248,7 @@ const Support = () => {
                                             <p className="text-gray-700 whitespace-pre-wrap">{msg.message}</p>
                                         </div>
 
-                                        {/* Replies */}
+
                                         {msg.replies?.length > 0 && (
                                             <div className="mt-4 space-y-3">
                                                 <h4 className="text-sm font-semibold text-gray-600 flex items-center gap-2"><FaReply /> Replies ({msg.replies.length})</h4>
@@ -255,7 +266,7 @@ const Support = () => {
                                             </div>
                                         )}
 
-                                        {/* Reply Form */}
+
                                         {replyingTo === msg._id ? (
                                             <div className="mt-4">
                                                 <textarea value={replyMessage} onChange={(e) => setReplyMessage(e.target.value)} placeholder="Write your reply..." rows="3" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#caeb66]" autoFocus />
@@ -277,7 +288,7 @@ const Support = () => {
                     </div>
                 )}
 
-                {/* New Message Section */}
+
                 {activeTab === 'new' && (
                     <div className="bg-white rounded-xl shadow-md overflow-hidden">
                         <div className="p-5 border-b bg-gradient-to-r from-[#03373d] to-[#1a5c64]">
@@ -301,7 +312,7 @@ const Support = () => {
                     </div>
                 )}
 
-                {/* Contact Section */}
+
                 {activeTab === 'contact' && (
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                         {supportChannels.map((channel, index) => (

@@ -23,7 +23,7 @@ const CustomerFeedback = () => {
             location: "Dhaka, Bangladesh",
             rating: 5,
             feedback: "Excellent delivery service! My parcel arrived before the estimated time. The live tracking feature is very accurate. Highly recommended for anyone looking for reliable courier service in Bangladesh.",
-            image: "https://randomuser.me/api/portraits/men/1.jpg",
+            image: "https:
             date: "2 days ago",
             orders: "45+",
             verified: true
@@ -34,7 +34,7 @@ const CustomerFeedback = () => {
             location: "Chittagong, Bangladesh",
             rating: 5,
             feedback: "Very professional and careful handling of my packages. The customer support team is very helpful and responsive. I've been using their service for 6 months and never had any issue.",
-            image: "https://randomuser.me/api/portraits/women/2.jpg",
+            image: "https:
             date: "5 days ago",
             orders: "28+",
             verified: true
@@ -45,7 +45,7 @@ const CustomerFeedback = () => {
             location: "Sylhet, Bangladesh",
             rating: 4,
             feedback: "Good service overall. Delivery was on time and package was in perfect condition. The merchant location feature helped me find the nearest pickup point easily.",
-            image: "https://randomuser.me/api/portraits/men/3.jpg",
+            image: "https:
             date: "1 week ago",
             orders: "12+",
             verified: true
@@ -56,7 +56,7 @@ const CustomerFeedback = () => {
             location: "Rajshahi, Bangladesh",
             rating: 5,
             feedback: "Best courier service in town! Very affordable prices and fast delivery. The 24/7 call center support is amazing. They solved my query within minutes.",
-            image: "https://randomuser.me/api/portraits/women/4.jpg",
+            image: "https:
             date: "2 weeks ago",
             orders: "52+",
             verified: true
@@ -67,7 +67,7 @@ const CustomerFeedback = () => {
             location: "Khulna, Bangladesh",
             rating: 5,
             feedback: "I'm very impressed with their safe delivery guarantee. All my important documents reached safely. The real-time notification system keeps me updated about my parcel.",
-            image: "https://randomuser.me/api/portraits/men/5.jpg",
+            image: "https:
             date: "3 weeks ago",
             orders: "19+",
             verified: true
@@ -84,7 +84,7 @@ const CustomerFeedback = () => {
         setActiveIndex((prev) => (prev - 1 + feedbacks.length) % feedbacks.length);
     };
 
-    // Auto scroll every 5 seconds
+
     useEffect(() => {
         const timer = setInterval(() => {
             nextSlide();
@@ -139,18 +139,18 @@ const CustomerFeedback = () => {
     return (
         <div className="relative overflow-hidden py-20 px-4">
 
-            {/* Background Decorative Elements */}
+
             <div className="absolute top-20 left-10 w-64 h-64 bg-[#caeb66]/5 rounded-full blur-3xl animate-pulse" />
             <div className="absolute bottom-20 right-10 w-80 h-80 bg-[#03373d]/5 rounded-full blur-3xl animate-pulse delay-1000" />
 
-            {/* Quote marks background */}
+
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[#caeb66]/5 text-[200px] font-bold select-none pointer-events-none">
                 ❝ ❞
             </div>
 
             <div className="max-w-7xl mx-auto relative z-10">
 
-                {/* Header Section */}
+
                 <motion.div
                     ref={sectionRef}
                     variants={containerVariants}
@@ -179,7 +179,7 @@ const CustomerFeedback = () => {
                     </motion.p>
                 </motion.div>
 
-                {/* Main Carousel - Only Cards */}
+
                 <div className="relative">
                     <div className="overflow-hidden px-4 md:px-12">
                         <AnimatePresence mode="wait" custom={direction}>
@@ -195,7 +195,7 @@ const CustomerFeedback = () => {
                                 <div className="w-full max-w-4xl">
                                     <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-10 border border-gray-100 relative">
 
-                                        {/* Quote Icon */}
+
                                         <div className="absolute top-6 right-6 text-[#caeb66]/20">
                                             <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
                                                 <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
@@ -203,7 +203,7 @@ const CustomerFeedback = () => {
                                         </div>
 
                                         <div className="flex flex-col lg:flex-row gap-8 items-center">
-                                            {/* Left Side - Image & Info */}
+
                                             <div className="text-center lg:w-1/3">
                                                 <motion.div
                                                     initial={{ scale: 0 }}
@@ -280,7 +280,7 @@ const CustomerFeedback = () => {
                                                 </motion.div>
                                             </div>
 
-                                            {/* Right Side - Feedback */}
+
                                             <div className="lg:w-2/3 text-center lg:text-left">
                                                 <motion.div
                                                     initial={{ opacity: 0, y: 20 }}
@@ -317,7 +317,7 @@ const CustomerFeedback = () => {
                         </AnimatePresence>
                     </div>
 
-                    {/* Navigation Buttons */}
+
                     <motion.button
                         onClick={prevSlide}
                         whileHover={{ scale: 1.1, x: -3 }}
@@ -337,7 +337,7 @@ const CustomerFeedback = () => {
                     </motion.button>
                 </div>
 
-                {/* Dots Indicator */}
+
                 <div className="flex justify-center gap-3 mt-8">
                     {feedbacks.map((_, idx) => (
                         <motion.button
@@ -356,7 +356,7 @@ const CustomerFeedback = () => {
                     ))}
                 </div>
 
-                {/* Trust Badge */}
+
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}

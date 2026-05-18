@@ -87,7 +87,7 @@ const Ourservices = () => {
         <div className='relative py-20 my-10 mx-4 md:mx-8'>
 
             <div className='relative z-10 container mx-auto px-6'>
-                {/* Header Section - Clean without background */}
+
                 <div className='text-center mb-16'>
                     <motion.div
                         initial={{ opacity: 0, y: -30 }}
@@ -108,7 +108,7 @@ const Ourservices = () => {
                     </motion.div>
                 </div>
 
-                {/* Services Grid with Animations */}
+
                 <motion.div
                     className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
                     variants={containerVariants}
@@ -127,7 +127,7 @@ const Ourservices = () => {
                             }}
                             className="group relative bg-white rounded-2xl p-8 border border-gray-100 shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer"
                         >
-                            {/* Icon Container with Animation */}
+
                             <motion.div
                                 className="relative mb-6"
                                 whileHover={{ rotate: 5 }}
@@ -136,26 +136,26 @@ const Ourservices = () => {
                                 <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center shadow-md`}>
                                     {React.createElement(item.icon, { className: "text-white text-2xl" })}
                                 </div>
-                                {/* Decorative dot */}
+
                                 <div className="absolute -top-2 -right-2 w-3 h-3 bg-[#caeb66] rounded-full animate-pulse" />
                             </motion.div>
 
-                            {/* Title */}
+
                             <h3 className="text-xl font-bold text-[#03373d] mb-3 group-hover:text-[#caeb66] transition-colors duration-300">
                                 {item.title}
                             </h3>
 
-                            {/* Description */}
+
                             <p className="text-gray-500 text-sm leading-relaxed mb-3">
                                 {item.text}
                             </p>
 
-                            {/* Subtext */}
+
                             <p className="text-[#caeb66] text-xs font-medium">
                                 {item.subtext}
                             </p>
 
-                            {/* Hover Arrow Animation */}
+
                             <motion.div
                                 className="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100"
                                 initial={{ x: -10, opacity: 0 }}
@@ -172,7 +172,7 @@ const Ourservices = () => {
                     ))}
                 </motion.div>
 
-                {/* Bottom CTA with Animation */}
+
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}

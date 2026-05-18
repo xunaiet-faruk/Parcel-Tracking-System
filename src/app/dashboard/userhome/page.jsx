@@ -55,7 +55,7 @@ const Userhome = () => {
                 console.log("📋 First parcel sample:", parcels[0]);
             }
 
-            // স্ট্যাটস ক্যালকুলেশন
+
             const totalParcels = parcels.length;
             const deliveredParcels = parcels.filter(p => {
                 const status = p.deliverystatus || p.status;
@@ -78,7 +78,7 @@ const Userhome = () => {
                 totalSpent
             });
 
-            // রিসেন্ট প্যাকেল
+
             const recent = [...parcels]
                 .sort((a, b) => {
                     const dateA = new Date(a.bookingDate || a.createdAt || a.date || a.created_date || 0);
@@ -88,7 +88,7 @@ const Userhome = () => {
                 .slice(0, 5);
             setRecentParcels(recent);
 
-            // চার্টের জন্য ডাটা - bookingDate ব্যবহার করে
+
             const chartData = getChartData(parcels);
             console.log("📈 Chart data:", chartData);
             setChartData(chartData);
@@ -113,7 +113,7 @@ const Userhome = () => {
             const nextDate = new Date(date);
             nextDate.setDate(date.getDate() + 1);
 
-            // দিনের নাম বের করা
+
             const dayIndex = date.getDay();
             const dayName = dayIndex === 0 ? 'Sun' :
                 dayIndex === 1 ? 'Mon' :
@@ -122,7 +122,7 @@ const Userhome = () => {
                             dayIndex === 4 ? 'Thu' :
                                 dayIndex === 5 ? 'Fri' : 'Sat';
 
-            // এই দিনের প্যাকেল ফিল্টার করুন - bookingDate ব্যবহার করে
+
             const dayParcels = parcels.filter(p => {
                 let parcelDate = p.bookingDate || p.createdAt || p.date || p.created_date;
                 if (!parcelDate) return false;
@@ -215,12 +215,12 @@ const Userhome = () => {
         return <Loading />;
     }
 
-    // চেক করুন চার্টে ডাটা আছে কিনা
+
     const hasChartData = chartData.some(d => d.totalParcels > 0 || d.delivered > 0 || d.amount > 0);
 
     return (
         <div className="space-y-6 p-6">
-            {/* Welcome Section */}
+
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -239,7 +239,7 @@ const Userhome = () => {
                 </Link>
             </motion.div>
 
-            {/* 4 Stats Cards */}
+
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatCard title="Total Parcels" value={stats.totalParcels} icon={<FaBox className="text-2xl" />} bgColor="bg-blue-50" textColor="text-blue-600" />
                 <StatCard title="Delivered" value={stats.deliveredParcels} icon={<FaCheckCircle className="text-2xl" />} bgColor="bg-green-50" textColor="text-green-600" />
@@ -247,7 +247,7 @@ const Userhome = () => {
                 <StatCard title="Total Spent" value={stats.totalSpent} icon={<FaMoneyBillWave className="text-2xl" />} bgColor="bg-purple-50" textColor="text-purple-600" />
             </div>
 
-            {/* Main Chart */}
+
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -301,7 +301,7 @@ const Userhome = () => {
                 )}
             </motion.div>
 
-            {/* Recent Parcels Table */}
+
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -309,7 +309,7 @@ const Userhome = () => {
             >
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-xl font-bold text-[#03373d]">📦 Recent Parcels</h2>
-                
+
                 </div>
 
                 <div className="overflow-x-auto">
@@ -376,7 +376,7 @@ const Userhome = () => {
                 </div>
             </motion.div>
 
-            {/* Quick Action */}
+
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}

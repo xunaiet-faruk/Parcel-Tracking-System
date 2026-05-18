@@ -53,7 +53,7 @@ const Payment = () => {
     return (
         <div className="min-h-screen flex items-center justify-center p-4">
             <div className="max-w-md w-full">
-                {/* Back Button */}
+
                 <button
                     onClick={() => router.back()}
                     className="mb-4 flex items-center gap-2 text-white/80 hover:text-white transition-colors"
@@ -62,9 +62,9 @@ const Payment = () => {
                     <span>Back</span>
                 </button>
 
-                {/* Payment Card */}
+
                 <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
-                    {/* Card Header */}
+
                     <div className="bg-gradient-to-r from-[#03373d] to-[#1a5c64] px-6 py-5 text-center">
                         <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
                             <FiCreditCard className="w-8 h-8 text-white" />
@@ -73,9 +73,9 @@ const Payment = () => {
                         <p className="text-[#caeb66] text-sm mt-1">Complete your payment securely</p>
                     </div>
 
-                    {/* Card Body */}
+
                     <div className="p-6">
-                        {/* Sender Info */}
+
                         <div className="mb-6">
                             <div className="flex items-center gap-3 mb-4 pb-3 border-b border-gray-100">
                                 <div className="w-10 h-10 bg-[#03373d]/10 rounded-full flex items-center justify-center">
@@ -98,7 +98,7 @@ const Payment = () => {
                             </div>
                         </div>
 
-                        {/* Amount Section */}
+
                         <div className="mb-6 bg-gradient-to-r from-[#03373d] to-[#1a5c64] rounded-2xl p-5 text-center">
                             <p className="text-white/80 text-sm mb-1">Total Amount</p>
                             <div className="flex items-center justify-center gap-2">
@@ -112,13 +112,13 @@ const Payment = () => {
                             )}
                         </div>
 
-                        {/* Parcel Info */}
+
                         <div className="mb-6 text-center">
                             <p className="text-xs text-gray-400">Parcel: {parcel.parcelName}</p>
                             <p className="text-xs text-gray-400">Weight: {parcel.parcelWeight} kg</p>
                         </div>
 
-                        {/* Payment Button */}
+
                         {parcel.status === 'paid' ? (
                             <button
                                 disabled
@@ -137,7 +137,7 @@ const Payment = () => {
                             </button>
                         )}
 
-                        {/* Secure Note */}
+
                         <div className="text-center mt-4">
                             <p className="text-xs text-gray-400 flex items-center justify-center gap-1">
                                 <span className="inline-block w-1 h-1 bg-green-500 rounded-full"></span>
@@ -147,7 +147,7 @@ const Payment = () => {
                     </div>
                 </div>
 
-                {/* Decorative Elements */}
+
                 <div className="text-center mt-6">
                     <p className="text-white/60 text-sm">
                         Need help? Contact support

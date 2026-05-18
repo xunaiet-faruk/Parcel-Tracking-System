@@ -33,11 +33,11 @@ const PaymentHistory = () => {
             setLoading(true);
             const email = user?.email;
 
-            // ২টি এন্ডপয়েন্ট চেষ্টা করা
+
             let paymentData = [];
 
             try {
-                // প্রথম এন্ডপয়েন্ট
+
                 const res = await axios.get(`/payment?email=${email}`);
                 if (res.data && Array.isArray(res.data)) {
                     paymentData = res.data;
@@ -156,7 +156,7 @@ const PaymentHistory = () => {
         return <Loading />;
     }
 
-   
+
     const totalAmount = filteredPayments.reduce((sum, p) => sum + (p.amount || 0), 0);
     const successfulPayments = filteredPayments.filter(p => p.paymentStatus === "paid" || p.paymentStatus === "completed").length;
     const uniqueMethods = new Set(filteredPayments.map(p => p.paymentMethod)).size;
@@ -164,7 +164,7 @@ const PaymentHistory = () => {
     return (
       <Userprotract>
             <div className="w-full container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {/* Header */}
+
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -180,7 +180,7 @@ const PaymentHistory = () => {
                         Track and manage all your payment transactions
                     </p>
                 </motion.div>
-                {/* Table Section */}
+
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -285,10 +285,9 @@ const PaymentHistory = () => {
                         </table>
                     </div>
 
-
                 </motion.div>
 
-                {/* Payment Details Modal */}
+
                 {selectedPayment && (
                     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setSelectedPayment(null)}>
                         <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full" onClick={(e) => e.stopPropagation()}>

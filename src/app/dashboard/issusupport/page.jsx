@@ -23,18 +23,22 @@ const AdminSupport = () => {
     const [statusFilter, setStatusFilter] = useState('all');
     const messagesEndRef = useRef(null);
 
-    // React Query দিয়ে মেসেজ লোড করা - অটো রিফ্রেশ
+
     const { data: messages = [], isLoading, refetch } = useQuery({
-        queryKey: ['admin-support-messages'],
+        queryKey: ['admin-support-messages', user?.email],
         queryFn: async () => {
-            const response = await axios.get('/admin/support/messages');
+            if (!user?.email) return [];
+
+
+            const response = await axios.get(`/admin/support/messages?adminEmail=${user.email}`);
             return response.data || [];
         },
-        refetchInterval: 5000, // প্রতি 5 সেকেন্ডে অটো রিফ্রেশ
+        enabled: !!user?.email,
+        refetchInterval: 5000,
         refetchOnWindowFocus: true,
     });
 
-    // স্ট্যাটাস আপডেট মিউটেশন
+
     const updateStatusMutation = useMutation({
         mutationFn: async ({ messageId, status }) => {
             const response = await axios.patch(`/support/messages/${messageId}/status`, { status });
@@ -44,18 +48,20 @@ const AdminSupport = () => {
             queryClient.invalidateQueries(['admin-support-messages']);
             Swal.fire("Updated", "Status updated successfully", "success");
         },
-        onError: () => {
-            Swal.fire("Error", "Failed to update status", "error");
+        onError: (error) => {
+            console.error('Status update error:', error);
+            Swal.fire("Error", error.response?.data?.message || "Failed to update status", "error");
         }
     });
 
-    // রিপ্লাই মিউটেশন
+
     const replyMutation = useMutation({
         mutationFn: async ({ messageId, replyMessage }) => {
             const response = await axios.post(`/support/messages/${messageId}/reply`, {
                 message: replyMessage,
-                repliedByName: user?.displayName || 'Admin',
-                repliedByRole: 'admin'
+                repliedByName: user?.displayName || user?.name || 'Admin',
+                repliedByRole: 'admin',
+                repliedBy: user?.email
             });
             return response.data;
         },
@@ -65,16 +71,17 @@ const AdminSupport = () => {
             setSelectedMessage(null);
             Swal.fire("Success", "Reply sent successfully", "success");
         },
-        onError: () => {
-            Swal.fire("Error", "Failed to send reply", "error");
+        onError: (error) => {
+            console.error('Reply error:', error);
+            Swal.fire("Error", error.response?.data?.message || "Failed to send reply", "error");
         }
     });
 
-    // ফিল্টার করা মেসেজ
-    const filteredMessages = messages.filter(msg => {
+
+    const filteredMessages = Array.isArray(messages) ? messages.filter(msg => {
         if (statusFilter === 'all') return true;
         return msg.status === statusFilter;
-    });
+    }) : [];
 
     const getStatusBadge = (status) => {
         const badges = {
@@ -118,17 +125,23 @@ const AdminSupport = () => {
         });
     };
 
-    // Auto scroll to bottom when new messages arrive
-    useEffect(() => {
-        if (messagesEndRef.current) {
-            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-        }
-    }, [messages]);
+
+    if (!user?.email) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <div className="text-center">
+                    <MdSupportAgent className="text-6xl text-gray-300 mx-auto mb-4" />
+                    <h2 className="text-xl font-semibold text-gray-600">Please Login</h2>
+                    <p className="text-gray-500 mt-2">You need to be logged in to access support panel</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gray-50 py-8 px-4">
             <div className="max-w-7xl mx-auto">
-                {/* Header */}
+
                 <div className="text-center mb-8">
                     <div className="inline-flex items-center justify-center p-3 bg-[#03373d] rounded-full mb-4">
                         <MdSupportAgent className="text-2xl text-[#caeb66]" />
@@ -137,7 +150,7 @@ const AdminSupport = () => {
                     <p className="text-gray-500 text-sm mt-1">Manage all customer & rider support tickets</p>
                 </div>
 
-                {/* Stats */}
+
                 <div className="grid grid-cols-3 gap-4 mb-6">
                     <div className="bg-white rounded-xl shadow-sm p-4 text-center">
                         <p className="text-2xl font-bold text-yellow-600">{messages.filter(m => m.status === 'pending').length}</p>
@@ -153,35 +166,35 @@ const AdminSupport = () => {
                     </div>
                 </div>
 
-                {/* Filter */}
-                <div className="flex gap-2 mb-6 justify-center">
+
+                <div className="flex gap-2 mb-6 justify-center flex-wrap">
                     <button
                         onClick={() => setStatusFilter('all')}
                         className={`px-4 py-2 rounded-lg text-sm font-medium transition ${statusFilter === 'all' ? 'bg-[#03373d] text-white' : 'bg-white text-gray-600 hover:bg-gray-100'}`}
                     >
-                        All
+                        All ({messages.length})
                     </button>
                     <button
                         onClick={() => setStatusFilter('pending')}
                         className={`px-4 py-2 rounded-lg text-sm font-medium transition ${statusFilter === 'pending' ? 'bg-yellow-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-100'}`}
                     >
-                        Pending
+                        Pending ({messages.filter(m => m.status === 'pending').length})
                     </button>
                     <button
                         onClick={() => setStatusFilter('answered')}
                         className={`px-4 py-2 rounded-lg text-sm font-medium transition ${statusFilter === 'answered' ? 'bg-green-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-100'}`}
                     >
-                        Answered
+                        Answered ({messages.filter(m => m.status === 'answered').length})
                     </button>
                     <button
                         onClick={() => setStatusFilter('resolved')}
                         className={`px-4 py-2 rounded-lg text-sm font-medium transition ${statusFilter === 'resolved' ? 'bg-blue-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-100'}`}
                     >
-                        Resolved
+                        Resolved ({messages.filter(m => m.status === 'resolved').length})
                     </button>
                 </div>
 
-                {/* Messages List */}
+
                 {isLoading ? (
                     <div className="flex justify-center py-12">
                         <FaSpinner className="animate-spin text-3xl text-[#03373d]" />
@@ -195,7 +208,7 @@ const AdminSupport = () => {
                     <div className="space-y-4">
                         {filteredMessages.map((msg) => (
                             <div key={msg._id} className="bg-white rounded-xl shadow-md overflow-hidden">
-                                {/* Message Header */}
+
                                 <div className="p-5 border-b bg-gray-50">
                                     <div className="flex justify-between items-start flex-wrap gap-3">
                                         <div className="flex-1">
@@ -204,7 +217,7 @@ const AdminSupport = () => {
                                                 {getStatusBadge(msg.status)}
                                                 {getRoleBadge(msg.role)}
                                             </div>
-                                            <div className="flex items-center gap-4 text-sm text-gray-500">
+                                            <div className="flex items-center gap-4 text-sm text-gray-500 flex-wrap">
                                                 <span className="flex items-center gap-1"><FaUser className="text-xs" /> {msg.name}</span>
                                                 <span className="flex items-center gap-1"><FaEnvelope className="text-xs" /> {msg.email}</span>
                                                 <span className="flex items-center gap-1"><FaClock className="text-xs" /> {formatDate(msg.createdAt)}</span>
@@ -222,13 +235,13 @@ const AdminSupport = () => {
                                     </div>
                                 </div>
 
-                                {/* Message Body */}
+
                                 <div className="p-5">
                                     <div className="bg-gray-50 rounded-lg p-4 mb-4">
                                         <p className="text-gray-700 whitespace-pre-wrap">{msg.message}</p>
                                     </div>
 
-                                    {/* Replies */}
+
                                     {msg.replies && msg.replies.length > 0 && (
                                         <div className="mt-4 space-y-3">
                                             <h4 className="text-sm font-semibold text-gray-600 flex items-center gap-2">
@@ -250,7 +263,7 @@ const AdminSupport = () => {
                                         </div>
                                     )}
 
-                                    {/* Reply Button / Form */}
+
                                     {selectedMessage?._id === msg._id ? (
                                         <div className="mt-4">
                                             <textarea

@@ -38,29 +38,29 @@ const AuthProvider = ({ children }) => {
         }
     }, []);
 
-    // Email/Password login
+
     const login = (email, password) => {
         if (!auth) return Promise.reject(new Error("Firebase auth not initialized"));
         return signInWithEmailAndPassword(auth, email, password);
     };
 
-    // Email/Password register
+
     const register = (email, password) => {
         return createUserWithEmailAndPassword(auth, email, password);
     };
 
-    // Google login/register
+
     const googleLogin = () => {
         const provider = new GoogleAuthProvider();
         return signInWithPopup(auth, provider);
     };
 
-    // Logout
+
     const logout = () => {
         return signOut(auth);
     };
 
-    // Update user profile
+
     const updateUserProfile = (displayName, photoURL) => {
         if (user) {
             return updateProfile(user, { displayName, photoURL });

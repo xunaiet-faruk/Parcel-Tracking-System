@@ -6,7 +6,7 @@ const Companies = () => {
             <div>
                 <h1 className='text-[#03373d] font-bold text-center text-4xl'>We've helped thousands of sales teams</h1>
             </div>
-           
+
             <div>
                 <Marquee className='pt-14' behavior="scroll" autoFill="true" speed="100">
                    <div className='flex justify-center items-center gap-5 object-contain'>

@@ -226,7 +226,7 @@ const UsermanagMent = () => {
                     </div>
                 </div>
 
-                {/* Tabs */}
+
                 <div className="px-6  flex justify-end items-center flex-wrap gap-4" style={{ borderColor: "#e0e7e9" }}>
                     <div className="flex gap-2 flex-wrap">
                         <button
@@ -282,7 +282,7 @@ const UsermanagMent = () => {
                     </div>
                 </div>
 
-                {/* Table */}
+
                 <div className="bg-gray-50 flex items-center justify-center p-2">
                     <div className="w-full container mx-auto bg-white rounded-2xl shadow-xl overflow-hidden" style={{ color: "#03373d" }}>
                         <div className="overflow-x-auto">
@@ -425,7 +425,7 @@ const UsermanagMent = () => {
                     </div>
                 </div>
 
-                {/* Details Modal */}
+
                 {showDetailsModal && selectedUser && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                         <div className="bg-white rounded-2xl shadow-xl max-w-md w-full mx-auto overflow-hidden" style={{ color: "#03373d" }}>
@@ -524,7 +524,7 @@ const UsermanagMent = () => {
                     </div>
                 )}
 
-                {/* Role Change Modal */}
+
                 {showRoleModal && selectedUser && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
                         <div className="bg-white rounded-2xl shadow-xl max-w-md w-full mx-auto overflow-hidden" style={{ color: "#03373d" }}>

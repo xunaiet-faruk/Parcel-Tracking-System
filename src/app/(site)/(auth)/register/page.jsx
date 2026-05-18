@@ -26,7 +26,7 @@ const RegisterPage = () => {
         const password = form.password.value;
         const phone = form.phone.value;
 
-   
+
         if (password.length < 6) {
             setError("Password should be at least 6 characters");
             setLoading(false);
@@ -42,10 +42,10 @@ const RegisterPage = () => {
             }
 
             const res = await axios.post("/users", userInfo);
-            
-            
 
-            
+
+
+
             form.reset();
             Swal.fire({
                 title: "Registration Successful",
@@ -129,7 +129,7 @@ const RegisterPage = () => {
                     variants={containerVariants}
                     className="bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row"
                 >
-                    {/* Left Side - Image */}
+
                     <motion.div
                         variants={itemVariants}
                         className="md:w-1/2 relative bg-gradient-to-br from-[#03373d] to-[#044e57] p-8 flex items-center justify-center"
@@ -191,7 +191,7 @@ const RegisterPage = () => {
                         </div>
                     </motion.div>
 
-                    {/* Right Side - Registration Form */}
+
                     <motion.div
                         variants={itemVariants}
                         className="md:w-1/2 p-8 md:p-12"
@@ -220,7 +220,7 @@ const RegisterPage = () => {
                             </motion.div>
                         )}
 
-                        {/* Google Sign Up Button */}
+
                         <motion.button
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
@@ -262,7 +262,7 @@ const RegisterPage = () => {
                             </div>
                         </div>
 
-                        {/* Registration Form */}
+
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <motion.div variants={itemVariants}>
                                 <label className="block text-gray-700 font-semibold mb-2">

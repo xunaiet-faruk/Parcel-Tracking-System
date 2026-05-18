@@ -173,7 +173,7 @@ export default function Adminhome() {
 
     return (
         <div className="space-y-6">
-            {/* Welcome Section */}
+
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -197,7 +197,7 @@ export default function Adminhome() {
                 </button>
             </motion.div>
 
-            {/* Stats Cards */}
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {statCards.map((stat, index) => (
                     <motion.div
@@ -229,7 +229,7 @@ export default function Adminhome() {
                 ))}
             </div>
 
-            {/* Filter Section */}
+
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -266,7 +266,7 @@ export default function Adminhome() {
                 </div>
             </motion.div>
 
-            {/* All Parcels Section */}
+
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -337,9 +337,9 @@ export default function Adminhome() {
                 </div>
             </motion.div>
 
-            {/* Chart Actions */}
+
             <AdminOverview/>
-            
+
         </div>
     );
 }

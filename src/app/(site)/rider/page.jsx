@@ -27,7 +27,8 @@ const RiderPage = () => {
         termsAccepted: false,
     });
 
-    const [errors, setErrors] = useState({});
+
+    const [errors, setErrors] = useState();
 
     useEffect(() => {
         if (isApproved) {
@@ -73,7 +74,7 @@ const RiderPage = () => {
     };
 
     const validateForm = () => {
-        const newErrors = {};
+        const newErrors = ;
 
         if (!formData.fullName) newErrors.fullName = "Full name is required";
         if (!formData.email) newErrors.email = "Email is required";
@@ -186,7 +187,7 @@ const RiderPage = () => {
         return <Loading/>
     }
 
-  
+
     if (isApproved) {
         return (
             <div className="min-h-screen py-12 ">
@@ -243,7 +244,7 @@ const RiderPage = () => {
         <div className="min-h-screen py-12">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-                {/* Status Banners */}
+
                 {isRejected && (
                     <div className="mb-6 bg-red-50 border-l-4 border-red-500 rounded-lg p-4 shadow-sm">
                         <div className="flex items-center gap-3">
@@ -268,7 +269,7 @@ const RiderPage = () => {
                     </div>
                 )}
 
-                {/* Header */}
+
                 <div className="text-center mb-10">
                     <h1 className="text-4xl md:text-5xl font-bold text-[#03373d] mb-4">
                         Join Our <span className="text-[#caeb66]">Rider Team</span>
@@ -279,10 +280,10 @@ const RiderPage = () => {
                     </p>
                 </div>
 
-                {/* Form and Image Grid */}
+
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-                    {/* Left Side - Form */}
+
                     <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
                         <div className="p-6 md:p-8">
                             <div className="mb-6">
@@ -526,7 +527,7 @@ const RiderPage = () => {
                         </div>
                     </div>
 
-                    {/* Right Side - Image and Benefits */}
+
                     <div className="space-y-6">
                         <div className="bg-gradient-to-br from-[#03373d] to-[#1a5c64] rounded-3xl overflow-hidden shadow-2xl">
                             <div className="relative h-96">

@@ -4,19 +4,16 @@ import React, { useEffect, useMemo } from 'react';
 import useAuth from './useAuth';
 import { useRouter } from 'next/navigation';
 
-
 const useAxios = () => {
     const { user, logout } = useAuth()
     const router = useRouter()
     const axiosInstance = useMemo(() => {
         return axios.create({
 
-            baseURL: 'https://server-six-zeta-57.vercel.app'
-
+            
+            baseURL: 'http://localhost:3000'
 
         })
-
-
 
     }, [])
 
@@ -49,8 +46,6 @@ const useAxios = () => {
             axiosInstance.interceptors.response.eject(restInterceptor);
         };
     }, [axiosInstance, user, logout, router]);
-
-
 
     return axiosInstance;
 };

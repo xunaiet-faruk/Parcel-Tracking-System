@@ -43,11 +43,11 @@ const Riderhome = () => {
             setLoading(true);
             const email = user?.email;
 
-            // রাইডারের সব প্যাকেল আনা
+
             const response = await axios.get(`/parcels?riderEmail=${email}`);
             const parcels = response.data || [];
 
-            // স্ট্যাটিসটিক্স ক্যালকুলেশন
+
             const assigned = parcels.filter(p => p.deliverystatus === 'assigned').length;
             const completed = parcels.filter(p => p.deliverystatus === 'delivered').length;
             const pending = parcels.filter(p => p.deliverystatus === 'pending-pickup' || p.deliverystatus === 'picked-up').length;
@@ -62,21 +62,21 @@ const Riderhome = () => {
                 earnings: totalEarnings
             });
 
-            // ডেলিভারি ট্রেন্ড (লাস্ট ৭ দিন)
+
             const trend = getLast7DaysTrend(parcels);
             setDeliveryTrend(trend);
 
-            // আর্নিংস ডাটা (লাস্ট ৩০ দিন) - নাম পরিবর্তন করা হয়েছে
+
             const earningsTrendData = getLast30DaysEarnings(parcels);
             setEarningsData(earningsTrendData);
 
-            // অ্যাসাইনড ডেলিভারি (যেগুলো এখনো ডেলিভার হয়নি)
+
             const assignedOnly = parcels.filter(p =>
                 p.deliverystatus === 'assigned' || p.deliverystatus === 'picked-up'
             );
             setAssignedDeliveries(assignedOnly);
 
-            // ডেলিভারি হিস্ট্রি (যেগুলো ডেলিভার হয়েছে বা রিজেক্ট)
+
             const history = parcels.filter(p =>
                 p.deliverystatus === 'delivered' || p.deliverystatus === 'cancelled'
             ).sort((a, b) => new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt));
@@ -167,7 +167,7 @@ const Riderhome = () => {
             }
 
             await axios.patch(`/parcels/deliverystatus/${parcelId}`, updateData);
-            fetchRiderData(); // রিফ্রেশ ডাটা
+            fetchRiderData();
         } catch (error) {
             console.error("Error updating delivery status:", error);
         }
@@ -230,7 +230,7 @@ const Riderhome = () => {
 
     return (
         <div className="space-y-6 p-6">
-            {/* Welcome Section */}
+
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -240,7 +240,7 @@ const Riderhome = () => {
                 <p className="text-gray-600">Manage your deliveries and track your performance</p>
             </motion.div>
 
-            {/* 4 Stats Cards */}
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatCard
                     title="Assigned"
@@ -268,9 +268,9 @@ const Riderhome = () => {
                 />
             </div>
 
-            {/* Middle: Charts */}
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Delivery Trend Chart */}
+
                 <motion.div
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -305,7 +305,7 @@ const Riderhome = () => {
                     </ResponsiveContainer>
                 </motion.div>
 
-                {/* Earnings Chart */}
+
                 <motion.div
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -334,9 +334,9 @@ const Riderhome = () => {
                 </motion.div>
             </div>
 
-            {/* Bottom: Assigned Deliveries Table & History */}
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Assigned Deliveries Table */}
+
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -424,7 +424,7 @@ const Riderhome = () => {
                     </div>
                 </motion.div>
 
-                {/* Delivery History */}
+
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}

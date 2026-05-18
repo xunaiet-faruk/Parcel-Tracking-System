@@ -29,7 +29,7 @@ const AssignDelivery = () => {
         enabled: !!user?.email,
         staleTime: 10000,
         refetchOnWindowFocus: false,
-        // Remove polling by default; refetch explicitly after accept/reject
+
     });
 
     const acceptMutation = useMutation({

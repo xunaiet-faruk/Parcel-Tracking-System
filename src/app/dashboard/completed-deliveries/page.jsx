@@ -20,7 +20,7 @@ const CompleteDeliveries = () => {
     const [selectedParcel, setSelectedParcel] = useState(null);
     const [showDetailsModal, setShowDetailsModal] = useState(false);
 
-    // Fetch all parcels for this rider
+
     const { data: allParcels = [], isLoading, refetch } = useQuery({
         queryKey: ['completeDeliveries', user?.email],
         queryFn: async () => {
@@ -30,19 +30,19 @@ const CompleteDeliveries = () => {
         enabled: !!user?.email
     });
 
-    // Ongoing deliveries (accepted, picked-up) - যেগুলো এখনো সম্পন্ন হয়নি
+
     const ongoingDeliveries = allParcels.filter(p =>
         p.deliverystatus === 'accepted' ||
         p.deliverystatus === 'picked-up'
     );
 
-    // History deliveries (delivered, completed) - যেগুলো সম্পন্ন হয়েছে
+
     const historyDeliveries = allParcels.filter(p =>
         p.deliverystatus === 'delivered' ||
         p.deliverystatus === 'completed'
     );
 
-    // Pick Up Mutation
+
     const pickUpMutation = useMutation({
         mutationFn: async (parcel) => {
             const updateInfo = {
@@ -72,7 +72,7 @@ const CompleteDeliveries = () => {
         }
     });
 
-    // Deliver Mutation
+
     const deliverMutation = useMutation({
         mutationFn: async (parcel) => {
             const updateInfo = {
@@ -197,7 +197,7 @@ const CompleteDeliveries = () => {
        <Riderprotract>
             <div className="py-12">
                 <div className="container mx-auto">
-                    {/* Header Section */}
+
                     <div className="flex items-center justify-between gap-3 mb-8">
                         <div className="flex items-center gap-3">
                             <div className="w-12 h-12 bg-gradient-to-br from-[#03373d] to-[#1a5c64] rounded-xl flex items-center justify-center">
@@ -209,7 +209,7 @@ const CompleteDeliveries = () => {
                             </div>
                         </div>
 
-                        {/* Tabs */}
+
                         <div className="flex gap-3">
                             <button
                                 onClick={() => setActiveTab('ongoing')}
@@ -232,7 +232,7 @@ const CompleteDeliveries = () => {
                         </div>
                     </div>
 
-                    {/* Ongoing Deliveries Tab */}
+
                     {activeTab === 'ongoing' && (
                         <>
                             {ongoingDeliveries.length === 0 ? (
@@ -334,7 +334,7 @@ const CompleteDeliveries = () => {
                         </>
                     )}
 
-                    {/* History Deliveries Tab */}
+
                     {activeTab === 'history' && (
                         <>
                             {historyDeliveries.length === 0 ? (

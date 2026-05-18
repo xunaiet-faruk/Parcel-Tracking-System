@@ -4,7 +4,7 @@ import useAxios from './useAxios';
 import { useQuery } from '@tanstack/react-query';
 
 const useRole = () => {
-    const { user, loading: authLoading } = useAuth(); // authLoading যোগ করুন
+    const { user, loading: authLoading } = useAuth();
     const axios = useAxios();
 
     const { data: role = null, isLoading: roleLoading } = useQuery({
@@ -15,14 +15,14 @@ const useRole = () => {
                 const res = await axios.get(`/users/${user.email}/role`);
                 console.log(res.data.role);
                 return res.data.role || 'user';
-            
+
             } catch (error) {
                 console.error('Error fetching role:', error);
-                return 'user'; // ডিফল্ট রোল
+                return 'user';
             }
         },
-        enabled: !!user?.email && !authLoading, // শুধু মাত্র ইউজার লোড হলে রান করবে
-        staleTime: 5 * 60 * 1000, // 5 মিনিট ক্যাশে থাকবে
+        enabled: !!user?.email && !authLoading,
+        staleTime: 5 * 60 * 1000,
         retry: 1
     });
 

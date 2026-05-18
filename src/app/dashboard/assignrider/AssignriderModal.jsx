@@ -18,9 +18,8 @@ const AssignRiderModal = ({
 
     if (!isOpen) return null;
 
-    // শুধুমাত্র approved এবং blocked নয় এমন রাইডার ফিল্টার করা
     const availableRiders = riders?.filter(rider =>
-        rider.status === 'approved' && rider.status !== 'blocked'
+        rider.status === 'approved' && rider.workstatus === 'available'
     ) || [];
 
     const handleSelectRider = (riderId) => {
@@ -57,7 +56,7 @@ const AssignRiderModal = ({
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm p-4">
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden transform transition-all flex flex-col">
-                {/* Modal Header */}
+
                 <div className="bg-gradient-to-r from-[#03373d] to-[#1a5c64] p-4 flex justify-between items-center text-white sticky top-0 z-10">
                     <h3 className="text-lg font-bold flex items-center gap-2">
                         <FaMotorcycle /> Assign Rider to Parcel
@@ -67,9 +66,9 @@ const AssignRiderModal = ({
                     </button>
                 </div>
 
-                {/* Modal Body */}
+
                 <div className="p-6 overflow-y-auto flex-1">
-                    {/* Parcel Information */}
+
                     <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
                         <h4 className="font-semibold text-[#1a5c64] mb-2">Parcel Information</h4>
                         <div className="grid grid-cols-2 gap-3 text-sm">
@@ -92,7 +91,7 @@ const AssignRiderModal = ({
                         </div>
                     </div>
 
-                    {/* Riders Table */}
+
                     <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-3">
                             Select Available Rider ({availableRiders.length} available)
@@ -193,7 +192,7 @@ const AssignRiderModal = ({
                     )}
                 </div>
 
-                {/* Modal Footer Buttons */}
+
                 <div className="p-6 bg-gray-50 border-t border-gray-200 flex gap-3 sticky bottom-0">
                     <button
                         onClick={onClose}

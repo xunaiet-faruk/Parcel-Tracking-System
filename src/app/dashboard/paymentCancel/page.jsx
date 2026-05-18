@@ -21,7 +21,7 @@ const PaymentCancel = () => {
                 transition={{ duration: 0.4, type: "spring", stiffness: 200 }}
                 className="bg-white p-8 rounded-2xl shadow-xl text-center max-w-md mx-4"
             >
-                {/* Animated Cancel Icon */}
+
                 <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
@@ -54,7 +54,7 @@ const PaymentCancel = () => {
                     </motion.svg>
                 </motion.div>
 
-                {/* Text Content with Fade In */}
+
                 <motion.div
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
@@ -71,7 +71,7 @@ const PaymentCancel = () => {
                     </p>
                 </motion.div>
 
-                {/* Action Buttons */}
+
                 <motion.div
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
@@ -97,7 +97,7 @@ const PaymentCancel = () => {
                     </motion.button>
                 </motion.div>
 
-                {/* Help Text */}
+
                 <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -115,7 +115,7 @@ const PaymentCancel = () => {
                     </p>
                 </motion.div>
 
-                {/* Loading Spinner while animating */}
+
                 {!showContent && (
                     <div className="absolute inset-0 flex items-center justify-center bg-white rounded-2xl">
                         <div className="w-8 h-8 border-3 border-[#03373d] border-t-transparent rounded-full animate-spin"></div>

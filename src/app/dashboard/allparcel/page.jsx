@@ -12,6 +12,7 @@ import {
 import useAxios from '../../(site)/hooks/useAxios';
 import Loading from '@/app/components/Loading';
 import Link from 'next/link';
+import Swal from 'sweetalert2';
 
 const AllParcel = () => {
     const axios = useAxios();
@@ -25,7 +26,7 @@ const AllParcel = () => {
     const [sortOrder, setSortOrder] = useState('desc');
     const [updatingId, setUpdatingId] = useState(null);
     const [showUpdateModal, setShowUpdateModal] = useState(false);
-    const [updateData, setUpdateData] = useState({});
+    const [updateData, setUpdateData] = useState();
 
     useEffect(() => {
         fetchAllParcels();
@@ -115,10 +116,19 @@ const AllParcel = () => {
                 setUpdatingId(parcelId);
                 await axios.patch(`/parcels/deliverystatus/${parcelId}`, { deliverystatus: 'cancelled' });
                 await fetchAllParcels();
-                alert("Parcel cancelled successfully");
+                     Swal.fire({
+                         title: "Parcel cancelled successfully",
+                                icon: "success",
+                                draggable: true
+                            })
+
             } catch (error) {
-                console.error("Error cancelling parcel:", error);
-                alert("Failed to cancel parcel");
+
+                Swal.fire({
+                    title: "Error cancelling parcel:", error,
+                    icon: "error",
+                    draggable: true
+                })
             } finally {
                 setUpdatingId(null);
             }
@@ -145,10 +155,18 @@ const AllParcel = () => {
             await axios.put(`/parcels/${selectedParcel._id}`, updateData);
             await fetchAllParcels();
             setShowUpdateModal(false);
-            alert("Parcel updated successfully");
+            Swal.fire({
+                title:"Parcel updated successfully",
+                icon: "success",
+                draggable: true
+            })
         } catch (error) {
             console.error("Error updating parcel:", error);
-            alert("Failed to update parcel");
+            Swal.fire({
+                title: "Failed to update parcel",
+                icon: "success",
+                draggable: true
+            })
         } finally {
             setUpdatingId(null);
         }
@@ -203,7 +221,11 @@ const AllParcel = () => {
     const copyToClipboard = (text) => {
         if (text) {
             navigator.clipboard.writeText(text);
-            alert('Copied to clipboard!');
+            Swal.fire({
+                text: "Copied to clipboard!",
+                icon: "success"
+            });
+
         }
     };
 
@@ -214,7 +236,7 @@ const AllParcel = () => {
     return (
         <div className="min-h-screen bg-gray-50 py-8 px-4">
             <div className="max-w-7xl mx-auto">
-                {/* Header */}
+
             <div className='flex justify-between items-center'>
                     <motion.div
                         initial={{ opacity: 0, y: -20 }}
@@ -239,9 +261,9 @@ const AllParcel = () => {
 
             </div>
 
-           
 
-                {/* Parcels Grid */}
+
+
                 <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                     <AnimatePresence>
                         {filteredParcels.length > 0 ? (
@@ -260,7 +282,7 @@ const AllParcel = () => {
                                                 isCancelled ? 'border-l-4 border-l-red-500' : ''
                                             }`}
                                     >
-                                        {/* Card Header */}
+
                                         <div className={`p-4 ${isDelivered ? 'bg-green-50' : isCancelled ? 'bg-red-50' : 'bg-gradient-to-r from-[#03373d] to-[#1a5c64]'}`}>
                                             <div className="flex justify-between items-start">
                                                 <div className="flex-1">
@@ -286,7 +308,7 @@ const AllParcel = () => {
                                             </div>
                                         </div>
 
-                                        {/* Card Body - Limited Info */}
+
                                         <div className="p-4 flex-1">
                                             <div className="space-y-2">
                                                 <div className="flex justify-between items-center">
@@ -312,7 +334,7 @@ const AllParcel = () => {
                                             </div>
                                         </div>
 
-                                        {/* Card Footer - Fixed Buttons */}
+
                                         <div className="p-4 bg-gray-50 border-t border-gray-100">
                                             <div className="flex gap-2">
                                                 <button
@@ -324,7 +346,7 @@ const AllParcel = () => {
 
                                                 {!isDelivered && !isCancelled && (
                                                     <>
-                                                      
+
                                                         <button
                                                             onClick={() => cancelParcel(parcel._id)}
                                                             disabled={updatingId === parcel._id}
@@ -336,7 +358,7 @@ const AllParcel = () => {
                                                     </>
                                                 )}
 
-                                              
+
                                             </div>
                                         </div>
                                     </motion.div>
@@ -352,7 +374,7 @@ const AllParcel = () => {
                 </div>
             </div>
 
-            {/* Parcel Details Modal */}
+
             <AnimatePresence>
                 {selectedParcel && (
                     <motion.div
@@ -430,7 +452,7 @@ const AllParcel = () => {
                 )}
             </AnimatePresence>
 
-            {/* Update Modal */}
+
             <AnimatePresence>
                 {showUpdateModal && selectedParcel && (
                     <motion.div

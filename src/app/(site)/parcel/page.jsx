@@ -7,29 +7,29 @@ import useAuth from "../hooks/useAuth";
 
 const Page = () => {
     const [formData, setFormData] = useState({
-        // Parcel Details
+
         discount: "no",
         parcelName: "",
         parcelWeight: "",
 
-        // Sender Details
+
         senderName: "",
-        senderEmail: "", // Auto-filled from user
+        senderEmail: "",
         senderAddress: "",
         senderPhone: "",
         senderDistrict: "",
         senderPickupInfo: "",
 
-        // Receiver Details
+
         receiverName: "",
-        receiverEmail: "", // Manual input
+        receiverEmail: "",
         receiverAddress: "",
         receiverPhone: "",
         receiverDistrict: "",
         receiverDeliveryInfo: "",
     });
 
-    const [errors, setErrors] = useState({});
+    const [errors, setErrors] = useState();
     const [calculatedPrice, setCalculatedPrice] = useState(null);
     const [priceDetails, setPriceDetails] = useState(null);
     const { user } = useAuth();
@@ -40,7 +40,7 @@ const Page = () => {
         "Barisal", "Rangpur", "Mymensingh", "Comilla", "Narayanganj"
     ];
 
-   
+
     useEffect(() => {
         if (user) {
             setFormData(prev => ({
@@ -69,7 +69,7 @@ const Page = () => {
 
         let basePrice = 0;
         let extraPrice = 0;
-        let priceBreakdown = {};
+        let priceBreakdown = ;
 
         if (isWithinCity) {
             if (weightNum <= 3) {
@@ -152,7 +152,7 @@ const Page = () => {
     };
 
     const validateForm = () => {
-        const newErrors = {};
+        const newErrors = ;
 
         if (!formData.parcelName) newErrors.parcelName = "Parcel name is required";
         if (!formData.parcelWeight) newErrors.parcelWeight = "Parcel weight is required";
@@ -167,7 +167,7 @@ const Page = () => {
         if (!formData.receiverPhone) newErrors.receiverPhone = "Receiver phone is required";
         if (!formData.receiverDistrict) newErrors.receiverDistrict = "Receiver district is required";
 
-        // Validate email format
+
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (formData.senderEmail && !emailRegex.test(formData.senderEmail)) {
             newErrors.senderEmail = "Invalid email format";
@@ -259,7 +259,7 @@ const Page = () => {
                 console.log("Form submitted:", response.data);
                 showSuccessAlert();
 
-                // Reset form (keep sender email and name from user)
+
                 setFormData({
                     discount: "no",
                     parcelName: "",
@@ -290,7 +290,7 @@ const Page = () => {
     return (
         <div className="min-h-screen py-12">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Header Section */}
+
                 <div className="text-center mb-12">
                     <h1 className="text-4xl md:text-5xl font-bold text-[#03373d] mb-4">
                         Send a <span className="text-[#caeb66]">Parcel</span>
@@ -301,10 +301,10 @@ const Page = () => {
                     </p>
                 </div>
 
-                {/* Main Form */}
+
                 <form onSubmit={handleSubmit} className="bg-white rounded-3xl shadow-2xl overflow-hidden">
                     <div className="p-6 md:p-8">
-                        {/* Parcel Details Section */}
+
                         <div className="mb-8">
                             <h2 className="text-2xl font-bold text-[#03373d] mb-4 flex items-center gap-2">
                                 <span className="w-1 h-8 bg-[#caeb66] rounded-full"></span>
@@ -312,7 +312,7 @@ const Page = () => {
                             </h2>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {/* Discount Option */}
+
                                 <div>
                                     <label className="block text-sm font-semibold text-gray-700 mb-2">
                                         Discount Option
@@ -345,7 +345,7 @@ const Page = () => {
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                                {/* Parcel Name */}
+
                                 <div>
                                     <label className="block text-sm font-semibold text-gray-700 mb-2">
                                         Parcel Name <span className="text-red-500">*</span>
@@ -361,7 +361,7 @@ const Page = () => {
                                     {errors.parcelName && <p className="text-red-500 text-xs mt-1">{errors.parcelName}</p>}
                                 </div>
 
-                                {/* Parcel Weight */}
+
                                 <div>
                                     <label className="block text-sm font-semibold text-gray-700 mb-2">
                                         Parcel Weight (kg) <span className="text-red-500">*</span>
@@ -380,9 +380,9 @@ const Page = () => {
                             </div>
                         </div>
 
-                        {/* Sender and Receiver Section */}
+
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                            {/* Sender Details */}
+
                             <div className="bg-gray-50 rounded-2xl p-6">
                                 <h2 className="text-2xl font-bold text-[#03373d] mb-4 flex items-center gap-2">
                                     <span className="w-1 h-8 bg-blue-500 rounded-full"></span>
@@ -486,7 +486,7 @@ const Page = () => {
                                 </div>
                             </div>
 
-                            {/* Receiver Details */}
+
                             <div className="bg-gray-50 rounded-2xl p-6">
                                 <h2 className="text-2xl font-bold text-[#03373d] mb-4 flex items-center gap-2">
                                     <span className="w-1 h-8 bg-green-500 rounded-full"></span>
@@ -589,7 +589,7 @@ const Page = () => {
                             </div>
                         </div>
 
-                        {/* Price Calculator Section */}
+
                         {priceDetails && (
                             <div className="mb-8 bg-gradient-to-r from-[#03373d] to-[#1a5c64] rounded-2xl p-6 text-white">
                                 <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
@@ -629,7 +629,7 @@ const Page = () => {
                             </div>
                         )}
 
-                        {/* Submit Button */}
+
                         <div className="text-center">
                             <button
                                 type="submit"

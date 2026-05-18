@@ -49,25 +49,25 @@ const LoginPage = () => {
     const handleGoogleLogin = async () => {
          setError("");
          setLoading(true);
- 
+
          try {
              const result = await googleLogin();
- 
+
              const userInfo = {
                  name: result.user.displayName,
                  email: result.user.email,
                  photo: result.user.photoURL,
              };
- 
+
              const res = await axios.post("/users", userInfo);
- 
+
              console.log("Google user saved:", res.data);
- 
+
              Swal.fire({
                  title: "Google Registration Successful",
                  icon: "success",
              });
- 
+
              router.push("/");
          } catch (error) {
              console.error("Google registration failed:", error);
@@ -109,7 +109,7 @@ const LoginPage = () => {
                     variants={containerVariants}
                     className="bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row"
                 >
-                    {/* Left Side - Image */}
+
                     <motion.div
                         variants={itemVariants}
                         className="md:w-1/2 relative bg-gradient-to-br from-[#03373d] to-[#044e57] p-8 flex items-center justify-center"
@@ -171,7 +171,7 @@ const LoginPage = () => {
                         </div>
                     </motion.div>
 
-                    {/* Right Side - Login Form */}
+
                     <motion.div
                         variants={itemVariants}
                         className="md:w-1/2 p-8 md:p-12"
@@ -200,7 +200,7 @@ const LoginPage = () => {
                             </motion.div>
                         )}
 
-                        {/* Google Sign In Button */}
+
                         <motion.button
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
@@ -242,7 +242,7 @@ const LoginPage = () => {
                             </div>
                         </div>
 
-                        {/* Login Form */}
+
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <motion.div variants={itemVariants}>
                                 <label className="block text-gray-700 font-semibold mb-2">

@@ -15,7 +15,7 @@ let auth = null;
 
 if (typeof window !== "undefined") {
     try {
-        // Check if all required config values are present
+
         if (firebaseConfig.apiKey && firebaseConfig.authDomain && firebaseConfig.projectId) {
             app = getApps().length ? getApp() : initializeApp(firebaseConfig);
             auth = getAuth(app);

@@ -7,11 +7,10 @@ import Loading from '@/app/components/Loading';
 import Link from 'next/link';
 import Image from 'next/image';
 
-// প্রিন্ট কম্পোনেন্ট - Tailwind CSS ব্যবহার করবে
 const PrintReport = React.forwardRef(({ reportType, stats, parcels, companyName, logoUrl }, ref) => {
     return (
         <div ref={ref} className="max-w-7xl mx-auto bg-white rounded-2xl overflow-hidden shadow-xl print:shadow-none">
-            {/* Header */}
+
             <div className="bg-gradient-to-r from-[#03373d] to-[#1a5c64] px-8 py-6 text-white flex justify-between items-center">
                 <div className="flex items-center gap-4">
                     {logoUrl && (
@@ -29,7 +28,7 @@ const PrintReport = React.forwardRef(({ reportType, stats, parcels, companyName,
                 </div>
             </div>
 
-            {/* Stats Cards */}
+
             <div className="grid grid-cols-4 gap-5 p-8 bg-gray-50">
                 <div className="bg-white rounded-xl p-5 text-center shadow-sm border">
                     <h4 className="text-gray-500 text-sm uppercase tracking-wide">Total Deliveries</h4>
@@ -49,7 +48,7 @@ const PrintReport = React.forwardRef(({ reportType, stats, parcels, companyName,
                 </div>
             </div>
 
-            {/* Table */}
+
             <div className="p-8">
                 <h3 className="text-lg font-semibold text-[#03373d] mb-4 border-b-2 border-[#caeb66] inline-block">📦 Delivery Details</h3>
                 <div className="overflow-x-auto mt-4">
@@ -82,7 +81,7 @@ const PrintReport = React.forwardRef(({ reportType, stats, parcels, companyName,
                 </div>
             </div>
 
-            {/* Footer */}
+
             <div className="bg-gray-50 px-8 py-5 text-center border-t">
                 <p className="text-xs text-gray-500">{companyName} Delivery Service | www.{companyName.toLowerCase()}.com | support@{companyName.toLowerCase()}.com</p>
                 <p className="text-xs text-gray-400 mt-1">© {new Date().getFullYear()} {companyName}. All rights reserved.</p>
@@ -98,7 +97,6 @@ const PrintReport = React.forwardRef(({ reportType, stats, parcels, companyName,
 
 PrintReport.displayName = 'PrintReport';
 
-// সিঙ্গেল ইনভয়েস কম্পোনেন্ট
 const PrintInvoice = React.forwardRef(({ parcel, companyName, logoUrl }, ref) => {
     return (
         <div ref={ref} className="max-w-3xl mx-auto bg-white rounded-2xl overflow-hidden shadow-xl print:shadow-none">
@@ -234,7 +232,7 @@ const ReportsPage = () => {
             <html>
             <head>
                 <title>Delivery Report</title>
-                <script src="https://cdn.tailwindcss.com"></script>
+                <script src="https:
                 <style>
                     @media print {
                         body { margin: 0; padding: 0; }
@@ -264,7 +262,7 @@ const ReportsPage = () => {
                 <html>
                 <head>
                     <title>Invoice - ${parcel.trackingId}</title>
-                    <script src="https://cdn.tailwindcss.com"></script>
+                    <script src="https:
                     <style>
                         @media print {
                             body { margin: 0; padding: 0; }
@@ -345,7 +343,7 @@ const ReportsPage = () => {
                     </div>
                 </div>
 
-                {/* Stats Cards */}
+
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
                     <div className="bg-white rounded-xl shadow-md p-5"><div className="flex items-center justify-between"><div><p className="text-gray-500 text-sm">Total Deliveries</p><p className="text-2xl font-bold text-[#03373d]">{stats.count}</p></div><FaTruck className="text-3xl text-[#caeb66]" /></div></div>
                     <div className="bg-white rounded-xl shadow-md p-5"><div className="flex items-center justify-between"><div><p className="text-gray-500 text-sm">Total Revenue</p><p className="text-2xl font-bold text-green-600">৳{stats.totalAmount.toLocaleString()}</p></div><FaMoneyBillWave className="text-3xl text-green-500" /></div></div>
@@ -353,7 +351,7 @@ const ReportsPage = () => {
                     <div className="bg-white rounded-xl shadow-md p-5"><div className="flex items-center justify-between"><div><p className="text-gray-500 text-sm">Avg. Per Delivery</p><p className="text-2xl font-bold text-blue-600">৳{stats.avgAmount}</p></div><FaFileInvoice className="text-3xl text-blue-500" /></div></div>
                 </div>
 
-                {/* Delivery List */}
+
                 <div className="bg-white rounded-xl shadow-md overflow-hidden">
                     <div className="p-5 border-b bg-gray-50"><h3 className="font-semibold text-gray-800">Delivery Details</h3><p className="text-sm text-gray-500">Showing {filteredParcels.length} deliveries</p></div>
                     <div className="overflow-x-auto">
@@ -385,7 +383,7 @@ const ReportsPage = () => {
                 </div>
             </div>
 
-            {/* Hidden Print Components */}
+
             <div className="hidden">
                 <PrintReport ref={printRef} reportType={reportType} stats={stats} parcels={filteredParcels} companyName={companyName} logoUrl={logoUrl} />
                 {currentInvoice && (

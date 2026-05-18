@@ -30,7 +30,7 @@ const MyParcels = () => {
     );
 
     const getStatusColor = (status, deliverystatus) => {
-        // প্রথমে deliverystatus চেক করুন, তারপর status
+
         const currentStatus = deliverystatus || status;
 
         switch (currentStatus) {
@@ -69,17 +69,17 @@ const MyParcels = () => {
         }
     };
 
-    // চেক করা প্যার্সেলটি ক্যান্সেল হয়েছে কিনা
+
     const isCancelled = (parcel) => {
         return parcel.deliverystatus === 'cancelled' || parcel.status === 'cancelled';
     };
 
-    // চেক করা প্যার্সেলটি ডেলিভারি হয়েছে কিনা
+
     const isDelivered = (parcel) => {
         return parcel.deliverystatus === 'delivered';
     };
 
-    // চেক করা প্যার্সেলটি পেমেন্ট করা হয়েছে কিনা
+
     const isPaid = (parcel) => {
         return parcel.paymentStatus === 'completed' || parcel.status === 'paid';
     };
@@ -249,9 +249,9 @@ const MyParcels = () => {
                                                 </div>
                                             </div>
 
-                                            {/* Action Buttons */}
+
                                             <div className="flex gap-2 pt-2 border-t">
-                                                {/* Edit Button - ক্যান্সেল বা ডেলিভারি হলে বন্ধ */}
+
                                                 <button
                                                     onClick={() => handleEdit(parcel)}
                                                     disabled={paid || cancelled || delivered}
@@ -265,7 +265,7 @@ const MyParcels = () => {
                                                     <span className="text-sm font-medium">Edit</span>
                                                 </button>
 
-                                                {/* Delete Button - ক্যান্সেল বা ডেলিভারি বা পেমেন্ট হলে বন্ধ */}
+
                                                 <button
                                                     onClick={() => handleDelete(parcel._id, parcel)}
                                                     disabled={paid || cancelled || delivered}
@@ -279,7 +279,7 @@ const MyParcels = () => {
                                                     <span className="text-sm font-medium">Delete</span>
                                                 </button>
 
-                                                {/* Pay Button - শুধু পেন্ডিং এবং ক্যান্সেল নয় এমন প্যার্সেলের জন্য */}
+
                                                 {!paid && !cancelled && !delivered && (
                                                     <Link href={`/dashboard/payment/${parcel._id}`} className="flex-1">
                                                         <button className="w-full cursor-pointer bg-gradient-to-r from-[#03373d] to-[#1a5c64] text-white px-3 py-2 rounded-lg hover:shadow-lg transition-all flex items-center justify-center gap-2">
@@ -289,7 +289,7 @@ const MyParcels = () => {
                                                     </Link>
                                                 )}
 
-                                                {/* Paid Button - পেমেন্ট করা হলে */}
+
                                                 {paid && !cancelled && (
                                                     <button disabled className="flex-1 bg-green-100 text-green-600 px-3 py-2 rounded-lg flex items-center justify-center gap-2 cursor-default">
                                                         <FiCheckCircle className="w-4 h-4" />
@@ -297,7 +297,7 @@ const MyParcels = () => {
                                                     </button>
                                                 )}
 
-                                                {/* Cancelled Badge - ক্যান্সেল হলে */}
+
                                                 {cancelled && (
                                                     <button disabled className="flex-1 bg-red-100 text-red-600 px-3 py-2 rounded-lg flex items-center justify-center gap-2 cursor-default">
                                                         <FiXCircle className="w-4 h-4" />
@@ -305,7 +305,7 @@ const MyParcels = () => {
                                                     </button>
                                                 )}
 
-                                                {/* Delivered Badge - ডেলিভারি হলে */}
+
                                                 {delivered && !cancelled && (
                                                     <button disabled className="flex-1 bg-green-100 text-green-600 px-3 py-2 rounded-lg flex items-center justify-center gap-2 cursor-default">
                                                         <FiCheckCircle className="w-4 h-4" />

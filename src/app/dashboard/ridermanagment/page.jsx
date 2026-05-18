@@ -12,6 +12,7 @@ import useAxios from '../../(site)/hooks/useAxios';
 import Loading from '@/app/components/Loading';
 import Swal from 'sweetalert2';
 import AdminRouters from '../Adminprotuct/AdminRouters';
+import useAuth from '@/app/(site)/hooks/useAuth';
 
 const Ridermangment = () => {
     const axios = useAxios();
@@ -19,6 +20,7 @@ const Ridermangment = () => {
     const [riders, setRiders] = useState([]);
     const [selectedRider, setSelectedRider] = useState(null);
     const [updatingId, setUpdatingId] = useState(null);
+    const {user} =useAuth();
 
     useEffect(() => {
         fetchAllRiders();
@@ -30,10 +32,10 @@ const Ridermangment = () => {
             const response = await axios.get('/rider');
             let data = response.data || [];
 
-            // যাদের status 'rejected' বা 'deleted' তারা বাদ
+
             data = data.filter(rider => rider.status !== 'rejected' && rider.status !== 'deleted');
 
-            // পারফরম্যান্স ডাটা যোগ করা
+
             const ridersWithPerformance = await Promise.all(data.map(async (rider) => {
                 const parcelsResponse = await axios.get(`/parcels?riderEmail=${rider.email}`);
                 const parcels = parcelsResponse.data || [];
@@ -108,12 +110,19 @@ const Ridermangment = () => {
         if (result.isConfirmed) {
             try {
                 setUpdatingId(riderId);
-                await axios.delete(`/rider/${riderId}`);
-                await fetchAllRiders();
-                Swal.fire("Deleted!", "Rider has been deleted.", "success");
+
+                const response = await axios.delete(`/rider/${riderId}?email=${user?.email}`);
+
+                if (response.data.success) {
+                    await fetchAllRiders();
+                    Swal.fire("Deleted!", response.data.message || "Rider has been deleted.", "success");
+                } else {
+                    throw new Error(response.data.message || "Delete failed");
+                }
             } catch (error) {
                 console.error("Error deleting rider:", error);
-                Swal.fire("Error", "Failed to delete rider", "error");
+                const errorMessage = error.response?.data?.message || error.response?.data?.error || "Failed to delete rider";
+                Swal.fire("Error", errorMessage, "error");
             } finally {
                 setUpdatingId(null);
             }
@@ -164,7 +173,7 @@ const Ridermangment = () => {
         <AdminRouters>
             <div className="min-h-screen bg-gray-50 py-8 px-4">
                 <div className="max-w-7xl mx-auto">
-                    {/* Header */}
+
                     <div className="mb-6">
                         <div className="flex items-center gap-3">
                             <div className="p-2 bg-[#03373d] rounded-lg">
@@ -177,7 +186,7 @@ const Ridermangment = () => {
                         </div>
                     </div>
 
-                    {/* Riders Grid */}
+
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                         {riders.length > 0 ? (
                             riders.map((rider, index) => (
@@ -185,7 +194,7 @@ const Ridermangment = () => {
                                     key={rider._id || index}
                                     className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all overflow-hidden border border-gray-100"
                                 >
-                                    {/* Header with status color */}
+
                                     <div className={`p-4 ${rider.status === 'approved' ? 'bg-green-50' : rider.status === 'blocked' ? 'bg-red-50' : 'bg-yellow-50'}`}>
                                         <div className="flex justify-between items-start">
                                             <div className="flex items-center gap-3">
@@ -201,9 +210,9 @@ const Ridermangment = () => {
                                         </div>
                                     </div>
 
-                                    {/* Body */}
+
                                     <div className="p-4 space-y-3">
-                                        {/* Contact Info */}
+
                                         <div className="space-y-2 text-sm">
                                             <div className="flex items-center gap-2 text-gray-600">
                                                 <FaPhone className="text-gray-400 text-xs w-4" />
@@ -219,7 +228,7 @@ const Ridermangment = () => {
                                             </div>
                                         </div>
 
-                                        {/* Performance Stats */}
+
                                         <div className="border-t pt-3 mt-2">
                                             <div className="grid grid-cols-3 gap-2 text-center">
                                                 <div>
@@ -236,7 +245,7 @@ const Ridermangment = () => {
                                                 </div>
                                             </div>
 
-                                            {/* Rating */}
+
                                             <div className="flex items-center justify-between mt-2 pt-2 border-t">
                                                 <div className="flex items-center gap-1">
                                                     {renderStars(rider.rating)}
@@ -250,7 +259,7 @@ const Ridermangment = () => {
                                         </div>
                                     </div>
 
-                                    {/* Actions - শুধু Block/Unblock এবং Delete */}
+
                                     <div className="p-4 bg-gray-50 border-t flex gap-2">
                                         <button
                                             onClick={() => setSelectedRider(rider)}
@@ -294,7 +303,7 @@ const Ridermangment = () => {
                     </div>
                 </div>
 
-                {/* Rider Details Modal */}
+
                 <AnimatePresence>
                     {selectedRider && (
                         <motion.div
@@ -320,7 +329,7 @@ const Ridermangment = () => {
                                 </div>
 
                                 <div className="p-5 space-y-4">
-                                    {/* Basic Info */}
+
                                     <div className="flex items-center gap-3 pb-3 border-b">
                                         <div className={`w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold text-white ${selectedRider.status === 'approved' ? 'bg-green-600' : selectedRider.status === 'blocked' ? 'bg-red-600' : 'bg-yellow-600'}`}>
                                             {selectedRider.name?.charAt(0).toUpperCase() || 'R'}
@@ -331,7 +340,7 @@ const Ridermangment = () => {
                                         </div>
                                     </div>
 
-                                    {/* Contact Info */}
+
                                     <div className="space-y-2 text-sm">
                                         <div className="flex justify-between">
                                             <span className="text-gray-500">Phone:</span>
@@ -351,7 +360,7 @@ const Ridermangment = () => {
                                         </div>
                                     </div>
 
-                                    {/* Performance */}
+
                                     <div className="bg-gray-50 rounded-lg p-3">
                                         <h4 className="font-semibold text-[#03373d] mb-2 text-sm">Performance</h4>
                                         <div className="grid grid-cols-3 gap-2 text-center">

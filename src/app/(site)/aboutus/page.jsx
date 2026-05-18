@@ -47,7 +47,7 @@ const Page = () => {
                 "Create sustainable employment opportunities for delivery professionals",
                 "Ensure 100% customer satisfaction through transparent operations"
             ],
-            image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&h=400&fit=crop"
+            image: "https:
         },
         vision: {
             title: "Our Vision",
@@ -58,7 +58,7 @@ const Page = () => {
                 "Process 1 million+ deliveries monthly with 99.9% accuracy",
                 "Build the largest network of delivery professionals in the region"
             ],
-            image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&h=400&fit=crop"
+            image: "https:
         },
         story: {
             title: "Our Story",
@@ -70,7 +70,7 @@ const Page = () => {
                 "Served 50,000+ happy customers and counting",
                 "Partnered with 1000+ local and international businesses"
             ],
-            image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&h=400&fit=crop"
+            image: "https:
         },
         values: {
             title: "Core Values",
@@ -82,7 +82,7 @@ const Page = () => {
                 "Teamwork: Growing together as one family",
                 "Excellence: Never settling for good when great is possible"
             ],
-            image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=600&h=400&fit=crop"
+            image: "https:
         },
         achievements: {
             title: "Our Achievements",
@@ -94,7 +94,7 @@ const Page = () => {
                 "98.5% Customer Satisfaction Rating",
                 "Featured in Top 10 Tech Startups of Bangladesh"
             ],
-            image: "https://images.unsplash.com/photo-1513151233558-860c5392816a?w=600&h=400&fit=crop"
+            image: "https:
         },
         team: {
             title: "Leadership Team",
@@ -106,7 +106,7 @@ const Page = () => {
                 "24/7 customer support team",
                 "Dedicated R&D department for continuous innovation"
             ],
-            image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&h=400&fit=crop"
+            image: "https:
         }
     };
 
@@ -126,9 +126,9 @@ const Page = () => {
 
     return (
         <div className=" bg-gradient-to-b from-gray-50 to-white">
-            {/* Hero Section */}
+
             <div className="relative bg-gradient-to-r from-[#03373d] to-[#1a5c64] text-white rounded-b-4xl overflow-hidden">
-                {/* Background Pattern */}
+
                 <div className="absolute inset-0 opacity-10">
                     <div className="absolute top-0 left-0 w-full h-full" style={{
                         backgroundImage: `radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 1px)`,
@@ -142,7 +142,7 @@ const Page = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6 }}
                     >
-                        
+
                         <h1 className="text-5xl md:text-7xl font-bold mb-6">
                             Redefining Delivery
                             <span className="text-[#caeb66]"> Across Bangladesh</span>
@@ -150,19 +150,19 @@ const Page = () => {
                         <p className="text-xl md:text-2xl mb-8 text-gray-200 max-w-3xl mx-auto">
                             We're on a mission to connect every corner of Bangladesh with fast, reliable, and affordable delivery services.
                         </p>
-                       
+
                     </motion.div>
                 </div>
 
-                {/* Wave Bottom */}
+
                 <div className="absolute bottom-0 w-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" className="w-full">
+                    <svg xmlns="http:
                         <path fill="#f3f4f6" fillOpacity="1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,154.7C960,171,1056,181,1152,165.3C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
                     </svg>
                 </div>
             </div>
 
-            {/* Stats Section */}
+
             <div className="max-w-7xl mx-auto px-6 -mt-16 relative z-10">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                     {stats.map((stat, index) => (
@@ -183,7 +183,7 @@ const Page = () => {
                 </div>
             </div>
 
-            {/* Tab Section */}
+
             <div className="max-w-7xl mx-auto px-6 py-20">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -199,7 +199,7 @@ const Page = () => {
                     </p>
                 </motion.div>
 
-                {/* Tab Bar */}
+
                 <div className="flex flex-wrap justify-center gap-3 mb-12">
                     {tabs.map((tab) => (
                         <button
@@ -216,7 +216,7 @@ const Page = () => {
                     ))}
                 </div>
 
-                {/* Tab Content */}
+
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={activeTab}
@@ -256,7 +256,7 @@ const Page = () => {
                 </AnimatePresence>
             </div>
 
-            {/* Features Section */}
+
             <div className="py-20">
                 <div className="max-w-7xl mx-auto px-6">
                     <motion.div
@@ -295,7 +295,7 @@ const Page = () => {
                 </div>
             </div>
 
-            
+
 
         </div>
     );

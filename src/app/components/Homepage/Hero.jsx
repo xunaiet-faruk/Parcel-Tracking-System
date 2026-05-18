@@ -15,13 +15,14 @@ import {
     FiAward,
     FiCreditCard
 } from "react-icons/fi";
+import Swal from "sweetalert2";
 
 const slides = [
     {
         id: 1,
         title: "Safe & Secure Parcel Management",
         subtitle: "Bank-grade security protocols and blockchain-verified handovers for your valuable goods.",
-        image: "https://images.pexels.com/photos/6169668/pexels-photo-6169668.jpeg?auto=compress&cs=tinysrgb&w=1200&h=800&fit=crop",
+        image: "https:
         tag: "High Security",
         stats: "99.97% Safe Rate",
         icon: FiShield
@@ -30,7 +31,7 @@ const slides = [
         id: 2,
         title: "Worldwide Parcel Tracking System",
         subtitle: "End-to-end visibility with real-time updates across every stage of delivery.",
-        image: "https://images.pexels.com/photos/2199293/pexels-photo-2199293.jpeg",
+        image: "https:
         tag: "Global Network",
         stats: "24/7 Tracking",
         icon: FiGlobe
@@ -39,7 +40,7 @@ const slides = [
         id: 3,
         title: "Safe & Secure Parcel Handling",
         subtitle: "Your package is protected with advanced security and real-time monitoring.",
-        image: "https://images.pexels.com/photos/4246120/pexels-photo-4246120.jpeg",
+        image: "https:
         tag: "Trusted",
         stats: "100% Secure",
         icon: FiShield
@@ -48,7 +49,7 @@ const slides = [
         id: 4,
         title: "Secure Online Payment System",
         subtitle: "Pay via bKash, Nagad, Rocket, Credit Card. 100% encrypted and fraud-protected transactions.",
-        image: "https://images.pexels.com/photos/4968635/pexels-photo-4968635.jpeg",
+        image: "https:
         tag: "Secure Payment",
         stats: "SSL Secured",
         icon: FiCreditCard
@@ -68,7 +69,11 @@ const Hero = () => {
 
     const handleTrack = () => {
         if (trackingId.trim()) {
-            alert(`Tracking ID: ${trackingId} - Demo tracking initiated.`);
+                     Swal.fire({
+                    title: `Tracking ID: ${trackingId} - Demo tracking initiated.`,
+                            icon: "success",
+                            draggable: true
+                        });
         } else {
             alert("Please enter a tracking ID.");
         }
@@ -77,13 +82,13 @@ const Hero = () => {
     return (
         <section className="relative py-20 flex items-center overflow-hidden">
 
-            {/* Floating animated blobs */}
+
             <div className="absolute top-20 right-10 w-72 h-72 bg-[#caeb66]/20 rounded-full blur-3xl animate-pulse pointer-events-none" />
             <div className="absolute bottom-20 left-10 w-96 h-96 bg-teal-200/20 rounded-full blur-3xl animate-pulse delay-1000 pointer-events-none" />
 
-            <div className="container mx-auto px-6 lg:px-12 grid lg:grid-cols-2 gap-12 items-center relative z-10">
+            <div className="container mx-auto px-6 lg:px-3 grid lg:grid-cols-2 gap-12 items-center relative z-10">
 
-                {/* Left Side: Dynamic Content */}
+
                 <div className="relative h-[500px] flex flex-col justify-center">
                     <AnimatePresence mode="wait">
                         <motion.div
@@ -94,7 +99,7 @@ const Hero = () => {
                             transition={{ duration: 0.5, type: "spring", stiffness: 100 }}
                             className="space-y-6"
                         >
-                            {/* Tag with icon */}
+
                             <div className="flex items-center gap-3">
                                 <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#03373d]/5 text-[#03373d] text-sm font-bold uppercase tracking-wider border border-[#03373d]/10">
                                     {React.createElement(slides[current].icon, { className: "w-4 h-4" })}
@@ -117,7 +122,7 @@ const Hero = () => {
                                 {slides[current].subtitle}
                             </p>
 
-                            {/* Enhanced Search/Track Bar - only for tracking slide */}
+
                             {current === 0 ? (
                                 <div className="pt-4">
                                     <div className="group bg-white shadow-2xl shadow-[#03373d]/15 rounded-2xl overflow-hidden border border-gray-100 transition-all duration-300 hover:shadow-[#03373d]/25 hover:scale-[1.01] max-w-xl">
@@ -155,7 +160,7 @@ const Hero = () => {
                                 </div>
                             )}
 
-                            {/* Enhanced Trust Indicators */}
+
                             <div className="flex flex-wrap gap-6 pt-6">
                                 <div className="flex items-center gap-2.5 text-sm font-bold text-gray-600 group cursor-default">
                                     <div className="p-1.5 bg-[#03373d]/10 rounded-full group-hover:bg-[#03373d]/20 transition-colors">
@@ -185,7 +190,7 @@ const Hero = () => {
                         </motion.div>
                     </AnimatePresence>
 
-                    {/* Custom Slider Dots with progress */}
+
                     <div className="flex gap-3 mt-12">
                         {slides.map((_, i) => (
                             <button
@@ -206,7 +211,7 @@ const Hero = () => {
                     </div>
                 </div>
 
-                {/* Right Side: Larger Image with 3D effect */}
+
                 <div className="relative flex justify-center items-center perspective-1000">
                     <AnimatePresence mode="wait">
                         <motion.div
@@ -217,27 +222,27 @@ const Hero = () => {
                             transition={{ duration: 0.6, type: "spring", damping: 20 }}
                             className="relative preserve-3d"
                         >
-                            {/* Outer decorative ring - larger */}
+
                             <div className="absolute -inset-6 bg-gradient-to-r from-[#caeb66]/30 via-[#03373d]/20 to-[#caeb66]/30 rounded-[2rem] blur-xl opacity-60" />
 
-                            {/* Image Container - larger size */}
+
                             <div className="relative w-full max-w-[550px] aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl transform transition-all duration-500 hover:scale-[1.02]">
                                 <img
                                     src={slides[current].image}
                                     alt="Parcel Management Logistics"
                                     className="w-full h-full object-cover"
                                 />
-                                {/* Gradient overlay */}
+
                                 <div className="absolute inset-0 bg-gradient-to-t from-[#03373d]/60 via-[#03373d]/10 to-transparent"></div>
 
-                                {/* Corner accent */}
+
                                 <div className="absolute top-4 left-4 w-20 h-20 border-t-3 border-l-3 border-white/30 rounded-tl-2xl"
                                     style={{ borderTopWidth: '3px', borderLeftWidth: '3px' }} />
                                 <div className="absolute bottom-4 right-4 w-20 h-20 border-b-3 border-r-3 border-white/30 rounded-br-2xl"
                                     style={{ borderBottomWidth: '3px', borderRightWidth: '3px' }} />
                             </div>
 
-                            {/* Floating Status Badge - Animated */}
+
                             <motion.div
                                 animate={{ y: [0, -12, 0], rotate: [0, 2, 0] }}
                                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
@@ -269,7 +274,7 @@ const Hero = () => {
                                 </div>
                             </motion.div>
 
-                            {/* Second floating badge - Delivery estimate / Payment info */}
+
                             <motion.div
                                 animate={{ x: [0, 8, 0], y: [0, -5, 0] }}
                                 transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
@@ -286,7 +291,7 @@ const Hero = () => {
                                 </div>
                             </motion.div>
 
-                            {/* Third floating badge - only for payment slide */}
+
                             {current === 3 && (
                                 <motion.div
                                     animate={{ scale: [1, 1.05, 1] }}
@@ -305,7 +310,7 @@ const Hero = () => {
 
             </div>
 
-            {/* Bottom wave decoration */}
+
             <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-[0]">
                 <svg className="relative block w-full h-[50px]" viewBox="0 0 1200 120" preserveAspectRatio="none">
                     <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V120H0V95.8C64.89,107.52,158.9,116.77,321.39,56.44Z"

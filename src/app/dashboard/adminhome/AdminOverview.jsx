@@ -40,7 +40,7 @@ const AdminOverview = () => {
                 });
             }
 
-            // 1. Parcel Status Distribution (Pie Chart)
+
             const delivered = parcels.filter(p => p.deliverystatus === 'delivered').length;
             const pending = parcels.filter(p => p.deliverystatus === 'pending-pickup' || p.deliverystatus === 'assigned').length;
             const pickedUp = parcels.filter(p => p.deliverystatus === 'picked-up').length;
@@ -53,35 +53,35 @@ const AdminOverview = () => {
                 { name: 'Cancelled', value: cancelled || 1, color: '#ef4444' }
             ]);
 
-            // 2. Delivery Trend (Line Chart - Last 7 days) - FIXED with bookingDate
+
             const last7Days = getLast7DaysData(parcels);
             console.log('Delivery trend data:', last7Days);
             setDeliveryTrend(last7Days);
 
-            // 3. Rider Performance (Bar Chart)
+
             const riderStats = getRiderPerformance(parcels, riders);
             setRiderPerformance(riderStats);
 
-            // 4. Revenue (Area Chart - Last 30 days) - FIXED with bookingDate
+
             const revenueStats = getRevenueDataLast30Days(parcels);
             console.log('Revenue data sample:', revenueStats.slice(0, 3));
             setRevenueData(revenueStats);
 
-            // 5. Top Users (Bar Chart)
+
             const topUsersData = getTopUsers(parcels);
             setTopUsers(topUsersData);
 
         } catch (error) {
             console.error("Error fetching data:", error);
         } finally {
-            // একটু delay দিয়ে loading false করছি smooth transition এর জন্য
+
             setTimeout(() => {
                 setLoading(false);
             }, 500);
         }
     };
 
-    // প্যাকেলের তারিখ বের করার ফাংশন
+
     const getParcelDate = (parcel) => {
         const date = parcel.bookingDate || parcel.createdAt || parcel.date || parcel.created_date;
         if (!date) return null;
@@ -116,7 +116,7 @@ const AdminOverview = () => {
 
             const dayName = days[date.getDay()];
 
-            // bookingDate ব্যবহার করে ফিল্টার করা
+
             const dayParcels = parcels.filter(p => {
                 const parcelDate = getParcelDate(p);
                 if (!parcelDate) return false;
@@ -248,7 +248,7 @@ const AdminOverview = () => {
         return result;
     };
 
-    // চেক করা চার্টে ডাটা আছে কিনা
+
     const hasDeliveryData = deliveryTrend.some(d => d.parcels > 0 || d.delivered > 0);
     const hasRevenueData = revenueData.some(d => d.revenue > 0);
 
@@ -267,9 +267,9 @@ const AdminOverview = () => {
                 <p className="text-gray-600">Real-time delivery insights and performance metrics</p>
             </motion.div>
 
-            {/* Row 1: Parcel Status (Pie) + Delivery Trend (Line) */}
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Parcel Status - Pie Chart */}
+
                 <motion.div
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -299,7 +299,7 @@ const AdminOverview = () => {
                     </ResponsiveContainer>
                 </motion.div>
 
-                {/* Delivery Trend - Line Chart */}
+
                 <motion.div
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -345,9 +345,9 @@ const AdminOverview = () => {
                 </motion.div>
             </div>
 
-            {/* Row 2: Rider Performance (Bar) + Revenue (Area) */}
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Rider Performance - Bar Chart */}
+
                 <motion.div
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -368,7 +368,7 @@ const AdminOverview = () => {
                     </ResponsiveContainer>
                 </motion.div>
 
-                {/* Revenue - Area Chart */}
+
                 <motion.div
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -413,7 +413,7 @@ const AdminOverview = () => {
                 </motion.div>
             </div>
 
-            {/* Row 3: Top Users (Bar Chart) */}
+
             <div className="grid grid-cols-1 gap-6">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
