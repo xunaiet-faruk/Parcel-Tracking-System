@@ -12,10 +12,10 @@ const useAxios = () => {
         return axios.create({
 
             baseURL: 'https://server-six-zeta-57.vercel.app'
+            // baseURL: "http://localhost:5000"
 
 
         })
-
 
 
     }, [])
