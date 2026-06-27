@@ -1,6 +1,6 @@
 "use client"
 import axios from 'axios';
-import React, { useEffect, useMemo } from 'react';
+import  { useEffect, useMemo } from 'react';
 import useAuth from './useAuth';
 import { useRouter } from 'next/navigation';
 
@@ -11,8 +11,10 @@ const useAxios = () => {
     const axiosInstance = useMemo(() => {
         return axios.create({
 
-            // baseURL: 'https://server-six-zeta-57.vercel.app'
-            baseURL: "http://localhost:5000"
+            baseURL: 'https://server-six-zeta-57.vercel.app'
+            
+
+            // baseURL: "http://localhost:5000"
 
 
         })
