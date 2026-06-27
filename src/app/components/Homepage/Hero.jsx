@@ -75,13 +75,13 @@ const Hero = () => {
     };
 
     return (
-        <section className="relative py-20 flex items-center overflow-hidden">
+        <section className="relative py-24 flex items-center overflow-hidden">
 
             {/* Floating animated blobs */}
             <div className="absolute top-20 right-10 w-72 h-72 bg-[#caeb66]/20 rounded-full blur-3xl animate-pulse pointer-events-none" />
             <div className="absolute bottom-20 left-10 w-96 h-96 bg-teal-200/20 rounded-full blur-3xl animate-pulse delay-1000 pointer-events-none" />
 
-            <div className="container mx-auto px-6 lg:px-12 grid lg:grid-cols-2 gap-12 items-center relative z-10">
+            <div className="container mx-auto px-6 lg:px-5 grid lg:grid-cols-2 gap-12 items-center relative z-10">
 
                 {/* Left Side: Dynamic Content */}
                 <div className="relative h-[500px] flex flex-col justify-center">

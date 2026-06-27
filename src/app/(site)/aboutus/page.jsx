@@ -125,7 +125,7 @@ const Page = () => {
     ];
 
     return (
-        <div className=" bg-gradient-to-b from-gray-50 to-white">
+        <div className=" ">
             {/* Hero Section */}
             <div className="relative bg-gradient-to-r from-[#03373d] to-[#1a5c64] text-white rounded-b-4xl overflow-hidden">
                 {/* Background Pattern */}

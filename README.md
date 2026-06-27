@@ -7,6 +7,10 @@
 
 ---
 
+Dashboard : 
+Admin : admin@gmail.com
+Pass : 12345678
+
 
 ## 🧾 Overview
 
